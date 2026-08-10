@@ -5,6 +5,13 @@
 */
 const TELEGRAM_GROUPS = [
   {
+    program: "Polimi Free Forum",
+    url: "https://t.me/+hVdotxBWIWUwMDU0",
+    pinned: true,
+    audience: "Everyone",
+    description: "The main community group for all Polimi students — meet people across programs, ask general questions, and stay connected."
+  },
+  {
     program: "Biomedical Engineering",
     url: "https://t.me/+AFwhBgOX24M5Mjg8"
   },
@@ -47,15 +54,18 @@ function initials(program) {
 function renderGroups() {
   const q = normalize(search.value);
   const groups = TELEGRAM_GROUPS
-    .filter(item => !q || normalize(item.program).includes(q))
-    .sort((a, b) => a.program.localeCompare(b.program));
+    .filter(item => !q || normalize(`${item.program} ${item.audience || ""} ${item.description || ""}`).includes(q))
+    .sort((a, b) => {
+      if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
+      return a.program.localeCompare(b.program);
+    });
 
   grid.innerHTML = "";
   const fragment = document.createDocumentFragment();
 
   groups.forEach((item, index) => {
     const card = document.createElement("article");
-    card.className = `telegram-group-card telegram-group-accent-${index % 5}`;
+    card.className = `telegram-group-card telegram-group-accent-${index % 5}${item.pinned ? " telegram-group-pinned" : ""}`;
 
     const top = document.createElement("div");
     top.className = "telegram-group-top";
@@ -76,13 +86,13 @@ function renderGroups() {
 
     const label = document.createElement("span");
     label.className = "telegram-group-label";
-    label.textContent = "PROGRAM GROUP";
+    label.textContent = item.pinned ? "📌 PINNED · MAIN COMMUNITY" : "PROGRAM GROUP";
 
     const title = document.createElement("h2");
     title.textContent = item.program;
 
     const description = document.createElement("p");
-    description.textContent = `Connect with ${item.program} students at Polimi.`;
+    description.textContent = item.description || `Connect with ${item.program} students at Polimi.`;
 
     body.append(label, title, description);
 

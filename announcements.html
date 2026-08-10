@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v2" />
+  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v3" />
   <title>Announcements · Polimi Students 2026/2027</title>
 </head>
 <body class="announcements-page announcements-page-v2">
@@ -40,10 +40,10 @@
       <div class="announcements-hero-copy">
         <span class="announcements-kicker">POLIMI UPDATES · 2026/27</span>
         <h1 id="announcementsTitle">University updates,<br><span>without the clutter.</span></h1>
-        <p>Important dates, deadlines, closures and useful information for incoming students. Tap any notice to read the full university announcement.</p>
+        <p>Important dates, deadlines, closures and useful information for incoming students. Tap any notice to open the full university announcement in a focused floating view.</p>
         <div class="announcements-hero-guide" aria-label="How this page works">
           <span><i>1</i> Scan the summary</span>
-          <span><i>2</i> Tap to expand</span>
+          <span><i>2</i> Open the notice</span>
           <span><i>3</i> Use official links when needed</span>
         </div>
       </div>
@@ -91,6 +91,10 @@
     </section>
   </main>
 
+  <div class="announcement-modal" id="announcementModal" hidden role="dialog" aria-modal="true" aria-labelledby="announcementModalTitle">
+    <div class="announcement-modal-panel" id="announcementModalPanel"></div>
+  </div>
+
   <nav class="announcements-mobile-nav" aria-label="Mobile navigation">
     <a href="index.html"><span>⌂</span><small>Students</small></a>
     <a href="groups.html"><span>✈</span><small>Groups</small></a>
@@ -102,6 +106,6 @@
     <span>Created by Kamyab</span>
   </footer>
 
-  <script src="announcements.js?v=20260811-announcements-v2"></script>
+  <script src="announcements.js?v=20260811-announcements-v3"></script>
 </body>
 </html>

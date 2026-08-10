@@ -87,18 +87,25 @@ University notices are available at `announcements.html`. The page currently inc
 
 To add another notice later, add a new object to the `POLIMI_ANNOUNCEMENTS` array in `announcements.js`. Each item supports a title, summary, date/status window, detail bullets, source and optional action links.
 
-## Announcements v2
+## Announcements v3
 
-`announcements.html` now uses a compact expandable feed. Each announcement supports:
+`announcements.html` now uses a card gallery with floating announcement details. Each announcement supports:
 
 - event/date labels
 - status (Active / Upcoming / Ended)
-- tags
+- topic tags
 - search and category filters
-- compact summary card
-- click/tap-to-expand full announcement
-- key-info highlights
+- compact visual cards
+- click/tap to open a centered desktop modal or mobile bottom sheet
+- key-info highlight tiles
+- full university wording in the floating detail view
 - official actions (email / external link)
 - shareable announcement URL hashes such as `announcements.html#italian-course-2026`
+- Escape/backdrop close behavior and mobile safe-area handling
 
 To add a future notice, add one object to `POLIMI_ANNOUNCEMENTS` in `announcements.js`.
+
+
+### Pinned main community group
+- Polimi Free Forum — https://t.me/+hVdotxBWIWUwMDU0
+- Shown as the pinned main group above program-specific Telegram groups.

@@ -128,16 +128,18 @@ function filteredAnnouncements() {
     });
 }
 
-function tagMarkup(tags = []) {
-  return tags.map(tag => `<span class="announcement-tag">${escapeHtml(tag)}</span>`).join("");
+function tagMarkup(tags = [], limit = Infinity) {
+  const shown = tags.slice(0, limit);
+  const more = tags.length > limit ? `<span class="announcement-tag announcement-tag-more">+${tags.length - limit}</span>` : "";
+  return shown.map(tag => `<span class="announcement-tag">${escapeHtml(tag)}</span>`).join("") + more;
 }
 
 function highlightsMarkup(items = []) {
   if (!items.length) return "";
   return `
-    <div class="announcement-highlights" aria-label="Key information">
+    <div class="announcement-modal-highlights" aria-label="Key information">
       ${items.map(item => `
-        <div class="announcement-highlight">
+        <div class="announcement-modal-highlight">
           <span>${escapeHtml(item.label)}</span>
           <strong>${escapeHtml(item.value)}</strong>
         </div>
@@ -148,24 +150,15 @@ function highlightsMarkup(items = []) {
 
 function actionsMarkup(item) {
   const actions = Array.isArray(item.actions) ? item.actions : [];
-  const linkActions = actions.map(action => {
+  return actions.map(action => {
     const external = !String(action.href).startsWith("mailto:");
     return `
-      <a class="announcement-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-        <span>${escapeHtml(action.label)}</span>
-        <span aria-hidden="true">${action.type === "email" ? "✉" : "↗"}</span>
+      <a class="announcement-modal-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
+        <span>${action.type === "email" ? "✉" : "↗"}</span>
+        <strong>${escapeHtml(action.label)}</strong>
       </a>
     `;
   }).join("");
-
-  return `
-    <div class="announcement-expanded-actions">
-      ${linkActions}
-      <button class="announcement-action share" type="button" data-share-announcement="${escapeHtml(item.id)}">
-        <span>Share notice</span><span aria-hidden="true">↗</span>
-      </button>
-    </div>
-  `;
 }
 
 function fullTextMarkup(item) {
@@ -177,52 +170,31 @@ function fullTextMarkup(item) {
 
 function announcementCardMarkup(item) {
   const status = announcementStatus(item);
-  const expanded = announcementState.openId === item.id;
-  const panelId = `announcement-panel-${item.id}`;
-
+  const primaryTag = (item.tags || [])[0] || item.category;
   return `
-    <article class="announcement-card announcement-${escapeHtml(item.tone || "general")} ${expanded ? "is-open" : ""}" data-announcement-id="${escapeHtml(item.id)}">
-      <button class="announcement-toggle" type="button" aria-expanded="${expanded}" aria-controls="${panelId}">
-        <span class="announcement-date-tile" aria-hidden="true">
-          <strong>${escapeHtml(item.dateShort)}</strong>
-          <small>${escapeHtml(item.dateMonth)}</small>
+    <article class="announcement-card-v3 announcement-${escapeHtml(item.tone || "general")}" data-announcement-id="${escapeHtml(item.id)}">
+      <button class="announcement-card-button" type="button" aria-label="Open announcement: ${escapeHtml(item.title)}">
+        <span class="announcement-card-accent" aria-hidden="true"></span>
+        <span class="announcement-card-top">
+          <span class="announcement-card-icon" aria-hidden="true">${escapeHtml(item.icon || "!")}</span>
+          <span class="announcement-card-status announcement-status ${status.className}">${escapeHtml(status.label)}</span>
         </span>
 
-        <span class="announcement-preview">
-          <span class="announcement-preview-topline">
-            <span class="announcement-category">${escapeHtml(item.category)}</span>
-            <span class="announcement-status ${status.className}">${escapeHtml(status.label)}</span>
-          </span>
-          <span class="announcement-preview-title">${escapeHtml(item.title)}</span>
-          <span class="announcement-preview-summary">${escapeHtml(item.summary)}</span>
-          <span class="announcement-tags">${tagMarkup(item.tags)}</span>
-          <span class="announcement-event-date"><span aria-hidden="true">◷</span>${escapeHtml(item.dateContext)} · ${escapeHtml(item.dateLabel)}</span>
+        <span class="announcement-card-date-row">
+          <span class="announcement-card-date">${escapeHtml(item.dateLabel)}</span>
+          <span class="announcement-card-topic">${escapeHtml(primaryTag)}</span>
         </span>
 
-        <span class="announcement-expand-icon" aria-hidden="true">⌄</span>
+        <span class="announcement-card-title">${escapeHtml(item.title)}</span>
+        <span class="announcement-card-summary">${escapeHtml(item.summary)}</span>
+
+        <span class="announcement-card-tags">${tagMarkup(item.tags, 3)}</span>
+
+        <span class="announcement-card-footer-v3">
+          <span><i aria-hidden="true">◷</i>${escapeHtml(item.dateContext)}</span>
+          <strong>Open notice <i aria-hidden="true">→</i></strong>
+        </span>
       </button>
-
-      <div class="announcement-expanded" id="${panelId}" ${expanded ? "" : "hidden"}>
-        <div class="announcement-expanded-inner">
-          ${highlightsMarkup(item.highlights)}
-
-          <div class="announcement-full-copy">
-            <span class="announcement-full-label">FULL ANNOUNCEMENT</span>
-            ${fullTextMarkup(item)}
-          </div>
-
-          <div class="announcement-source-block">
-            <div>
-              <span>Source</span>
-              <strong>${escapeHtml(item.source || "Politecnico di Milano")}</strong>
-              ${(item.signature || []).map(line => `<small>${escapeHtml(line)}</small>`).join("")}
-            </div>
-            <span class="announcement-official-pill">University communication</span>
-          </div>
-
-          ${actionsMarkup(item)}
-        </div>
-      </div>
     </article>
   `;
 }
@@ -253,31 +225,106 @@ function renderAnnouncements() {
     topCount.textContent = String(POLIMI_ANNOUNCEMENTS.length);
     topCount.hidden = POLIMI_ANNOUNCEMENTS.length === 0;
   }
-
   if (!grid) return;
 
   const items = filteredAnnouncements();
   if (count) count.textContent = `${items.length} ${items.length === 1 ? "announcement" : "announcements"}`;
   if (empty) empty.hidden = items.length > 0;
-
   grid.innerHTML = items.map(announcementCardMarkup).join("");
   updateFilterCounts();
 }
 
-function openAnnouncement(id, options = {}) {
-  const exists = POLIMI_ANNOUNCEMENTS.some(item => item.id === id);
-  if (!exists) return;
-  announcementState.openId = announcementState.openId === id && !options.force ? null : id;
-  renderAnnouncements();
+function renderAnnouncementModal(item) {
+  const status = announcementStatus(item);
+  const modal = document.getElementById("announcementModal");
+  const panel = document.getElementById("announcementModalPanel");
+  if (!modal || !panel) return;
 
-  if (announcementState.openId) {
-    if (options.updateHash !== false) history.replaceState(null, "", `#${id}`);
-    if (options.scroll) {
-      requestAnimationFrame(() => {
-        document.querySelector(`[data-announcement-id="${CSS.escape(id)}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  } else if (location.hash) {
+  panel.className = `announcement-modal-panel announcement-modal-${escapeHtml(item.tone || "general")}`;
+  panel.innerHTML = `
+    <div class="announcement-modal-toolbar">
+      <button class="announcement-modal-icon-btn" type="button" data-close-announcement aria-label="Close announcement">×</button>
+      <span class="announcement-modal-toolbar-label">UNIVERSITY ANNOUNCEMENT</span>
+      <button class="announcement-modal-icon-btn share" type="button" data-share-announcement="${escapeHtml(item.id)}" aria-label="Share announcement">↗</button>
+    </div>
+
+    <div class="announcement-modal-scroll">
+      <header class="announcement-modal-hero">
+        <div class="announcement-modal-hero-top">
+          <span class="announcement-modal-date-tile" aria-hidden="true">
+            <strong>${escapeHtml(item.dateShort)}</strong>
+            <small>${escapeHtml(item.dateMonth)}</small>
+          </span>
+          <div>
+            <div class="announcement-modal-status-row">
+              <span class="announcement-category">${escapeHtml(item.category)}</span>
+              <span class="announcement-status ${status.className}">${escapeHtml(status.label)}</span>
+            </div>
+            <p>${escapeHtml(item.dateContext)} · ${escapeHtml(item.dateLabel)}</p>
+          </div>
+        </div>
+        <h2 id="announcementModalTitle">${escapeHtml(item.title)}</h2>
+        <p class="announcement-modal-summary">${escapeHtml(item.summary)}</p>
+        <div class="announcement-modal-tags">${tagMarkup(item.tags)}</div>
+      </header>
+
+      <div class="announcement-modal-body">
+        ${highlightsMarkup(item.highlights)}
+
+        <section class="announcement-modal-copy" aria-labelledby="announcementFullLabel">
+          <span class="announcement-modal-section-label" id="announcementFullLabel">FULL ANNOUNCEMENT</span>
+          ${fullTextMarkup(item)}
+        </section>
+
+        <section class="announcement-modal-source">
+          <div>
+            <span>OFFICIAL SOURCE</span>
+            <strong>${escapeHtml(item.source || "Politecnico di Milano")}</strong>
+            ${(item.signature || []).map(line => `<small>${escapeHtml(line)}</small>`).join("")}
+          </div>
+          <span class="announcement-official-pill">University communication</span>
+        </section>
+
+        <div class="announcement-modal-actions">
+          ${actionsMarkup(item)}
+          <button class="announcement-modal-action share" type="button" data-share-announcement="${escapeHtml(item.id)}">
+            <span>↗</span><strong>Share announcement</strong>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function openAnnouncement(id, options = {}) {
+  const item = POLIMI_ANNOUNCEMENTS.find(x => x.id === id);
+  if (!item) return;
+
+  announcementState.openId = id;
+  renderAnnouncementModal(item);
+
+  const modal = document.getElementById("announcementModal");
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add("announcement-modal-open");
+  requestAnimationFrame(() => modal.classList.add("is-visible"));
+
+  if (options.updateHash !== false) history.replaceState(null, "", `#${encodeURIComponent(id)}`);
+  requestAnimationFrame(() => modal.querySelector("[data-close-announcement]")?.focus({ preventScroll: true }));
+}
+
+function closeAnnouncement(options = {}) {
+  const modal = document.getElementById("announcementModal");
+  if (!modal || modal.hidden) return;
+  modal.classList.remove("is-visible");
+  document.body.classList.remove("announcement-modal-open");
+  announcementState.openId = null;
+  setTimeout(() => {
+    modal.hidden = true;
+    const panel = document.getElementById("announcementModalPanel");
+    if (panel) panel.innerHTML = "";
+  }, 180);
+  if (options.updateHash !== false && location.hash) {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
   }
 }
@@ -294,12 +341,11 @@ async function shareAnnouncement(id) {
       return;
     }
     await navigator.clipboard.writeText(url);
-    const button = document.querySelector(`[data-share-announcement="${CSS.escape(id)}"] span:first-child`);
-    if (button) {
-      const previous = button.textContent;
-      button.textContent = "Link copied";
-      setTimeout(() => { button.textContent = previous; }, 1600);
-    }
+    document.querySelectorAll(`[data-share-announcement="${CSS.escape(id)}"] strong`).forEach(label => {
+      const previous = label.textContent;
+      label.textContent = "Link copied";
+      setTimeout(() => { label.textContent = previous; }, 1600);
+    });
   } catch (_) {}
 }
 
@@ -315,34 +361,47 @@ function bindAnnouncementControls() {
   document.querySelectorAll("[data-announcement-filter]").forEach(button => {
     button.addEventListener("click", () => {
       announcementState.filter = button.dataset.announcementFilter || "all";
-      announcementState.openId = null;
       renderAnnouncements();
     });
   });
 
   document.getElementById("announcementGrid")?.addEventListener("click", event => {
+    const button = event.target.closest(".announcement-card-button");
+    const card = button?.closest("[data-announcement-id]");
+    if (card) openAnnouncement(card.dataset.announcementId);
+  });
+
+  const modal = document.getElementById("announcementModal");
+  modal?.addEventListener("click", event => {
     const share = event.target.closest("[data-share-announcement]");
     if (share) {
-      event.stopPropagation();
       shareAnnouncement(share.dataset.shareAnnouncement);
       return;
     }
-
-    if (event.target.closest("a")) return;
-    const toggle = event.target.closest(".announcement-toggle");
-    if (toggle) {
-      const card = toggle.closest("[data-announcement-id]");
-      if (card) openAnnouncement(card.dataset.announcementId);
+    if (event.target.closest("[data-close-announcement]") || event.target === modal) {
+      closeAnnouncement();
     }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && announcementState.openId) closeAnnouncement();
   });
 
   document.getElementById("clearAnnouncementSearch")?.addEventListener("click", () => {
     if (search) search.value = "";
     announcementState.query = "";
     announcementState.filter = "all";
-    announcementState.openId = null;
     renderAnnouncements();
     search?.focus();
+  });
+
+  window.addEventListener("hashchange", () => {
+    const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (id && POLIMI_ANNOUNCEMENTS.some(item => item.id === id)) {
+      openAnnouncement(id, { updateHash: false });
+    } else if (announcementState.openId) {
+      closeAnnouncement({ updateHash: false });
+    }
   });
 }
 
@@ -358,22 +417,15 @@ if (announcementsThemeToggle) {
   const savedTheme = localStorage.getItem("polimi_theme");
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
   setAnnouncementsTheme(savedTheme || (prefersDark ? "dark" : "light"));
-
   announcementsThemeToggle.addEventListener("click", () => {
     setAnnouncementsTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   });
 }
 
 bindAnnouncementControls();
+renderAnnouncements();
 
 const initialHash = decodeURIComponent(location.hash.replace(/^#/, ""));
 if (initialHash && POLIMI_ANNOUNCEMENTS.some(item => item.id === initialHash)) {
-  announcementState.openId = initialHash;
-}
-renderAnnouncements();
-
-if (announcementState.openId) {
-  requestAnimationFrame(() => {
-    document.querySelector(`[data-announcement-id="${CSS.escape(announcementState.openId)}"]`)?.scrollIntoView({ block: "center" });
-  });
+  requestAnimationFrame(() => openAnnouncement(initialHash, { updateHash: false }));
 }
