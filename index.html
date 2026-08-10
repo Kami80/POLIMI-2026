@@ -22,6 +22,10 @@
     </a>
 
     <div class="header-actions">
+      <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" aria-label="Add your information via Google Form">
+        <span class="form-link-icon">＋</span>
+        <span class="form-link-text">Add your info</span>
+      </a>
       <span class="status-pill" id="connectionStatus">
         <span class="status-dot"></span>
         <span>Connecting…</span>
@@ -99,7 +103,7 @@
         </div>
 
         <div class="filter-row" id="filterRow">
-          <div class="filter-placeholder">Filters will appear here when the sheet loads.</div>
+          <div class="filter-placeholder">Slicers will appear here when the sheet loads.</div>
         </div>
       </div>
 
@@ -107,12 +111,6 @@
         <p id="resultText">Loading your sheet…</p>
         <button class="text-button" id="clearFilters" type="button" hidden>Clear filters</button>
       </div>
-
-      <section id="emptyState" class="state-card" hidden>
-        <div class="state-icon">⌕</div>
-        <h2>No matching records</h2>
-        <p>Try a different search term or clear one of the filters.</p>
-      </section>
 
       <div id="tableView" class="data-view" hidden>
         <div class="table-shell">

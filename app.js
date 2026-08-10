@@ -13,8 +13,12 @@ const CONFIG = {
   brandName: "Polimi Students 2026/2027",
   rowsPerPage: 24,
   defaultView: "table",
-  maxAutoFilters: 4,
-  maxFilterOptions: 18,
+  slicers: [
+    { key: "program", label: "Program name", aliases: ["program name", "programme name", "study program", "study programme", "program", "programme"] },
+    { key: "gender", label: "Gender", aliases: ["gender", "sex"] },
+    { key: "campus", label: "Campus", aliases: ["which campus are you primarily attending", "primary campus", "campus"] },
+    { key: "roommate", label: "Want roommate", aliases: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"] },
+  ],
 };
 
 const state = {
@@ -34,7 +38,7 @@ function cacheElements() {
   [
     "brandText", "siteTitle", "siteSubtitle", "connectionStatus", "themeToggle", "themeIcon",
     "statRows", "statColumns", "statVisible", "statUpdated", "searchInput", "filterRow",
-    "tableViewBtn", "cardViewBtn", "clearFilters", "resultText", "emptyState",
+    "tableViewBtn", "cardViewBtn", "clearFilters", "resultText",
     "tableView", "tableHead", "tableBody", "cardView",
     "pagination", "prevPage", "nextPage", "pageInfo", "refreshButton"
   ].forEach(id => els[id] = document.getElementById(id));
@@ -111,7 +115,6 @@ function setStatus(type, text) {
 }
 
 function showState(kind) {
-  els.emptyState.hidden = kind !== "empty";
   const showData = kind === "data";
   els.tableView.hidden = !showData || state.view !== "table";
   els.cardView.hidden = !showData || state.view !== "cards";
@@ -203,67 +206,220 @@ function showError(message) {
   showState("idle");
 }
 
-function getAutoFilterColumns() {
-  return state.columns
-    .map(column => {
-      const values = state.rows
-        .map(row => String(row[column.index]?.display ?? "").trim())
-        .filter(Boolean);
-      const unique = [...new Set(values)];
-      const ratio = values.length ? unique.length / values.length : 1;
-      return { column, unique, ratio };
+function normalizeHeader(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function findSlicerColumn(definition) {
+  const aliases = definition.aliases.map(normalizeHeader);
+
+  // Prefer an exact header/alias match first.
+  let column = state.columns.find(item => aliases.includes(normalizeHeader(item.label)));
+  if (column) return column;
+
+  // Then use a careful contains match so question-style headers still work.
+  column = state.columns.find(item => {
+    const header = normalizeHeader(item.label);
+    return aliases.some(alias => header.includes(alias) || alias.includes(header));
+  });
+
+  // Final keyword fallbacks for long Google Form question headers.
+  if (!column) {
+    const keyword = { program: "program", gender: "gender", campus: "campus", roommate: "roommate" }[definition.key];
+    if (keyword) column = state.columns.find(item => normalizeHeader(item.label).includes(keyword));
+  }
+
+  return column || null;
+}
+
+function getSlicerColumns() {
+  return CONFIG.slicers
+    .map(definition => {
+      const column = findSlicerColumn(definition);
+      if (!column) return null;
+
+      const counts = new Map();
+      state.rows.forEach(row => {
+        const value = String(row[column.index]?.display ?? "").trim();
+        if (!value) return;
+        counts.set(value, (counts.get(value) || 0) + 1);
+      });
+
+      const unique = [...counts.keys()].sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
+      );
+
+      return { definition, column, unique, counts };
     })
-    .filter(item => item.unique.length >= 2 && item.unique.length <= CONFIG.maxFilterOptions && item.ratio <= 0.65)
-    .sort((a, b) => a.unique.length - b.unique.length)
-    .slice(0, CONFIG.maxAutoFilters);
+    .filter(Boolean);
 }
 
 function renderFilters() {
   els.filterRow.innerHTML = "";
-  const filterColumns = getAutoFilterColumns();
+  const slicers = getSlicerColumns();
 
-  if (!filterColumns.length) {
+  if (!slicers.length) {
     const note = document.createElement("div");
     note.className = "filter-placeholder";
-    note.textContent = "Search is ready. Categorical filters will appear automatically when suitable columns are found.";
+    note.textContent = "Slicer columns could not be detected in this sheet.";
     els.filterRow.appendChild(note);
     return;
   }
 
-  filterColumns.forEach(({ column, unique }) => {
-    const wrap = document.createElement("div");
-    wrap.className = "filter-select-wrap";
+  const heading = document.createElement("div");
+  heading.className = "slicer-heading";
+  heading.innerHTML = `<span class="slicer-heading-icon">☷</span><span><strong>Slicers</strong><small>Choose one or more values</small></span>`;
+  els.filterRow.appendChild(heading);
 
-    const select = document.createElement("select");
-    select.className = "filter-select";
-    select.setAttribute("aria-label", `Filter by ${column.label}`);
+  slicers.forEach(({ definition, column, unique, counts }) => {
+    const details = document.createElement("details");
+    details.className = "slicer";
+    details.dataset.columnIndex = String(column.index);
 
-    const all = document.createElement("option");
-    all.value = "";
-    all.textContent = `${column.label}: All`;
-    select.appendChild(all);
+    const summary = document.createElement("summary");
+    summary.className = "slicer-summary";
 
-    unique
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
-      .forEach(value => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = value;
-        select.appendChild(option);
+    const summaryMain = document.createElement("span");
+    summaryMain.className = "slicer-summary-main";
+    const title = document.createElement("span");
+    title.className = "slicer-title";
+    title.textContent = definition.label;
+    const selection = document.createElement("span");
+    selection.className = "slicer-selection";
+    selection.dataset.slicerSelection = String(column.index);
+    summaryMain.append(title, selection);
+
+    const chevron = document.createElement("span");
+    chevron.className = "slicer-chevron";
+    chevron.textContent = "⌄";
+    summary.append(summaryMain, chevron);
+    details.appendChild(summary);
+
+    const panel = document.createElement("div");
+    panel.className = "slicer-panel";
+
+    const panelHead = document.createElement("div");
+    panelHead.className = "slicer-panel-head";
+    const panelTitle = document.createElement("span");
+    panelTitle.textContent = definition.label;
+    const clear = document.createElement("button");
+    clear.className = "slicer-clear";
+    clear.type = "button";
+    clear.textContent = "Clear";
+    clear.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      delete state.filters[column.index];
+      panel.querySelectorAll('input[type="checkbox"][data-value]').forEach(input => {
+        input.checked = false;
       });
+      const allInput = panel.querySelector('input[data-all="true"]');
+      if (allInput) allInput.checked = true;
+      updateSlicerSummary(column.index);
+      state.page = 1;
+      applyDataPipeline();
+    });
+    panelHead.append(panelTitle, clear);
+    panel.appendChild(panelHead);
 
-    select.value = state.filters[column.index] || "";
-    select.addEventListener("change", event => {
-      const value = event.target.value;
-      if (value) state.filters[column.index] = value;
-      else delete state.filters[column.index];
+    const optionList = document.createElement("div");
+    optionList.className = "slicer-options";
+
+    const allLabel = document.createElement("label");
+    allLabel.className = "slicer-option slicer-option-all";
+    const allInput = document.createElement("input");
+    allInput.type = "checkbox";
+    allInput.dataset.all = "true";
+    allInput.checked = !(state.filters[column.index]?.length);
+    const allBox = document.createElement("span");
+    allBox.className = "custom-checkbox";
+    const allText = document.createElement("span");
+    allText.className = "slicer-option-text";
+    allText.textContent = "All";
+    const allCount = document.createElement("span");
+    allCount.className = "slicer-option-count";
+    allCount.textContent = formatNumber(state.rows.length);
+    allLabel.append(allInput, allBox, allText, allCount);
+    optionList.appendChild(allLabel);
+
+    allInput.addEventListener("change", () => {
+      if (!allInput.checked) {
+        allInput.checked = true;
+        return;
+      }
+      delete state.filters[column.index];
+      optionList.querySelectorAll('input[type="checkbox"][data-value]').forEach(input => {
+        input.checked = false;
+      });
+      updateSlicerSummary(column.index);
       state.page = 1;
       applyDataPipeline();
     });
 
-    wrap.appendChild(select);
-    els.filterRow.appendChild(wrap);
+    unique.forEach(value => {
+      const label = document.createElement("label");
+      label.className = "slicer-option";
+
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.dataset.value = value;
+      input.checked = (state.filters[column.index] || []).includes(value);
+
+      const box = document.createElement("span");
+      box.className = "custom-checkbox";
+      const text = document.createElement("span");
+      text.className = "slicer-option-text";
+      text.textContent = value;
+      text.title = value;
+      const count = document.createElement("span");
+      count.className = "slicer-option-count";
+      count.textContent = formatNumber(counts.get(value) || 0);
+
+      label.append(input, box, text, count);
+      optionList.appendChild(label);
+
+      input.addEventListener("change", () => {
+        const selected = [...optionList.querySelectorAll('input[type="checkbox"][data-value]:checked')]
+          .map(item => item.dataset.value);
+
+        if (selected.length) state.filters[column.index] = selected;
+        else delete state.filters[column.index];
+
+        allInput.checked = selected.length === 0;
+        updateSlicerSummary(column.index);
+        state.page = 1;
+        applyDataPipeline();
+      });
+    });
+
+    panel.appendChild(optionList);
+    details.appendChild(panel);
+    els.filterRow.appendChild(details);
+
+    updateSlicerSummary(column.index);
   });
+}
+
+function updateSlicerSummary(columnIndex) {
+  const selectionEl = els.filterRow.querySelector(`[data-slicer-selection="${columnIndex}"]`);
+  if (!selectionEl) return;
+
+  const selected = state.filters[columnIndex] || [];
+  if (!selected.length) {
+    selectionEl.textContent = "All";
+    selectionEl.classList.remove("active");
+  } else if (selected.length === 1) {
+    selectionEl.textContent = selected[0];
+    selectionEl.classList.add("active");
+  } else {
+    selectionEl.textContent = `${selected.length} selected`;
+    selectionEl.classList.add("active");
+  }
 }
 
 function applyDataPipeline() {
@@ -274,8 +430,9 @@ function applyDataPipeline() {
     const matchesSearch = !query || row.some(cell => String(cell.display).toLowerCase().includes(query));
     if (!matchesSearch) return false;
 
-    return filterEntries.every(([columnIndex, expected]) => {
-      return String(row[Number(columnIndex)]?.display ?? "").trim() === expected;
+    return filterEntries.every(([columnIndex, selectedValues]) => {
+      const value = String(row[Number(columnIndex)]?.display ?? "").trim();
+      return Array.isArray(selectedValues) && selectedValues.includes(value);
     });
   });
 
@@ -319,14 +476,26 @@ function buildResultText(count) {
 }
 
 function renderRows() {
-  if (!state.rows.length || !state.filteredRows.length) {
-    showState(state.rows.length ? "empty" : "empty");
+  if (!state.rows.length) {
+    showState("idle");
+    els.tableBody.innerHTML = "";
+    els.cardView.innerHTML = "";
     els.pagination.hidden = true;
     return;
   }
 
+  // Keep the selected data view visible even when filters/search return zero rows.
+  // The compact result count already communicates the empty result, so no large
+  // placeholder panel is needed.
   showState("data");
   renderTableHead();
+
+  if (!state.filteredRows.length) {
+    els.tableBody.innerHTML = "";
+    els.cardView.innerHTML = "";
+    els.pagination.hidden = true;
+    return;
+  }
 
   const start = (state.page - 1) * CONFIG.rowsPerPage;
   const end = start + CONFIG.rowsPerPage;

@@ -12,6 +12,9 @@ It currently reads `gid=0` (normally the first tab).
 
 ## Features
 
+- Multi-select checkbox slicers for Program name, Gender, Campus, and Want roommate
+- Multiple selections inside a slicer use OR logic; different slicers combine with AND logic
+
 - Automatic Google Sheet column detection
 - Responsive table view
 - Mobile-friendly card view
