@@ -1737,3 +1737,365 @@ tbody tr:hover { background: var(--surface-2); }
   }
   .roommate-match-badge { max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
 }
+
+
+/* =========================================================
+   Simple student cards — name, gender and program only
+   ========================================================= */
+.student-grid {
+  gap: 16px;
+}
+
+.student-card.student-card-v2.student-card-simple {
+  min-height: 138px;
+  padding: 22px 22px 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  gap: 16px;
+  align-items: center;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 7px 24px rgba(15, 23, 42, .055);
+  overflow: hidden;
+}
+
+.student-card.student-card-v2.student-card-simple:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--line));
+  box-shadow: 0 14px 34px rgba(15, 23, 42, .09);
+}
+
+.student-card-simple-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.student-card-simple .student-card-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.student-card-simple .student-card-title-row .student-name {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 820;
+  letter-spacing: -.025em;
+}
+
+.student-card-simple .simple-gender-badge {
+  min-height: 25px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+
+.student-card-program-simple {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 650;
+}
+
+.student-card-simple .student-card-simple-chevron {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--muted-2);
+  font-size: 24px;
+  transition: transform .16s ease, background .16s ease, color .16s ease;
+}
+
+.student-card-simple:hover .student-card-simple-chevron {
+  transform: translateX(2px);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Matching still ranks the cards, but does not add extra card content. */
+.roommate-match-card.student-card.student-card-v2.student-card-simple,
+.student-card.student-card-v2.student-card-simple[data-match-score] {
+  min-height: 138px;
+}
+
+@media (min-width: 1100px) {
+  .student-grid {
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1099px) {
+  .student-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .student-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 112px;
+    padding: 17px 16px;
+    grid-template-columns: minmax(0, 1fr) 30px;
+    gap: 12px;
+    border-radius: 17px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, .045);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .student-card.student-card-v2.student-card-simple:hover {
+    transform: none;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, .045);
+  }
+
+  .student-card.student-card-v2.student-card-simple:active {
+    transform: scale(.992);
+    background: var(--surface-2);
+  }
+
+  .student-card-simple-content {
+    gap: 9px;
+  }
+
+  .student-card-simple .student-card-title-row {
+    gap: 7px;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .student-card-simple .simple-gender-badge {
+    min-height: 23px;
+    padding: 0 8px;
+    font-size: 8px;
+  }
+
+  .student-card-program-simple {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .student-card-simple .student-card-simple-chevron {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: transparent;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 390px) {
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 106px;
+    padding: 15px 14px;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    font-size: 14px;
+  }
+
+  .student-card-program-simple {
+    font-size: 10.5px;
+  }
+}
+
+/* =========================================================
+   Color profile cards — name + program only
+   Two-column mobile layout with stable program-based accents
+   ========================================================= */
+.student-card.student-card-v2.student-card-simple {
+  --card-accent: #4f7cff;
+  --card-accent-soft: rgba(79, 124, 255, .13);
+  min-height: 164px;
+  padding: 24px 22px 22px;
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  background:
+    radial-gradient(circle at 92% 10%, var(--card-accent-soft), transparent 35%),
+    var(--surface);
+  border-color: color-mix(in srgb, var(--card-accent) 13%, var(--line));
+}
+
+.student-card.student-card-v2.student-card-simple::before {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  height: auto;
+  border-radius: 20px 0 0 20px;
+  background: var(--card-accent);
+  opacity: .9;
+  z-index: -1;
+}
+
+.student-card.student-card-v2.student-card-simple::after {
+  content: "";
+  position: absolute;
+  width: 62px;
+  height: 62px;
+  right: -18px;
+  top: -20px;
+  border-radius: 50%;
+  background: var(--card-accent-soft);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.student-card-simple .student-card-title-row .student-name {
+  font-size: 18px;
+  line-height: 1.22;
+  font-weight: 830;
+}
+
+.student-card-program-simple {
+  max-width: 92%;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.student-card-simple .student-card-simple-chevron {
+  background: color-mix(in srgb, var(--card-accent) 9%, var(--surface-2));
+  color: var(--card-accent);
+}
+
+.student-card-simple:hover .student-card-simple-chevron {
+  background: color-mix(in srgb, var(--card-accent) 15%, var(--surface));
+  color: var(--card-accent);
+}
+
+.card-accent-0 { --card-accent: #4f7cff; --card-accent-soft: rgba(79, 124, 255, .14); }
+.card-accent-1 { --card-accent: #7c5cff; --card-accent-soft: rgba(124, 92, 255, .13); }
+.card-accent-2 { --card-accent: #00a6a6; --card-accent-soft: rgba(0, 166, 166, .12); }
+.card-accent-3 { --card-accent: #e96f5f; --card-accent-soft: rgba(233, 111, 95, .12); }
+.card-accent-4 { --card-accent: #d78b24; --card-accent-soft: rgba(215, 139, 36, .13); }
+.card-accent-5 { --card-accent: #2f9d67; --card-accent-soft: rgba(47, 157, 103, .12); }
+
+[data-theme="dark"] .student-card.student-card-v2.student-card-simple {
+  background:
+    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--card-accent) 16%, transparent), transparent 38%),
+    var(--surface);
+  border-color: color-mix(in srgb, var(--card-accent) 22%, var(--line));
+}
+
+@media (max-width: 760px) {
+  .student-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 158px;
+    padding: 16px 14px 15px 16px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 10px;
+    align-items: stretch;
+    border-radius: 18px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, .055);
+  }
+
+  .student-card.student-card-v2.student-card-simple::before {
+    inset: 0 0 auto 0;
+    width: auto;
+    height: 4px;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .student-card.student-card-v2.student-card-simple::after {
+    width: 54px;
+    height: 54px;
+    right: -18px;
+    top: -18px;
+  }
+
+  .student-card-simple-content {
+    gap: 10px;
+    justify-content: flex-start;
+  }
+
+  .student-card-simple .student-card-title-row {
+    display: block;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .student-card-program-simple {
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+
+  .student-card-simple .student-card-simple-chevron {
+    width: 28px;
+    height: 28px;
+    justify-self: end;
+    align-self: end;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--card-accent) 10%, var(--surface));
+    color: var(--card-accent);
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 350px) {
+  .student-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 124px;
+    grid-template-columns: minmax(0, 1fr) 30px;
+    grid-template-rows: 1fr;
+    align-items: center;
+  }
+
+  .student-card-simple .student-card-simple-chevron {
+    justify-self: center;
+    align-self: center;
+  }
+}

@@ -1158,25 +1158,15 @@ function renderCards(rows, start) {
   els.cardView.innerHTML = "";
   const fragment = document.createDocumentFragment();
   const nameCol = semanticColumn("name");
-  const genderCol = semanticColumn("gender");
   const programCol = semanticColumn("program");
-  const campusCol = semanticColumn("campus");
-  const degreeCol = semanticColumn("degree");
-  const roommateCol = semanticColumn("roommate");
-  const polimiMailCol = semanticColumn("polimiMail");
 
   rows.forEach((row, offset) => {
     const name = displayValue(row, nameCol) || `Student ${start + offset + 1}`;
-    const gender = displayValue(row, genderCol);
     const program = displayValue(row, programCol) || "Program not specified";
-    const campus = displayValue(row, campusCol) || "Campus not specified";
-    const degree = displayValue(row, degreeCol) || "Degree not specified";
-    const roommate = displayValue(row, roommateCol) || "Roommate not specified";
-    const polimiMail = displayValue(row, polimiMailCol);
     const slug = studentSlug(row);
 
     const card = document.createElement("article");
-    card.className = "student-card student-card-compact student-card-v2";
+    card.className = `student-card student-card-v2 student-card-simple ${cardAccentClass(program || name)}`;
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
@@ -1191,12 +1181,8 @@ function renderCards(rows, start) {
       }
     });
 
-    const avatar = document.createElement("div");
-    avatar.className = "student-avatar student-card-avatar";
-    avatar.textContent = initials(name);
-
     const content = document.createElement("div");
-    content.className = "student-card-content";
+    content.className = "student-card-content student-card-simple-content";
 
     const titleRow = document.createElement("div");
     titleRow.className = "student-card-title-row";
@@ -1206,79 +1192,18 @@ function renderCards(rows, start) {
     title.textContent = name;
     titleRow.appendChild(title);
 
-    if (gender) {
-      const badge = document.createElement("span");
-      badge.className = `gender-badge compact-badge ${genderClass(gender)}`;
-      badge.textContent = gender;
-      titleRow.appendChild(badge);
-    }
-
-    if (mailtoUrl(polimiMail)) {
-      const verified = document.createElement("span");
-      verified.className = "polimi-mail-badge compact-polimi-badge";
-      verified.textContent = "✓ Polimi";
-      verified.title = "Polimi mail provided";
-      titleRow.appendChild(verified);
-    }
-
-    if (state.roommateMatchMode) {
-      const matchMeta = state.roommateMatchMeta.get(row);
-      if (matchMeta) {
-        const matchBadge = document.createElement("span");
-        matchBadge.className = `roommate-match-badge ${matchMeta.score >= 88 ? "strong" : ""}`;
-        matchBadge.textContent = roommateMatchTier(matchMeta);
-        matchBadge.title = matchMeta.reasons.join(" · ") || "Roommate match";
-        titleRow.appendChild(matchBadge);
-        card.classList.add("roommate-match-card");
-        card.dataset.matchScore = String(matchMeta.score);
-      }
-    }
-
     const programLine = document.createElement("div");
-    programLine.className = "student-card-program";
+    programLine.className = "student-card-program student-card-program-simple";
     programLine.textContent = program;
 
-    const meta = document.createElement("div");
-    meta.className = "student-card-meta";
-
-    const campusChip = document.createElement("span");
-    campusChip.className = "student-meta-chip campus-chip";
-    campusChip.title = `Campus: ${campus}`;
-    campusChip.textContent = campus;
-
-    const degreeChip = document.createElement("span");
-    degreeChip.className = "student-meta-chip degree-chip";
-    degreeChip.title = `Degree: ${degree}`;
-    degreeChip.textContent = degree;
-
-    const roommateChip = document.createElement("span");
-    roommateChip.className = `student-meta-chip roommate-chip ${roommateClass(roommate)}`;
-    roommateChip.title = `Roommate: ${roommate}`;
-    roommateChip.textContent = `Roommate · ${roommate}`;
-
-    meta.append(campusChip, degreeChip, roommateChip);
-    content.append(titleRow, programLine, meta);
-
-    if (state.roommateMatchMode) {
-      const matchMeta = state.roommateMatchMeta.get(row);
-      if (matchMeta?.reasons?.length) {
-        const reasons = document.createElement("div");
-        reasons.className = "roommate-match-reasons";
-        matchMeta.reasons.slice(0, 3).forEach(reason => {
-          const chip = document.createElement("span");
-          chip.textContent = `✓ ${reason}`;
-          reasons.appendChild(chip);
-        });
-        content.appendChild(reasons);
-      }
-    }
+    content.append(titleRow, programLine);
 
     const arrow = document.createElement("span");
-    arrow.className = "student-card-chevron";
+    arrow.className = "student-card-chevron student-card-simple-chevron";
     arrow.setAttribute("aria-hidden", "true");
     arrow.textContent = "›";
 
-    card.append(avatar, content, arrow);
+    card.append(content, arrow);
     fragment.appendChild(card);
   });
 
@@ -1559,6 +1484,15 @@ function initials(name) {
   const parts = String(name).trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return "P";
   return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+}
+
+function cardAccentClass(value) {
+  const text = String(value || "Polimi");
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+  }
+  return `card-accent-${Math.abs(hash) % 6}`;
 }
 
 function genderClass(value) {
