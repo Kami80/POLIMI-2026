@@ -3,6 +3,7 @@ const CONFIG = {
   sheetGid: "0",
   rowsPerPage: 24,
   defaultView: "cards",
+  formUrl: "https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog",
   hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail"],
   slicers: [
     { key: "program", label: "Program name", aliases: ["program name", "programme name", "study program", "study programme", "program", "programme"] },
@@ -19,6 +20,7 @@ const CONFIG = {
     roommate: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"],
     note: ["maybe a note to describe yourself", "note to describe yourself", "about me", "bio", "note", "description"],
     telegram: ["telegram id", "telegram username", "telegram", "telegram account"],
+    email: ["email address", "email", "e-mail", "e mail"],
   }
 };
 
@@ -31,13 +33,18 @@ const state = {
   sort: { index: null, direction: "asc" },
   page: 1,
   view: CONFIG.defaultView,
+  sheetReady: false,
+  authorized: false,
+  authorizedEmail: "",
+  pendingEmail: "",
 };
 
 const els = {};
 
 function cacheElements() {
   [
-    "connectionStatus", "themeToggle", "themeIcon", "statRows", "statVisible", "statPrograms", "statCampuses",
+    "accessGate", "protectedApp", "accessForm", "accessEmail", "accessSubmit", "accessSubmitLabel", "accessStatus", "accessNotFound", "changeEmailButton",
+    "connectionStatus", "themeToggle", "themeIcon",
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
     "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
     "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
@@ -52,6 +59,14 @@ function normalize(value) {
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
     .replace(/\s+/g, " ");
+}
+
+function normalizeEmail(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
 }
 
 function isHiddenColumn(column) {
@@ -103,6 +118,18 @@ function applyTheme(theme) {
 }
 
 function setupEvents() {
+  els.accessForm.addEventListener("submit", event => {
+    event.preventDefault();
+    requestAccess(els.accessEmail.value);
+  });
+
+  els.accessEmail.addEventListener("input", () => {
+    els.accessNotFound.hidden = true;
+    if (state.sheetReady) setAccessStatus("", "Use the same email you submitted in the form.");
+  });
+
+  els.changeEmailButton?.addEventListener("click", lockDirectory);
+
   els.searchInput.addEventListener("input", debounce(event => {
     state.query = event.target.value.trim().toLowerCase();
     state.page = 1;
@@ -147,6 +174,108 @@ function setupEvents() {
   });
 }
 
+function setAccessStatus(type, text) {
+  els.accessStatus.className = `access-status ${type || ""}`.trim();
+  els.accessStatus.textContent = text;
+}
+
+function setAccessBusy(isBusy, label) {
+  els.accessSubmit.disabled = isBusy || !state.sheetReady;
+  if (label) els.accessSubmitLabel.textContent = label;
+}
+
+function emailExists(email) {
+  const emailColumn = semanticColumn("email");
+  if (!emailColumn) return null;
+  const target = normalizeEmail(email);
+  return state.rows.some(row => normalizeEmail(displayValue(row, emailColumn)) === target);
+}
+
+function requestAccess(rawEmail, options = {}) {
+  const email = normalizeEmail(rawEmail);
+  els.accessEmail.value = email;
+  els.accessNotFound.hidden = true;
+
+  if (!isValidEmail(email)) {
+    setAccessStatus("error", "Enter a valid email address.");
+    els.accessEmail.focus();
+    return;
+  }
+
+  if (!state.sheetReady) {
+    state.pendingEmail = email;
+    setAccessBusy(true, "Checking…");
+    setAccessStatus("loading", "Loading the latest form responses…");
+    return;
+  }
+
+  setAccessBusy(true, "Checking…");
+  setAccessStatus("loading", "Looking for your form submission…");
+
+  const exists = emailExists(email);
+  if (exists === null) {
+    setAccessBusy(false, "Check & enter");
+    setAccessStatus("error", "I couldn’t find an email column in the response sheet. Check the form response headers.");
+    return;
+  }
+
+  if (exists) {
+    sessionStorage.setItem("polimi-verified-email", email);
+    unlockDirectory(email);
+    return;
+  }
+
+  sessionStorage.removeItem("polimi-verified-email");
+  state.authorized = false;
+  state.authorizedEmail = "";
+  setAccessBusy(false, "Check & enter");
+  setAccessStatus("error", "We couldn’t match that email with a submitted profile. Make sure it’s the same address you used in the form.");
+  els.accessNotFound.hidden = false;
+  if (!options.silent) els.accessEmail.focus();
+}
+
+function unlockDirectory(email) {
+  state.authorized = true;
+  state.authorizedEmail = normalizeEmail(email);
+  state.pendingEmail = "";
+
+  els.accessGate.hidden = true;
+  els.protectedApp.hidden = false;
+  document.body.classList.add("directory-unlocked");
+
+  state.query = "";
+  state.filters = {};
+  state.sort = { index: null, direction: "asc" };
+  state.page = 1;
+  els.searchInput.value = "";
+  els.searchClear.hidden = true;
+
+  renderFilters();
+  applyDataPipeline();
+  setStatus("online", "Live");
+  setAccessBusy(false, "Check & enter");
+
+  const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
+  els.updatedText.textContent = `Updated ${now}`;
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+}
+
+function lockDirectory() {
+  sessionStorage.removeItem("polimi-verified-email");
+  state.authorized = false;
+  state.authorizedEmail = "";
+  state.pendingEmail = "";
+  closeFilterSheet();
+  els.protectedApp.hidden = true;
+  els.accessGate.hidden = false;
+  document.body.classList.remove("directory-unlocked");
+  els.accessEmail.value = "";
+  els.accessNotFound.hidden = true;
+  setAccessBusy(false, "Check & enter");
+  setAccessStatus("", "Use the same email you submitted in the form.");
+  requestAnimationFrame(() => els.accessEmail.focus());
+}
+
 function setStatus(type, text) {
   els.connectionStatus.className = `connection ${type || ""}`.trim();
   const label = els.connectionStatus.querySelector(".connection-text");
@@ -176,7 +305,12 @@ function setView(view) {
 }
 
 function loadSheet() {
+  state.sheetReady = false;
   setStatus("", "Connecting");
+  if (!state.authorized) {
+    setAccessBusy(true, "Loading directory…");
+    setAccessStatus("loading", "Checking the latest form responses…");
+  }
   els.resultText.textContent = "Loading students…";
   els.cardView.hidden = true;
   els.tableView.hidden = true;
@@ -225,20 +359,17 @@ function handleSheetResponse(response) {
       }))
     ).filter(row => row.some(cell => String(cell.display).trim() !== ""));
 
-    state.query = "";
-    state.filters = {};
-    state.sort = { index: null, direction: "asc" };
-    state.page = 1;
-    els.searchInput.value = "";
-    els.searchClear.hidden = true;
+    state.sheetReady = true;
+    setStatus("online", "Ready");
 
-    updateStatsBase();
-    renderFilters();
-    applyDataPipeline();
-    setStatus("online", "Live");
-
-    const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
-    els.updatedText.textContent = `Updated ${now}`;
+    const rememberedEmail = state.authorizedEmail || state.pendingEmail || sessionStorage.getItem("polimi-verified-email") || "";
+    if (rememberedEmail) {
+      requestAccess(rememberedEmail, { silent: true });
+    } else {
+      setAccessBusy(false, "Check & enter");
+      setAccessStatus("", "Directory ready. Enter the same email you submitted in the form.");
+      requestAnimationFrame(() => els.accessEmail.focus());
+    }
   } catch (error) {
     showError(error.message || "Could not read the sheet.");
   }
@@ -246,23 +377,15 @@ function handleSheetResponse(response) {
 
 function showError(message) {
   console.error(message);
+  state.sheetReady = false;
   setStatus("error", "Offline");
   els.resultText.textContent = "Could not load student data. Check the Sheet sharing settings and refresh.";
-  [els.statRows, els.statVisible, els.statPrograms, els.statCampuses].forEach(el => el.textContent = "—");
+  if (!state.authorized) {
+    setAccessBusy(true, "Directory unavailable");
+    setAccessStatus("error", "Could not check the form responses right now. Refresh the page and try again.");
+  }
 }
 
-function updateStatsBase() {
-  els.statRows.textContent = formatNumber(state.rows.length);
-  const program = semanticColumn("program");
-  const campus = semanticColumn("campus");
-  els.statPrograms.textContent = formatNumber(uniqueValues(program).length);
-  els.statCampuses.textContent = formatNumber(uniqueValues(campus).length);
-}
-
-function uniqueValues(column) {
-  if (!column) return [];
-  return [...new Set(state.rows.map(row => displayValue(row, column)).filter(Boolean))];
-}
 
 function getSlicerDefinitions() {
   return CONFIG.slicers.map(definition => {
@@ -434,7 +557,6 @@ function applyDataPipeline() {
   state.filteredRows = rows;
   const maxPage = Math.max(1, Math.ceil(rows.length / CONFIG.rowsPerPage));
   state.page = Math.min(state.page, maxPage);
-  els.statVisible.textContent = formatNumber(rows.length);
   els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
   renderActiveFilters();
   renderRows();
@@ -793,6 +915,8 @@ window.addEventListener("resize", debounce(renderRows, 120));
 
 document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
+  els.protectedApp.hidden = true;
+  els.accessGate.hidden = false;
   setupTheme();
   setupEvents();
   setView(CONFIG.defaultView);
