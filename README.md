@@ -58,7 +58,7 @@ The email gate is a user-experience/membership gate. If the Google Sheet itself 
 
 ## Creator & reporting
 
-This project was created by **Kamyab Safaei**. Kamyab's student profile receives a permanent **Creator** badge (instead of the temporary New badge). Profile reports are routed to Kamyab using the contact details in Kamyab's own sheet row, preferring Telegram and falling back to Polimi/form email when needed.
+This project was created by **Kamyab**. Kamyab's student profile receives a permanent **Creator** badge (instead of the temporary New badge). Profile reports are routed to Kamyab using the contact details in Kamyab's own sheet row, preferring Telegram and falling back to Polimi/form email when needed.
 
 ## App icon
 

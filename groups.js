@@ -11,6 +11,10 @@ const TELEGRAM_GROUPS = [
   {
     program: "Electrical Engineering",
     url: "https://t.me/ElecEngPolimi"
+  },
+  {
+    program: "Chemical Engineering",
+    url: "https://t.me/+E-ZbMJk_9FthYTY0"
   }
 ];
 

@@ -5,7 +5,8 @@ const CONFIG = {
   defaultView: "cards",
   formUrl: "https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog",
   reportEmail: "",
-  creatorName: "Kamyab Safaei",
+  creatorMatchName: "Kamyab Safaei",
+  creatorDisplayName: "Kamyab",
   cacheMaxAgeMs: 7 * 24 * 60 * 60 * 1000,
   hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail", "show telegram", "display telegram", "telegram visibility", "share telegram", "show polimi mail", "display polimi mail", "polimi mail visibility", "share polimi mail"],
   slicers: [
@@ -2035,13 +2036,13 @@ function closeProfileMenu() {
 function updateProfileMenuForRow(row) {
   const own = row === currentUserRow();
   if (els.profileUpdateAction) els.profileUpdateAction.hidden = !own;
-  if (els.profileReportAction) els.profileReportAction.textContent = `⚑ Report to ${CONFIG.creatorName}`;
+  if (els.profileReportAction) els.profileReportAction.textContent = `⚑ Report to ${CONFIG.creatorDisplayName}`;
 }
 
 function isCreatorRow(row) {
   if (!row) return false;
   const name = normalize(displayValue(row, semanticColumn("name")));
-  const creator = normalize(CONFIG.creatorName);
+  const creator = normalize(CONFIG.creatorMatchName);
   return Boolean(name && creator && (name === creator || name.startsWith(`${creator} `)));
 }
 
@@ -2053,7 +2054,7 @@ function creatorReportDestination(profileRow, slug) {
   const creator = creatorRow();
   if (!creator) return null;
 
-  const creatorName = displayValue(creator, semanticColumn("name")) || CONFIG.creatorName;
+  const creatorName = CONFIG.creatorDisplayName;
   const telegram = displayValue(creator, semanticColumn("telegram"));
   const polimiMail = displayValue(creator, semanticColumn("polimiMail"));
   const formEmail = displayValue(creator, semanticColumn("email"));
