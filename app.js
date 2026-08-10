@@ -4,7 +4,9 @@ const CONFIG = {
   rowsPerPage: 24,
   defaultView: "cards",
   formUrl: "https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog",
-  hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail"],
+  reportEmail: "",
+  cacheMaxAgeMs: 7 * 24 * 60 * 60 * 1000,
+  hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail", "show telegram", "display telegram", "telegram visibility", "share telegram", "show polimi mail", "display polimi mail", "polimi mail visibility", "share polimi mail"],
   slicers: [
     { key: "program", label: "Program name", aliases: ["program name", "programme name", "study program", "study programme", "program", "programme"] },
     { key: "gender", label: "Gender", aliases: ["gender", "sex"] },
@@ -23,6 +25,8 @@ const CONFIG = {
     polimiMail: ["polimi mail", "polimi email", "polimi e-mail", "polimi e mail", "politecnico mail", "politecnico email", "university mail", "university email"],
     email: ["email address", "email", "e-mail", "e mail"],
     timestamp: ["timestamp", "submitted at", "submission time", "date submitted"],
+    telegramVisibility: ["show telegram", "display telegram", "telegram visibility", "share telegram", "make telegram public"],
+    polimiMailVisibility: ["show polimi mail", "display polimi mail", "polimi mail visibility", "share polimi mail", "make polimi mail public"],
   }
 };
 
@@ -47,6 +51,12 @@ const state = {
   roommateReferenceRow: null,
   roommateMatchMeta: new WeakMap(),
   preferencesRestored: false,
+  sortMode: "recent",
+  savedOnly: false,
+  savedSlugs: new Set(),
+  cachedDataLoaded: false,
+  deferredInstallPrompt: null,
+  isOfflineCache: false,
 };
 
 const els = {};
@@ -54,24 +64,48 @@ const els = {};
 function cacheElements() {
   [
     "accessGate", "protectedApp", "accessForm", "accessEmail", "accessSubmit", "accessSubmitLabel", "accessStatus", "accessNotFound", "changeEmailButton",
-    "connectionStatus", "themeToggle", "themeIcon",
+    "connectionStatus", "themeToggle", "themeIcon", "myProfileButton", "myProfileAvatar", "installAppButton",
+    "directoryIntroTitle", "directoryIntroText", "sortSelect", "savedTrigger", "savedCount", "savedBanner", "savedReset",
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
     "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
     "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
     "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
-    "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions",
+    "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
+    "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
     "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
-    "quickFilters", "emptyState", "emptyReset"
+    "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileMyProfileButton",
+    "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
 function normalize(value) {
   return String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
     .replace(/\s+/g, " ");
+}
+
+function searchNormalize(value) {
+  let text = normalize(value);
+  const replacements = [
+    [/\bmilan\b/g, "milano"],
+    [/\bleonardo\b/g, "milano leonardo"],
+    [/\bbovisa\b/g, "milano bovisa"],
+    [/\bchem eng\b/g, "chemical engineering"],
+    [/\barch\b/g, "architecture"],
+    [/\bmsc\b/g, "master laurea magistrale"],
+    [/\bbsc\b/g, "bachelor laurea"],
+  ];
+  replacements.forEach(([pattern, replacement]) => { text = text.replace(pattern, replacement); });
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function searchTokens(value) {
+  return searchNormalize(value).split(" ").filter(Boolean);
 }
 
 function normalizeEmail(value) {
@@ -162,7 +196,7 @@ function setupEvents() {
     els.searchInput.focus();
   });
 
-  [els.cardViewBtn, els.tableViewBtn].forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
+  [els.cardViewBtn, els.tableViewBtn].filter(Boolean).forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
   els.clearFilters.addEventListener("click", resetAllFilters);
   els.emptyReset?.addEventListener("click", resetAllFilters);
   els.prevPage.addEventListener("click", () => changePage(-1));
@@ -172,8 +206,8 @@ function setupEvents() {
   [els.roommateMatchButton, els.mobileRoommateButton].filter(Boolean).forEach(button => button.addEventListener("click", toggleRoommateMatchMode));
   els.roommateMatchReset?.addEventListener("click", exitRoommateMatchMode);
 
-  [els.filterTrigger, els.mobileFilterButton].forEach(button => button.addEventListener("click", openFilterSheet));
-  [els.filterBackdrop, els.filterClose].forEach(button => button.addEventListener("click", closeFilterSheet));
+  [els.filterTrigger, els.mobileFilterButton].filter(Boolean).forEach(button => button.addEventListener("click", openFilterSheet));
+  [els.filterBackdrop, els.filterClose].filter(Boolean).forEach(button => button.addEventListener("click", closeFilterSheet));
   els.sheetApply.addEventListener("click", applyDraftFilters);
   els.sheetReset.addEventListener("click", () => {
     state.draftFilters = {};
@@ -183,6 +217,45 @@ function setupEvents() {
 
   [els.profileBackdrop, els.profileClose].forEach(button => button?.addEventListener("click", () => closeStudentProfile()));
   els.profileShare?.addEventListener("click", shareActiveProfile);
+  els.profileSave?.addEventListener("click", toggleSavedActiveProfile);
+  els.profileMenuButton?.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleProfileMenu();
+  });
+  els.profileReportAction?.addEventListener("click", reportActiveProfile);
+  document.addEventListener("click", event => {
+    if (!els.profileMenu?.hidden && !event.target.closest(".profile-menu-wrap")) closeProfileMenu();
+  });
+
+  els.myProfileButton?.addEventListener("click", openMyProfile);
+  els.mobileMyProfileButton?.addEventListener("click", openMyProfile);
+  els.savedTrigger?.addEventListener("click", toggleSavedMode);
+  els.mobileSavedButton?.addEventListener("click", toggleSavedMode);
+  els.savedReset?.addEventListener("click", exitSavedMode);
+  els.mobileStudentsButton?.addEventListener("click", () => {
+    const changed = state.savedOnly || state.roommateMatchMode;
+    state.savedOnly = false;
+    state.roommateMatchMode = false;
+    state.roommateReferenceRow = null;
+    state.roommateMatchMeta = new WeakMap();
+    state.page = 1;
+    updateSavedUI();
+    updateRoommateMatchUI();
+    if (changed) applyDataPipeline();
+    document.getElementById("directory")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  els.sortSelect?.addEventListener("change", event => {
+    state.sortMode = event.target.value || "recent";
+    state.sort = { index: null, direction: "asc" };
+    state.page = 1;
+    persistDirectoryPreferences();
+    applyDataPipeline();
+  });
+
+  els.installAppButton?.addEventListener("click", installApp);
+  els.welcomeTourDone?.addEventListener("click", dismissWelcomeTour);
+  els.welcomeTourBackdrop?.addEventListener("click", dismissWelcomeTour);
 
   window.addEventListener("popstate", () => {
     if (!state.authorized) return;
@@ -312,11 +385,14 @@ function unlockDirectory(email) {
   state.roommateMatchMeta = new WeakMap();
   restoreDirectoryPreferences();
 
+  loadSavedProfiles();
   renderFilters();
   renderQuickFilters();
   updateRoommateMatchUI();
+  updateSavedUI();
+  updatePersonalizedHeader();
   applyDataPipeline();
-  setStatus("online", "Live");
+  setStatus(state.isOfflineCache ? "" : "online", state.isOfflineCache ? "Cached" : "Live");
   setAccessBusy(false, "Check & enter");
 
   const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
@@ -324,6 +400,7 @@ function unlockDirectory(email) {
   requestAnimationFrame(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
     openProfileFromUrl();
+    maybeShowWelcomeTour();
   });
 }
 
@@ -334,7 +411,10 @@ function lockDirectory() {
   state.pendingEmail = "";
   state.roommateMatchMode = false;
   state.roommateReferenceRow = null;
+  state.savedOnly = false;
+  state.sortMode = "recent";
   state.roommateMatchMeta = new WeakMap();
+  state.savedOnly = false;
   closeFilterSheet();
   closeStudentProfile({ syncUrl: false });
   els.protectedApp.hidden = true;
@@ -399,15 +479,22 @@ function setView(view) {
 
 function loadSheet() {
   state.sheetReady = false;
+  state.isOfflineCache = false;
   setStatus("", "Connecting");
-  if (!state.authorized) {
-    setAccessBusy(true, "Loading directory…");
-    setAccessStatus("loading", "Checking the latest form responses…");
+
+  const hydrated = hydrateSheetCache();
+  if (!hydrated) {
+    if (!state.authorized) {
+      setAccessBusy(true, "Loading directory…");
+      setAccessStatus("loading", "Checking the latest form responses…");
+    } else {
+      renderSkeletonCards();
+    }
+    els.resultText.textContent = "Loading students…";
+  } else {
+    setStatus("", "Cached");
+    if (els.updatedText) els.updatedText.textContent = "Cached · refreshing…";
   }
-  els.resultText.textContent = "Loading students…";
-  els.cardView.hidden = true;
-  els.tableView.hidden = true;
-  els.pagination.hidden = true;
 
   if (!window.google?.charts) {
     showError("Google data loader did not start.");
@@ -454,11 +541,22 @@ function handleSheetResponse(response) {
 
     buildProfileIndex();
     state.sheetReady = true;
-    setStatus("online", "Ready");
+    state.isOfflineCache = false;
+    saveSheetCache();
+    setStatus("online", "Live");
 
     const rememberedEmail = state.authorizedEmail || state.pendingEmail || localStorage.getItem("polimi-verified-email") || "";
     if (rememberedEmail) {
       requestAccess(rememberedEmail, { silent: true });
+      if (state.authorized) {
+        buildProfileIndex();
+        loadSavedProfiles();
+        updatePersonalizedHeader();
+        renderFilters();
+        renderQuickFilters();
+        applyDataPipeline();
+        if (els.updatedText) els.updatedText.textContent = `Updated ${new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date())}`;
+      }
     } else {
       setAccessBusy(false, "Check & enter");
       setAccessStatus("", "Directory ready. Enter the same email you used in the form.");
@@ -471,6 +569,19 @@ function handleSheetResponse(response) {
 
 function showError(message) {
   console.error(message);
+  if (state.rows.length) {
+    state.sheetReady = true;
+    state.isOfflineCache = true;
+    setStatus("", "Offline · cached");
+    if (els.updatedText) els.updatedText.textContent = "Showing the latest cached directory";
+    if (state.authorized) applyDataPipeline();
+    else {
+      const rememberedEmail = localStorage.getItem("polimi-verified-email") || "";
+      if (rememberedEmail) requestAccess(rememberedEmail, { silent: true });
+      else { setAccessBusy(false, "Check & enter"); setAccessStatus("", "Offline copy available. Enter the email you previously used."); }
+    }
+    return;
+  }
   state.sheetReady = false;
   setStatus("error", "Offline");
   els.resultText.textContent = "Could not load student data. Check the Sheet sharing settings and refresh.";
@@ -510,27 +621,25 @@ function buildProfileIndex() {
   const emailCol = semanticColumn("email");
   const polimiMailCol = semanticColumn("polimiMail");
   const telegramCol = semanticColumn("telegram");
-  const groups = new Map();
+  const programCol = semanticColumn("program");
+  const campusCol = semanticColumn("campus");
+  const legacyBases = new Map();
 
   state.rows.forEach((row, index) => {
     const name = displayValue(row, nameCol) || `Student ${index + 1}`;
     const base = slugifyProfileName(name);
-    if (!groups.has(base)) groups.set(base, []);
-    groups.get(base).push({ row, index, name });
+    const identity = displayValue(row, emailCol) || displayValue(row, polimiMailCol) || displayValue(row, telegramCol) || `${name}|${displayValue(row, programCol)}|${displayValue(row, campusCol)}|${index}`;
+    let slug = `${base}-${stableHash(identity)}`;
+    let bump = 2;
+    while (state.profileBySlug.has(slug)) slug = `${base}-${stableHash(`${identity}-${bump++}`)}`;
+    state.profileBySlug.set(slug, row);
+    state.slugByRow.set(row, slug);
+    if (!legacyBases.has(base)) legacyBases.set(base, []);
+    legacyBases.get(base).push(row);
   });
 
-  groups.forEach((items, base) => {
-    items.forEach(({ row, index }, position) => {
-      let slug = base;
-      if (position > 0) {
-        const identity = displayValue(row, polimiMailCol) || displayValue(row, telegramCol) || displayValue(row, emailCol) || `${base}-${index}`;
-        slug = `${base}-${stableHash(identity)}`;
-      }
-      while (state.profileBySlug.has(slug)) slug = `${base}-${position + 2}`;
-      state.profileBySlug.set(slug, row);
-      state.slugByRow.set(row, slug);
-    });
-  });
+  // Keep old name-only links working when the name is unique. New shares always use the stable hashed URL.
+  legacyBases.forEach((rows, base) => { if (rows.length === 1 && !state.profileBySlug.has(base)) state.profileBySlug.set(base, rows[0]); });
 }
 
 function studentSlug(row) {
@@ -561,9 +670,13 @@ function openStudentProfile(row, options = {}) {
   const { syncUrl = true } = options;
   const slug = studentSlug(row);
   state.activeProfileSlug = slug;
+  closeProfileMenu();
   renderStudentProfile(row);
+  updateProfileSaveButton();
+  updateProfileMenuForRow(row);
   els.profileSheet.classList.add("open");
   els.profileSheet.setAttribute("aria-hidden", "false");
+  if (row === currentUserRow()) els.mobileMyProfileButton?.classList.add("active");
   syncBodyLock();
   els.profilePanel?.querySelector(".profile-scroll")?.scrollTo({ top: 0, behavior: "auto" });
 
@@ -579,7 +692,9 @@ function closeStudentProfile(options = {}) {
   if (!els.profileSheet) return;
   els.profileSheet.classList.remove("open");
   els.profileSheet.setAttribute("aria-hidden", "true");
+  els.mobileMyProfileButton?.classList.remove("active");
   state.activeProfileSlug = "";
+  closeProfileMenu();
   syncBodyLock();
 
   if (syncUrl) {
@@ -601,6 +716,8 @@ function renderStudentProfile(row) {
   const noteCol = semanticColumn("note");
   const telegramCol = semanticColumn("telegram");
   const polimiMailCol = semanticColumn("polimiMail");
+  const telegramVisibilityCol = semanticColumn("telegramVisibility");
+  const polimiMailVisibilityCol = semanticColumn("polimiMailVisibility");
   const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol, polimiMailCol].filter(Boolean).map(column => column.index));
 
   const name = displayValue(row, nameCol) || "Polimi student";
@@ -610,8 +727,8 @@ function renderStudentProfile(row) {
   const degree = displayValue(row, degreeCol) || "Not specified";
   const roommate = displayValue(row, roommateCol) || "Not specified";
   const note = displayValue(row, noteCol);
-  const telegram = displayValue(row, telegramCol);
-  const polimiMail = displayValue(row, polimiMailCol);
+  const telegram = contactVisibilityAllows(displayValue(row, telegramVisibilityCol)) ? displayValue(row, telegramCol) : "";
+  const polimiMail = contactVisibilityAllows(displayValue(row, polimiMailVisibilityCol)) ? displayValue(row, polimiMailCol) : "";
 
   els.profileBody.innerHTML = "";
   const hero = document.createElement("section");
@@ -699,6 +816,7 @@ function renderStudentProfile(row) {
   const mailButton = createProfileContactButton("mail", polimiMail);
   [telegramButton, mailButton].filter(Boolean).forEach(button => els.profileActions.appendChild(button));
   els.profileActions.hidden = els.profileActions.childElementCount === 0;
+  if (els.profileContactPrivacy) els.profileContactPrivacy.hidden = els.profileActions.hidden;
   els.profileShareLabel.textContent = "Share";
 }
 
@@ -846,11 +964,12 @@ function calculateRoommateMatch(referenceRow, candidateRow) {
 }
 
 function roommateMatchTier(meta) {
-  if (!meta) return "Match";
-  if (meta.score >= 108) return "Best match";
-  if (meta.score >= 88) return "Great match";
-  if (meta.score >= 65) return "Good match";
-  return "Potential";
+  if (!meta) return "Potential match";
+  if (meta.sameCampus && meta.sameProgram) return "Strong match";
+  if (meta.sameCampus) return "Same campus";
+  if (meta.sameProgram) return "Same program";
+  if (meta.score >= 55) return "Looking for roommate";
+  return "Potential match";
 }
 
 function toggleRoommateMatchMode() {
@@ -865,6 +984,8 @@ function enterRoommateMatchMode() {
     window.setTimeout(updateRoommateMatchUI, 1500);
     return;
   }
+  state.savedOnly = false;
+  updateSavedUI();
   state.roommateMatchMode = true;
   state.roommateReferenceRow = reference;
   state.roommateMatchMeta = new WeakMap();
@@ -877,6 +998,7 @@ function enterRoommateMatchMode() {
 }
 
 function exitRoommateMatchMode() {
+  if (!state.roommateMatchMode) return;
   state.roommateMatchMode = false;
   state.roommateReferenceRow = null;
   state.roommateMatchMeta = new WeakMap();
@@ -898,14 +1020,15 @@ function updateRoommateMatchUI() {
     els.mobileRoommateButton.setAttribute("aria-pressed", String(active));
   }
   if (els.roommateMatchBanner) els.roommateMatchBanner.hidden = !active;
+  updateMobileNavState();
 
   if (active && state.roommateReferenceRow) {
     const name = displayValue(state.roommateReferenceRow, semanticColumn("name")) || "your profile";
     const campus = displayValue(state.roommateReferenceRow, semanticColumn("campus"));
     const program = displayValue(state.roommateReferenceRow, semanticColumn("program"));
-    if (els.roommateMatchTitle) els.roommateMatchTitle.textContent = `Best roommate matches for ${name}`;
+    if (els.roommateMatchTitle) els.roommateMatchTitle.textContent = `Potential roommates for ${name}`;
     const details = [campus && `campus: ${campus}`, program && `program: ${program}`].filter(Boolean).join(" · ");
-    if (els.roommateMatchText) els.roommateMatchText.textContent = `People who want a roommate are ranked first${details ? `, then matched by ${details}` : ""}. Gender is only a light tie-breaker.`;
+    if (els.roommateMatchText) els.roommateMatchText.textContent = `People open to a roommate are prioritized${details ? `, with stronger matches for ${details}` : ""}. Match labels stay descriptive rather than pretending to be exact percentages.`;
   }
 }
 
@@ -1089,7 +1212,7 @@ function activeFilterCount() {
 
 function updateFilterBadges() {
   const count = activeFilterCount();
-  [els.filterCount, els.mobileFilterBadge].forEach(el => {
+  [els.filterCount, els.mobileFilterBadge].filter(Boolean).forEach(el => {
     el.textContent = count;
     el.hidden = count === 0;
   });
@@ -1112,16 +1235,21 @@ function renderActiveFilters() {
 }
 
 function applyDataPipeline() {
-  const query = state.query;
+  const tokens = searchTokens(state.query);
   const filterEntries = Object.entries(state.filters);
 
   let rows = state.rows.filter(row => {
-    if (query) {
-      const haystack = visibleColumns().map(column => displayValue(row, column).toLowerCase()).join(" ");
-      if (!haystack.includes(query)) return false;
+    if (tokens.length) {
+      const values = visibleColumns().map(column => displayValue(row, column));
+      const words = values.flatMap(value => searchNormalize(value).split(" ").filter(Boolean));
+      const acronyms = values.map(value => searchNormalize(value).split(" ").filter(Boolean).map(word => word[0]).join("")).filter(Boolean);
+      const haystack = `${values.map(searchNormalize).join(" ")} ${words.join(" ")} ${acronyms.join(" ")}`;
+      if (!tokens.every(token => haystack.includes(token))) return false;
     }
     return filterEntries.every(([index, selected]) => selected.has(displayValue(row, state.columns[Number(index)])));
   });
+
+  if (state.savedOnly) rows = rows.filter(row => state.savedSlugs.has(studentSlug(row)));
 
   if (state.roommateMatchMode && state.roommateReferenceRow) {
     const reference = state.roommateReferenceRow;
@@ -1140,15 +1268,23 @@ function applyDataPipeline() {
     const index = state.sort.index;
     const direction = state.sort.direction === "asc" ? 1 : -1;
     rows = [...rows].sort((a, b) => compareCells(a[index], b[index]) * direction);
+  } else {
+    rows = sortRowsByMode(rows, state.sortMode);
   }
 
   state.filteredRows = rows;
   const maxPage = Math.max(1, Math.ceil(rows.length / CONFIG.rowsPerPage));
   state.page = Math.min(state.page, maxPage);
-  els.resultText.textContent = state.roommateMatchMode
-    ? `${formatNumber(rows.length)} ${rows.length === 1 ? "roommate match" : "roommate matches"}`
-    : `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
+  if (state.savedOnly) {
+    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "saved student" : "saved students"}`;
+  } else if (state.roommateMatchMode) {
+    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "potential roommate" : "potential roommates"}`;
+  } else {
+    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
+  }
   renderActiveFilters();
+  updateSavedUI();
+  updateEmptyStateCopy();
   renderRows();
 }
 
@@ -1221,6 +1357,16 @@ function renderCards(rows, start) {
 
     content.append(titleRow, programLine);
 
+    if (state.roommateMatchMode) {
+      const meta = state.roommateMatchMeta.get(row);
+      if (meta) {
+        const match = document.createElement("span");
+        match.className = "roommate-match-mini";
+        match.textContent = roommateMatchTier(meta);
+        content.appendChild(match);
+      }
+    }
+
     const arrow = document.createElement("span");
     arrow.className = "student-card-chevron student-card-simple-chevron";
     arrow.setAttribute("aria-hidden", "true");
@@ -1290,6 +1436,7 @@ function sortBy(index) {
   if (state.sort.index === index) state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
   else state.sort = { index, direction: "asc" };
   state.page = 1;
+  persistDirectoryPreferences();
   applyDataPipeline();
 }
 
@@ -1522,7 +1669,8 @@ function persistDirectoryPreferences() {
       query: state.query,
       view: state.view,
       filters,
-      roommateMatchMode: state.roommateMatchMode
+      roommateMatchMode: state.roommateMatchMode,
+      sortMode: state.sortMode
     }));
   } catch (_) {}
 }
@@ -1533,6 +1681,8 @@ function restoreDirectoryPreferences() {
   state.view = CONFIG.defaultView;
   state.roommateMatchMode = false;
   state.roommateReferenceRow = null;
+  state.savedOnly = false;
+  state.sortMode = "recent";
 
   try {
     const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || "null");
@@ -1546,6 +1696,7 @@ function restoreDirectoryPreferences() {
         const selected = new Set((Array.isArray(item.values) ? item.values : []).filter(value => available.has(value)));
         if (selected.size) state.filters[column.index] = selected;
       });
+      if (["recent", "name", "program"].includes(saved.sortMode)) state.sortMode = saved.sortMode;
       if (saved.roommateMatchMode) {
         const reference = currentUserRow();
         if (reference) {
@@ -1560,52 +1711,49 @@ function restoreDirectoryPreferences() {
   els.searchClear.hidden = !state.query;
   els.cardViewBtn.classList.toggle("active", state.view === "cards");
   els.tableViewBtn.classList.toggle("active", state.view === "table");
+  if (els.sortSelect) els.sortSelect.value = state.sortMode;
   state.preferencesRestored = true;
 }
 
 function quickFilterSpec() {
   const specs = [];
+  const reference = currentUserRow();
+
+  // Personalized shortcuts based on the verified user's own form submission.
+  // "Classmates" means students in the same study program.
+  if (reference) {
+    const programCol = semanticColumn("program");
+    const ownProgram = displayValue(reference, programCol);
+    if (programCol && ownProgram) {
+      specs.push({
+        label: "Classmates",
+        column: programCol,
+        values: [ownProgram],
+        icon: "◎",
+        title: `Same program: ${ownProgram}`
+      });
+    }
+
+    const campusCol = semanticColumn("campus");
+    const ownCampus = displayValue(reference, campusCol);
+    if (campusCol && ownCampus) {
+      specs.push({
+        label: "Same campus",
+        column: campusCol,
+        values: [ownCampus],
+        icon: "⌖",
+        title: `Same campus: ${ownCampus}`
+      });
+    }
+  }
+
   const roommateCol = semanticColumn("roommate");
   if (roommateCol) {
     const values = [...new Set(state.rows.map(row => displayValue(row, roommateCol)).filter(Boolean))]
       .filter(value => roommateIntent(value).score >= 42);
-    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "⌂" });
+    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "⌂", title: "Students open to finding a roommate" });
   }
 
-  const campusCol = semanticColumn("campus");
-  if (campusCol) {
-    const counts = new Map();
-    state.rows.forEach(row => {
-      const value = displayValue(row, campusCol);
-      if (value) counts.set(value, (counts.get(value) || 0) + 1);
-    });
-    const preferred = ["leonardo", "bovisa"];
-    const chosen = [];
-    preferred.forEach(term => {
-      const hit = [...counts.keys()].find(value => normalize(value).includes(term));
-      if (hit && !chosen.includes(hit)) chosen.push(hit);
-    });
-    [...counts.entries()].sort((a,b) => b[1]-a[1]).forEach(([value]) => {
-      if (chosen.length < 2 && !chosen.includes(value)) chosen.push(value);
-    });
-    chosen.slice(0,2).forEach(value => {
-      const n = normalize(value);
-      let label = value;
-      if (n.includes("leonardo")) label = "Leonardo";
-      else if (n.includes("bovisa")) label = "Bovisa";
-      specs.push({ label, column: campusCol, values: [value], icon: "⌖" });
-    });
-  }
-
-  const degreeCol = semanticColumn("degree");
-  if (degreeCol) {
-    const values = [...new Set(state.rows.map(row => displayValue(row, degreeCol)).filter(Boolean))];
-    const masters = values.filter(value => {
-      const n = normalize(value);
-      return n.includes("master") || n.includes("magistrale") || n.includes("msc");
-    });
-    if (masters.length) specs.push({ label: "Master", column: degreeCol, values: masters, icon: "◇" });
-  }
   return specs;
 }
 
@@ -1617,11 +1765,16 @@ function quickFilterActive(spec) {
 function renderQuickFilters() {
   if (!els.quickFilters || !state.sheetReady) return;
   els.quickFilters.innerHTML = "";
+  const label = document.createElement("span");
+  label.className = "quick-filter-label";
+  label.textContent = "For you";
+  els.quickFilters.appendChild(label);
   quickFilterSpec().forEach(spec => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `quick-filter-chip${quickFilterActive(spec) ? " active" : ""}`;
     button.innerHTML = `<span aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
+    if (spec.title) button.title = spec.title;
     button.addEventListener("click", () => {
       if (quickFilterActive(spec)) delete state.filters[spec.column.index];
       else state.filters[spec.column.index] = new Set(spec.values);
@@ -1648,7 +1801,331 @@ function isRecentStudent(row) {
   let date = cell?.raw instanceof Date ? cell.raw : new Date(cell?.display || cell?.raw || "");
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
   const age = Date.now() - date.getTime();
-  return age >= 0 && age <= 14 * 24 * 60 * 60 * 1000;
+  return age >= 0 && age <= 7 * 24 * 60 * 60 * 1000;
+}
+
+
+const SHEET_CACHE_KEY = "polimi-sheet-cache-v2";
+const SAVED_KEY = "polimi-saved-students-v1";
+const ONBOARDING_KEY = "polimi-onboarding-seen-v1";
+
+function serializeRaw(value) {
+  if (value instanceof Date) return { __date: value.toISOString() };
+  if (value === undefined) return null;
+  return value;
+}
+
+function deserializeRaw(value) {
+  if (value && typeof value === "object" && value.__date) {
+    const date = new Date(value.__date);
+    return Number.isNaN(date.getTime()) ? value.__date : date;
+  }
+  return value;
+}
+
+function saveSheetCache() {
+  try {
+    const payload = {
+      version: 2,
+      savedAt: Date.now(),
+      columns: state.columns,
+      rows: state.rows.map(row => row.map(cell => ({ display: cell.display, raw: serializeRaw(cell.raw) })))
+    };
+    localStorage.setItem(SHEET_CACHE_KEY, JSON.stringify(payload));
+  } catch (_) {}
+}
+
+function hydrateSheetCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(SHEET_CACHE_KEY) || "null");
+    if (!cached?.columns?.length || !Array.isArray(cached.rows)) return false;
+    if (Date.now() - Number(cached.savedAt || 0) > CONFIG.cacheMaxAgeMs) return false;
+    state.columns = cached.columns;
+    state.rows = cached.rows.map(row => row.map(cell => ({ display: String(cell?.display ?? ""), raw: deserializeRaw(cell?.raw) })));
+    buildProfileIndex();
+    state.sheetReady = true;
+    state.cachedDataLoaded = true;
+    state.isOfflineCache = true;
+    const rememberedEmail = state.authorizedEmail || localStorage.getItem("polimi-verified-email") || "";
+    if (rememberedEmail && emailExists(rememberedEmail)) unlockDirectory(rememberedEmail);
+    else if (!state.authorized) {
+      setAccessBusy(false, "Check & enter");
+      setAccessStatus("", "Directory ready from cache. We’re refreshing it in the background.");
+    }
+    return true;
+  } catch (_) { return false; }
+}
+
+function renderSkeletonCards(count = 8) {
+  if (!els.cardView) return;
+  els.cardView.hidden = false;
+  els.tableView.hidden = true;
+  els.cardView.innerHTML = Array.from({ length: count }, () => `
+    <article class="student-card skeleton-card" aria-hidden="true">
+      <span class="skeleton-line skeleton-name"></span>
+      <span class="skeleton-line skeleton-program"></span>
+    </article>`).join("");
+}
+
+function timestampValue(row) {
+  const column = semanticColumn("timestamp");
+  if (!column) return 0;
+  const cell = row[column.index];
+  const date = cell?.raw instanceof Date ? cell.raw : new Date(cell?.display || cell?.raw || "");
+  return date instanceof Date && !Number.isNaN(date.getTime()) ? date.getTime() : 0;
+}
+
+function sortRowsByMode(rows, mode) {
+  const nameCol = semanticColumn("name");
+  const programCol = semanticColumn("program");
+  const copy = [...rows];
+  if (mode === "name") return copy.sort((a, b) => displayValue(a, nameCol).localeCompare(displayValue(b, nameCol), undefined, { sensitivity: "base" }));
+  if (mode === "program") return copy.sort((a, b) => displayValue(a, programCol).localeCompare(displayValue(b, programCol), undefined, { sensitivity: "base" }) || displayValue(a, nameCol).localeCompare(displayValue(b, nameCol)));
+  return copy.sort((a, b) => timestampValue(b) - timestampValue(a) || displayValue(a, nameCol).localeCompare(displayValue(b, nameCol), undefined, { sensitivity: "base" }));
+}
+
+function loadSavedProfiles() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+    state.savedSlugs = new Set(Array.isArray(saved) ? saved.filter(slug => state.profileBySlug.has(slug)) : []);
+  } catch (_) { state.savedSlugs = new Set(); }
+  updateSavedUI();
+}
+
+function saveSavedProfiles() {
+  try { localStorage.setItem(SAVED_KEY, JSON.stringify([...state.savedSlugs])); } catch (_) {}
+  updateSavedUI();
+}
+
+function toggleSavedActiveProfile() {
+  const slug = state.activeProfileSlug;
+  if (!slug) return;
+  if (state.savedSlugs.has(slug)) {
+    state.savedSlugs.delete(slug);
+    showToast("Removed from saved students");
+  } else {
+    state.savedSlugs.add(slug);
+    showToast("Student saved");
+  }
+  saveSavedProfiles();
+  updateProfileSaveButton();
+  if (state.savedOnly) applyDataPipeline();
+}
+
+function updateProfileSaveButton() {
+  if (!els.profileSave) return;
+  const active = Boolean(state.activeProfileSlug && state.savedSlugs.has(state.activeProfileSlug));
+  els.profileSave.classList.toggle("active", active);
+  els.profileSave.setAttribute("aria-pressed", String(active));
+  els.profileSave.setAttribute("aria-label", active ? "Remove student from saved profiles" : "Save student profile");
+  els.profileSave.textContent = active ? "♥" : "♡";
+}
+
+function toggleSavedMode() {
+  state.savedOnly = !state.savedOnly;
+  if (state.savedOnly && state.roommateMatchMode) {
+    state.roommateMatchMode = false;
+    state.roommateReferenceRow = null;
+    state.roommateMatchMeta = new WeakMap();
+    updateRoommateMatchUI();
+  }
+  state.page = 1;
+  updateSavedUI();
+  applyDataPipeline();
+  document.getElementById("directory")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function exitSavedMode() {
+  if (!state.savedOnly) return;
+  state.savedOnly = false;
+  state.page = 1;
+  updateSavedUI();
+  applyDataPipeline();
+}
+
+function updateSavedUI() {
+  const count = state.savedSlugs.size;
+  if (els.savedCount) els.savedCount.textContent = String(count);
+  if (els.savedTrigger) {
+    els.savedTrigger.classList.toggle("active", state.savedOnly);
+    els.savedTrigger.setAttribute("aria-pressed", String(state.savedOnly));
+  }
+  if (els.mobileSavedButton) {
+    els.mobileSavedButton.classList.toggle("active", state.savedOnly);
+    els.mobileSavedButton.setAttribute("aria-pressed", String(state.savedOnly));
+  }
+  if (els.mobileSavedBadge) {
+    els.mobileSavedBadge.textContent = String(count);
+    els.mobileSavedBadge.hidden = count === 0;
+  }
+  if (els.savedBanner) els.savedBanner.hidden = !state.savedOnly;
+  updateMobileNavState();
+}
+
+function updateMobileNavState() {
+  els.mobileStudentsButton?.classList.toggle("active", !state.savedOnly && !state.roommateMatchMode);
+  els.mobileSavedButton?.classList.toggle("active", state.savedOnly);
+  els.mobileRoommateButton?.classList.toggle("active", state.roommateMatchMode);
+}
+
+function updateEmptyStateCopy() {
+  if (!els.emptyState) return;
+  const title = els.emptyState.querySelector("h3");
+  const text = els.emptyState.querySelector("p");
+  const button = els.emptyState.querySelector("button");
+  if (state.savedOnly) {
+    if (title) title.textContent = state.savedSlugs.size ? "No saved students match these filters" : "No saved students yet";
+    if (text) text.textContent = state.savedSlugs.size ? "Clear the current search or filters to see your saved profiles." : "Open a student profile and tap the heart to save it here.";
+    if (button) button.textContent = state.savedSlugs.size ? "Clear search & filters" : "Show all students";
+  } else if (state.roommateMatchMode) {
+    if (title) title.textContent = "No potential roommates match this view";
+    if (text) text.textContent = "Try clearing filters or switch back to the full student directory.";
+    if (button) button.textContent = "Clear search & filters";
+  } else {
+    if (title) title.textContent = "No students match this view";
+    if (text) text.textContent = "Try another search or clear your filters to see everyone again.";
+    if (button) button.textContent = "Clear search & filters";
+  }
+}
+
+function openMyProfile() {
+  const row = currentUserRow();
+  if (!row) { showToast("Your profile could not be matched yet"); return; }
+  openStudentProfile(row);
+}
+
+function updatePersonalizedHeader() {
+  const row = currentUserRow();
+  if (!row) return;
+  const name = displayValue(row, semanticColumn("name")) || "Student";
+  const first = name.split(/\s+/).filter(Boolean)[0] || "Student";
+  const program = displayValue(row, semanticColumn("program"));
+  const campus = displayValue(row, semanticColumn("campus"));
+  if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Find your people, ${first}.`;
+  if (els.directoryIntroText) els.directoryIntroText.textContent = [program && `Your program: ${program}`, campus && `Your campus: ${campus}`, "Tap any student to open the full profile."].filter(Boolean).join(" · ");
+  if (els.myProfileAvatar) els.myProfileAvatar.textContent = initials(name);
+}
+
+function toggleProfileMenu() {
+  if (!els.profileMenu) return;
+  const open = els.profileMenu.hidden;
+  els.profileMenu.hidden = !open;
+  els.profileMenuButton?.setAttribute("aria-expanded", String(open));
+}
+
+function closeProfileMenu() {
+  if (!els.profileMenu) return;
+  els.profileMenu.hidden = true;
+  els.profileMenuButton?.setAttribute("aria-expanded", "false");
+}
+
+function updateProfileMenuForRow(row) {
+  const own = row === currentUserRow();
+  if (els.profileUpdateAction) els.profileUpdateAction.hidden = !own;
+}
+
+function reportActiveProfile() {
+  const slug = state.activeProfileSlug;
+  const row = state.profileBySlug.get(slug);
+  if (!row) return;
+  const name = displayValue(row, semanticColumn("name")) || "Polimi student";
+  const subject = encodeURIComponent(`Polimi Students profile report: ${name}`);
+  const body = encodeURIComponent(`I want to report outdated or incorrect information on this profile:\n\n${profileUrl(slug)}\n\nIssue:\n`);
+  const recipient = CONFIG.reportEmail ? encodeURIComponent(CONFIG.reportEmail) : "";
+  window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+  closeProfileMenu();
+}
+
+function contactVisibilityAllows(value) {
+  const n = normalize(value);
+  if (!n) return true;
+  if (n === "no" || n.includes("private") || n.includes("hide") || n.includes("dont") || n.includes("do not")) return false;
+  return true;
+}
+
+function maybeShowWelcomeTour() {
+  if (!els.welcomeTour || localStorage.getItem(ONBOARDING_KEY) === "1") return;
+  window.setTimeout(() => {
+    if (!state.authorized || els.profileSheet?.classList.contains("open")) return;
+    els.welcomeTour.hidden = false;
+    document.body.classList.add("tour-open");
+  }, 500);
+}
+
+function dismissWelcomeTour() {
+  localStorage.setItem(ONBOARDING_KEY, "1");
+  if (els.welcomeTour) els.welcomeTour.hidden = true;
+  document.body.classList.remove("tour-open");
+}
+
+function showToast(message) {
+  if (!els.appToast) return;
+  els.appToast.textContent = message;
+  els.appToast.hidden = false;
+  els.appToast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => { els.appToast.classList.remove("show"); setTimeout(() => { els.appToast.hidden = true; }, 180); }, 1800);
+}
+
+function setupPWA() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+  }
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    state.deferredInstallPrompt = event;
+    if (els.installAppButton) els.installAppButton.hidden = false;
+  });
+  window.addEventListener("appinstalled", () => {
+    state.deferredInstallPrompt = null;
+    if (els.installAppButton) els.installAppButton.hidden = true;
+    showToast("Polimi Students installed");
+  });
+  const standalone = window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (!standalone && isiOS && els.installAppButton) els.installAppButton.hidden = false;
+}
+
+async function installApp() {
+  if (state.deferredInstallPrompt) {
+    state.deferredInstallPrompt.prompt();
+    try { await state.deferredInstallPrompt.userChoice; } catch (_) {}
+    state.deferredInstallPrompt = null;
+    if (els.installAppButton) els.installAppButton.hidden = true;
+    return;
+  }
+  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  showToast(isiOS ? "In Safari: Share → Add to Home Screen" : "Use your browser menu → Install app");
+}
+
+function setupDragToClose(panel, handle, closeFn) {
+  if (!panel || !handle || !window.PointerEvent) return;
+  let startY = 0, dragging = false;
+  handle.style.touchAction = "none";
+  handle.addEventListener("pointerdown", event => {
+    if (window.innerWidth > 760) return;
+    dragging = true; startY = event.clientY; panel.setPointerCapture?.(event.pointerId); panel.classList.add("dragging");
+  });
+  handle.addEventListener("pointermove", event => {
+    if (!dragging) return;
+    const dy = Math.max(0, event.clientY - startY);
+    panel.style.transform = `translateY(${dy}px)`;
+  });
+  const end = event => {
+    if (!dragging) return;
+    dragging = false;
+    const dy = Math.max(0, event.clientY - startY);
+    panel.classList.remove("dragging");
+    panel.style.transform = "";
+    if (dy > 90) closeFn();
+  };
+  handle.addEventListener("pointerup", end);
+  handle.addEventListener("pointercancel", end);
+}
+
+function setupSheetGestures() {
+  setupDragToClose(els.filterSheet?.querySelector(".sheet-panel"), els.filterSheet?.querySelector(".sheet-handle"), closeFilterSheet);
+  setupDragToClose(els.profilePanel, els.profileSheet?.querySelector(".profile-handle"), closeStudentProfile);
 }
 
 function cardAccentClass(value) {
@@ -1695,6 +2172,8 @@ document.addEventListener("DOMContentLoaded", () => {
   els.accessGate.hidden = false;
   setupTheme();
   setupEvents();
+  setupPWA();
+  setupSheetGestures();
   setView(CONFIG.defaultView);
   loadSheet();
 });
