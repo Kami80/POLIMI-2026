@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Polimi Students 2026/2027 — a responsive student data dashboard." />
+  <meta name="theme-color" content="#f7f2e8" />
+  <title>Polimi Students 2026/2027</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%23788b75%27/%3E%3Cpath d=%27M32 13l4.4 13.6L50 31l-13.6 4.4L32 49l-4.4-13.6L14 31l13.6-4.4L32 13z%27 fill=%27%23fffdf8%27/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+
+  <header class="site-header shell">
+    <a class="brand" href="#top" aria-label="Home">
+      <span class="brand-mark">✦</span>
+      <span id="brandText">Polimi Students 2026/2027</span>
+    </a>
+
+    <div class="header-actions">
+      <span class="status-pill" id="connectionStatus">
+        <span class="status-dot"></span>
+        <span>Connecting…</span>
+      </span>
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow">POLIMI STUDENTS · 2026/2027</p>
+        <h1 id="siteTitle">Polimi Students<br /><em>2026/2027</em></h1>
+        <p class="hero-text" id="siteSubtitle">
+          A calm, searchable and responsive view of your Google Sheet — always synced with the source.
+        </p>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+        <div class="mini-card mini-card-a">
+          <span class="mini-dot"></span>
+          <span>Live data</span>
+        </div>
+        <div class="mini-card mini-card-b">
+          <strong>⌕</strong>
+          <span>Instant search</span>
+        </div>
+        <div class="mini-card mini-card-c">
+          <span>☕</span>
+          <span>Cozy by design</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard shell" aria-label="Sheet dashboard">
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Records</span>
+          <strong class="stat-value" id="statRows">—</strong>
+          <span class="stat-note">in the sheet</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Fields</span>
+          <strong class="stat-value" id="statColumns">—</strong>
+          <span class="stat-note">available columns</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Showing</span>
+          <strong class="stat-value" id="statVisible">—</strong>
+          <span class="stat-note">matching records</span>
+        </article>
+        <article class="stat-card accent-card">
+          <span class="stat-label">Refreshed</span>
+          <strong class="stat-time" id="statUpdated">—</strong>
+          <span class="stat-note">this page session</span>
+        </article>
+      </div>
+
+      <div class="toolbar-wrap">
+        <div class="toolbar-top">
+          <label class="search-box" for="searchInput">
+            <span>⌕</span>
+            <input id="searchInput" type="search" placeholder="Search all records…" autocomplete="off" />
+            <kbd>/</kbd>
+          </label>
+
+          <div class="view-switch" aria-label="Choose view">
+            <button id="tableViewBtn" class="view-button active" type="button" data-view="table">▤ <span>Table</span></button>
+            <button id="cardViewBtn" class="view-button" type="button" data-view="cards">▦ <span>Cards</span></button>
+          </div>
+        </div>
+
+        <div class="filter-row" id="filterRow">
+          <div class="filter-placeholder">Filters will appear here when the sheet loads.</div>
+        </div>
+      </div>
+
+      <div class="result-meta">
+        <p id="resultText">Loading your sheet…</p>
+        <button class="text-button" id="clearFilters" type="button" hidden>Clear filters</button>
+      </div>
+
+      <section id="loadingState" class="state-card" aria-live="polite">
+        <div class="loader" aria-hidden="true"></div>
+        <h2>Warming things up…</h2>
+        <p>Fetching the latest rows from Google Sheets.</p>
+      </section>
+
+      <section id="errorState" class="state-card error-state" hidden>
+        <div class="state-icon">!</div>
+        <h2>We couldn’t load the sheet</h2>
+        <p id="errorMessage">Please check the sheet sharing settings and try again.</p>
+        <button class="primary-button" id="retryButton" type="button">Try again</button>
+      </section>
+
+      <section id="emptyState" class="state-card" hidden>
+        <div class="state-icon">⌕</div>
+        <h2>No matching records</h2>
+        <p>Try a different search term or clear one of the filters.</p>
+      </section>
+
+      <div id="tableView" class="data-view" hidden>
+        <div class="table-shell">
+          <table>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="cardView" class="data-view cards-grid" hidden></div>
+
+      <div class="pagination" id="pagination" hidden>
+        <button class="page-button" id="prevPage" type="button">← Previous</button>
+        <span id="pageInfo">Page 1 of 1</span>
+        <button class="page-button" id="nextPage" type="button">Next →</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <p>Powered by Google Sheets <span>•</span> Designed for a calmer view of data.</p>
+    <button class="text-button" id="refreshButton" type="button">↻ Refresh data</button>
+  </footer>
+
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
