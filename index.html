@@ -181,6 +181,26 @@
     </div>
   </aside>
 
+
+  <aside class="profile-sheet" id="profileSheet" aria-hidden="true">
+    <button class="profile-backdrop" id="profileBackdrop" type="button" aria-label="Close student profile"></button>
+    <section class="profile-panel" id="profilePanel" role="dialog" aria-modal="true" aria-labelledby="profileName">
+      <div class="profile-handle" aria-hidden="true"></div>
+      <header class="profile-toolbar">
+        <button class="profile-toolbar-btn" id="profileClose" type="button" aria-label="Close profile">×</button>
+        <span class="profile-toolbar-label">STUDENT PROFILE</span>
+        <button class="profile-toolbar-btn profile-share" id="profileShare" type="button" aria-label="Share student profile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4A3 3 0 0 0 15 5c0 .2.02.4.06.58L8.9 9.1A3 3 0 0 0 7 8.4a3 3 0 1 0 1.9 5.3l6.16 3.52A3 3 0 0 0 15 18a3 3 0 1 0 .9-2.14l-6.12-3.5c.14-.48.14-1 0-1.48l6.12-3.5A3 3 0 0 0 18 8Z" fill="currentColor"/></svg>
+          <span id="profileShareLabel">Share</span>
+        </button>
+      </header>
+      <div class="profile-scroll">
+        <div class="profile-body" id="profileBody"></div>
+      </div>
+      <div class="profile-contact-bar" id="profileActions" hidden></div>
+    </section>
+  </aside>
+
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <a href="#top" class="mobile-nav-item active"><span>⌂</span><small>Home</small></a>
     <button id="mobileFilterButton" class="mobile-nav-item" type="button"><span>☷</span><small>Filters</small><i id="mobileFilterBadge" hidden>0</i></button>
@@ -195,6 +215,6 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="app.js?v=20260810-mobile-redirect-fix"></script>
+  <script src="app.js?v=20260810-profile-app-v1"></script>
 </body>
 </html>

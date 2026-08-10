@@ -38,6 +38,10 @@ const state = {
   authorized: false,
   authorizedEmail: "",
   pendingEmail: "",
+  draftFilters: {},
+  profileBySlug: new Map(),
+  slugByRow: new WeakMap(),
+  activeProfileSlug: "",
 };
 
 const els = {};
@@ -49,7 +53,8 @@ function cacheElements() {
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
     "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
     "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
-    "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText"
+    "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
+    "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
@@ -155,20 +160,29 @@ function setupEvents() {
   els.refreshButton.addEventListener("click", loadSheet);
 
   [els.filterTrigger, els.mobileFilterButton].forEach(button => button.addEventListener("click", openFilterSheet));
-  [els.filterBackdrop, els.filterClose, els.sheetApply].forEach(button => button.addEventListener("click", () => {
-    renderDesktopFilters();
-    renderActiveFilters();
-    closeFilterSheet();
-  }));
+  [els.filterBackdrop, els.filterClose].forEach(button => button.addEventListener("click", closeFilterSheet));
+  els.sheetApply.addEventListener("click", applyDraftFilters);
   els.sheetReset.addEventListener("click", () => {
-    state.filters = {};
-    state.page = 1;
-    renderFilters();
-    applyDataPipeline();
+    state.draftFilters = {};
+    renderMobileFilters();
+    updateSheetApplyLabel();
+  });
+
+  [els.profileBackdrop, els.profileClose].forEach(button => button?.addEventListener("click", () => closeStudentProfile()));
+  els.profileShare?.addEventListener("click", shareActiveProfile);
+
+  window.addEventListener("popstate", () => {
+    if (!state.authorized) return;
+    const slug = new URL(window.location.href).searchParams.get("student");
+    if (slug) openStudentProfileBySlug(slug, { syncUrl: false });
+    else closeStudentProfile({ syncUrl: false });
   });
 
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape") closeFilterSheet();
+    if (event.key === "Escape") {
+      if (els.profileSheet?.classList.contains("open")) closeStudentProfile();
+      else closeFilterSheet();
+    }
     if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
       event.preventDefault();
       els.searchInput.focus();
@@ -294,7 +308,10 @@ function unlockDirectory(email) {
 
   const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
   els.updatedText.textContent = `Updated ${now}`;
-  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    openProfileFromUrl();
+  });
 }
 
 function lockDirectory() {
@@ -303,6 +320,7 @@ function lockDirectory() {
   state.authorizedEmail = "";
   state.pendingEmail = "";
   closeFilterSheet();
+  closeStudentProfile({ syncUrl: false });
   els.protectedApp.hidden = true;
   els.accessGate.hidden = false;
   document.body.classList.remove("directory-unlocked");
@@ -319,19 +337,38 @@ function setStatus(type, text) {
   if (label) label.textContent = text;
 }
 
+function cloneFilters(source = {}) {
+  return Object.fromEntries(Object.entries(source).map(([key, values]) => [key, new Set(values)]));
+}
+
 function openFilterSheet() {
+  state.draftFilters = cloneFilters(state.filters);
   renderMobileFilters();
+  updateSheetApplyLabel();
   els.filterSheet.classList.add("open");
   els.filterSheet.setAttribute("aria-hidden", "false");
   els.filterTrigger.setAttribute("aria-expanded", "true");
-  document.body.style.overflow = "hidden";
+  syncBodyLock();
 }
 
 function closeFilterSheet() {
   els.filterSheet.classList.remove("open");
   els.filterSheet.setAttribute("aria-hidden", "true");
   els.filterTrigger.setAttribute("aria-expanded", "false");
-  document.body.style.overflow = "";
+  syncBodyLock();
+}
+
+function applyDraftFilters() {
+  state.filters = cloneFilters(state.draftFilters);
+  state.page = 1;
+  renderDesktopFilters();
+  applyDataPipeline();
+  closeFilterSheet();
+}
+
+function syncBodyLock() {
+  const locked = els.filterSheet?.classList.contains("open") || els.profileSheet?.classList.contains("open");
+  document.body.style.overflow = locked ? "hidden" : "";
 }
 
 function setView(view) {
@@ -396,6 +433,7 @@ function handleSheetResponse(response) {
       }))
     ).filter(row => row.some(cell => String(cell.display).trim() !== ""));
 
+    buildProfileIndex();
     state.sheetReady = true;
     setStatus("online", "Ready");
 
@@ -423,6 +461,304 @@ function showError(message) {
   }
 }
 
+
+
+function slugifyProfileName(value) {
+  const slug = String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+  return slug || "student";
+}
+
+function stableHash(value) {
+  let hash = 2166136261;
+  const text = String(value || "");
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36).slice(0, 5);
+}
+
+function buildProfileIndex() {
+  state.profileBySlug = new Map();
+  state.slugByRow = new WeakMap();
+  const nameCol = semanticColumn("name");
+  const emailCol = semanticColumn("email");
+  const polimiMailCol = semanticColumn("polimiMail");
+  const telegramCol = semanticColumn("telegram");
+  const groups = new Map();
+
+  state.rows.forEach((row, index) => {
+    const name = displayValue(row, nameCol) || `Student ${index + 1}`;
+    const base = slugifyProfileName(name);
+    if (!groups.has(base)) groups.set(base, []);
+    groups.get(base).push({ row, index, name });
+  });
+
+  groups.forEach((items, base) => {
+    items.forEach(({ row, index }, position) => {
+      let slug = base;
+      if (position > 0) {
+        const identity = displayValue(row, polimiMailCol) || displayValue(row, telegramCol) || displayValue(row, emailCol) || `${base}-${index}`;
+        slug = `${base}-${stableHash(identity)}`;
+      }
+      while (state.profileBySlug.has(slug)) slug = `${base}-${position + 2}`;
+      state.profileBySlug.set(slug, row);
+      state.slugByRow.set(row, slug);
+    });
+  });
+}
+
+function studentSlug(row) {
+  return state.slugByRow.get(row) || "student";
+}
+
+function profileUrl(slug) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("student", slug);
+  url.hash = "";
+  return url.toString();
+}
+
+function openProfileFromUrl() {
+  const slug = new URL(window.location.href).searchParams.get("student");
+  if (slug) openStudentProfileBySlug(slug, { syncUrl: false });
+}
+
+function openStudentProfileBySlug(slug, options = {}) {
+  const row = state.profileBySlug.get(String(slug || ""));
+  if (!row) return false;
+  openStudentProfile(row, options);
+  return true;
+}
+
+function openStudentProfile(row, options = {}) {
+  if (!row || !els.profileSheet) return;
+  const { syncUrl = true } = options;
+  const slug = studentSlug(row);
+  state.activeProfileSlug = slug;
+  renderStudentProfile(row);
+  els.profileSheet.classList.add("open");
+  els.profileSheet.setAttribute("aria-hidden", "false");
+  syncBodyLock();
+  els.profilePanel?.querySelector(".profile-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+
+  if (syncUrl) {
+    const current = new URL(window.location.href).searchParams.get("student");
+    if (current !== slug) history.pushState({ student: slug }, "", profileUrl(slug));
+  }
+  requestAnimationFrame(() => els.profileClose?.focus({ preventScroll: true }));
+}
+
+function closeStudentProfile(options = {}) {
+  const { syncUrl = true } = options;
+  if (!els.profileSheet) return;
+  els.profileSheet.classList.remove("open");
+  els.profileSheet.setAttribute("aria-hidden", "true");
+  state.activeProfileSlug = "";
+  syncBodyLock();
+
+  if (syncUrl) {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("student")) {
+      url.searchParams.delete("student");
+      history.replaceState({}, "", url.toString());
+    }
+  }
+}
+
+function renderStudentProfile(row) {
+  const nameCol = semanticColumn("name");
+  const genderCol = semanticColumn("gender");
+  const programCol = semanticColumn("program");
+  const campusCol = semanticColumn("campus");
+  const degreeCol = semanticColumn("degree");
+  const roommateCol = semanticColumn("roommate");
+  const noteCol = semanticColumn("note");
+  const telegramCol = semanticColumn("telegram");
+  const polimiMailCol = semanticColumn("polimiMail");
+  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol, polimiMailCol].filter(Boolean).map(column => column.index));
+
+  const name = displayValue(row, nameCol) || "Polimi student";
+  const gender = displayValue(row, genderCol);
+  const program = displayValue(row, programCol) || "Program not specified";
+  const campus = displayValue(row, campusCol) || "Not specified";
+  const degree = displayValue(row, degreeCol) || "Not specified";
+  const roommate = displayValue(row, roommateCol) || "Not specified";
+  const note = displayValue(row, noteCol);
+  const telegram = displayValue(row, telegramCol);
+  const polimiMail = displayValue(row, polimiMailCol);
+
+  els.profileBody.innerHTML = "";
+  const hero = document.createElement("section");
+  hero.className = "profile-hero";
+  const avatar = document.createElement("div");
+  avatar.className = "profile-avatar";
+  avatar.textContent = initials(name);
+  const copy = document.createElement("div");
+  copy.className = "profile-identity";
+  const kicker = document.createElement("span");
+  kicker.className = "profile-kicker";
+  kicker.textContent = "POLIMI · 2026/27";
+  const title = document.createElement("h2");
+  title.id = "profileName";
+  title.textContent = name;
+  const badges = document.createElement("div");
+  badges.className = "profile-badges";
+  if (gender) {
+    const genderBadge = document.createElement("span");
+    genderBadge.className = `gender-badge ${genderClass(gender)}`;
+    genderBadge.textContent = gender;
+    badges.appendChild(genderBadge);
+  }
+  if (mailtoUrl(polimiMail)) {
+    const mailBadge = document.createElement("span");
+    mailBadge.className = "polimi-mail-badge profile-polimi-badge";
+    mailBadge.textContent = "✓ Polimi mail";
+    mailBadge.title = "Polimi mail provided";
+    badges.appendChild(mailBadge);
+  }
+  copy.append(kicker, title, badges);
+  hero.append(avatar, copy);
+
+  const programCard = document.createElement("section");
+  programCard.className = "profile-program";
+  programCard.innerHTML = `<span>Program</span><strong>${escapeHtml(program)}</strong>`;
+
+  const detailGrid = document.createElement("section");
+  detailGrid.className = "profile-detail-grid";
+  detailGrid.append(
+    createProfileDetail("Campus", campus, "⌖"),
+    createProfileDetail("Degree", degree, "◇"),
+    createProfileDetail("Roommate", roommate, "⌂")
+  );
+
+  els.profileBody.append(hero, programCard, detailGrid);
+
+  if (note) {
+    const about = document.createElement("section");
+    about.className = "profile-about";
+    const heading = document.createElement("div");
+    heading.className = "profile-section-title";
+    heading.innerHTML = `<span>✦</span><strong>About me</strong>`;
+    const text = document.createElement("p");
+    text.textContent = note;
+    about.append(heading, text);
+    els.profileBody.appendChild(about);
+  }
+
+  const extras = visibleColumns().filter(column => !coreIndexes.has(column.index) && displayValue(row, column));
+  if (extras.length) {
+    const extraSection = document.createElement("section");
+    extraSection.className = "profile-extra-section";
+    const heading = document.createElement("div");
+    heading.className = "profile-section-title";
+    heading.innerHTML = `<span>＋</span><strong>More details</strong>`;
+    const grid = document.createElement("div");
+    grid.className = "profile-extra-grid";
+    extras.forEach(column => {
+      const item = document.createElement("div");
+      item.className = "profile-extra-item";
+      const label = document.createElement("span");
+      label.textContent = shortHeader(column.label);
+      const value = document.createElement("strong");
+      renderColumnContent(value, column, displayValue(row, column));
+      item.append(label, value);
+      grid.appendChild(item);
+    });
+    extraSection.append(heading, grid);
+    els.profileBody.appendChild(extraSection);
+  }
+
+  els.profileActions.innerHTML = "";
+  const telegramButton = createProfileContactButton("telegram", telegram);
+  const mailButton = createProfileContactButton("mail", polimiMail);
+  [telegramButton, mailButton].filter(Boolean).forEach(button => els.profileActions.appendChild(button));
+  els.profileActions.hidden = els.profileActions.childElementCount === 0;
+  els.profileShareLabel.textContent = "Share";
+}
+
+function createProfileDetail(label, value, iconText) {
+  const item = document.createElement("div");
+  item.className = "profile-detail";
+  const icon = document.createElement("span");
+  icon.className = "profile-detail-icon";
+  icon.textContent = iconText;
+  const copy = document.createElement("div");
+  const key = document.createElement("span");
+  key.textContent = label;
+  const val = document.createElement("strong");
+  val.textContent = value;
+  copy.append(key, val);
+  item.append(icon, copy);
+  return item;
+}
+
+function createProfileContactButton(type, value) {
+  const isTelegram = type === "telegram";
+  const href = isTelegram ? telegramUrl(value) : mailtoUrl(value);
+  if (!href) return null;
+  const a = document.createElement("a");
+  a.className = `profile-contact-btn ${isTelegram ? "telegram" : "mail"}`;
+  a.href = href;
+  if (isTelegram) {
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.setAttribute("aria-label", `Open ${telegramLabel(value)} on Telegram`);
+    a.append(telegramIcon());
+  } else {
+    a.setAttribute("aria-label", `Email ${String(value).trim()}`);
+    a.append(mailIcon());
+  }
+  const label = document.createElement("span");
+  label.textContent = isTelegram ? "Telegram" : "Polimi Mail";
+  a.append(label);
+  return a;
+}
+
+async function shareActiveProfile() {
+  const slug = state.activeProfileSlug;
+  const row = state.profileBySlug.get(slug);
+  if (!slug || !row) return;
+  const name = displayValue(row, semanticColumn("name")) || "Polimi student";
+  const url = profileUrl(slug);
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: `${name} · Polimi Students`, text: `View ${name}'s Polimi Students profile.`, url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    flashShareLabel("Copied");
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+    try {
+      const input = document.createElement("textarea");
+      input.value = url;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+      flashShareLabel("Copied");
+    } catch (_) {
+      flashShareLabel("Copy link");
+    }
+  }
+}
+
+function flashShareLabel(text) {
+  if (!els.profileShareLabel) return;
+  els.profileShareLabel.textContent = text;
+  window.setTimeout(() => {
+    if (els.profileShareLabel) els.profileShareLabel.textContent = "Share";
+  }, 1600);
+}
 
 function getSlicerDefinitions() {
   return CONFIG.slicers.map(definition => {
@@ -499,30 +835,78 @@ function createDesktopOption(columnIndex, value, count, checked) {
 
 function renderMobileFilters() {
   els.mobileFilters.innerHTML = "";
-  getSlicerDefinitions().forEach(({ definition, column, values }) => {
-    const group = document.createElement("section");
+  getSlicerDefinitions().forEach(({ definition, column, counts, values }, groupIndex) => {
+    const group = document.createElement("details");
     group.className = "mobile-filter-group";
-    const title = document.createElement("h3");
+    group.open = groupIndex === 0 || Boolean(state.draftFilters[column.index]?.size);
+
+    const selected = state.draftFilters[column.index] || new Set();
+    const summary = document.createElement("summary");
+    summary.className = "mobile-filter-summary";
+    const summaryCopy = document.createElement("span");
+    const title = document.createElement("strong");
     title.textContent = definition.label;
+    const meta = document.createElement("small");
+    meta.textContent = selected.size ? `${selected.size} selected` : "All";
+    summaryCopy.append(title, meta);
+    const chevron = document.createElement("span");
+    chevron.className = "mobile-filter-chevron";
+    chevron.textContent = "⌄";
+    summary.append(summaryCopy, chevron);
+
     const options = document.createElement("div");
     options.className = "mobile-filter-options";
-    const selected = state.filters[column.index] || new Set();
-
     values.forEach(value => {
       const label = document.createElement("label");
       label.className = "mobile-check";
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = selected.has(value);
-      input.addEventListener("change", () => toggleFilterValue(column.index, value, input.checked, false));
-      const span = document.createElement("span");
-      span.textContent = value;
-      label.append(input, span);
+      input.addEventListener("change", () => {
+        toggleDraftFilterValue(column.index, value, input.checked);
+        const now = state.draftFilters[column.index] || new Set();
+        meta.textContent = now.size ? `${now.size} selected` : "All";
+      });
+      const box = document.createElement("span");
+      box.className = "mobile-check-box";
+      const text = document.createElement("span");
+      text.className = "mobile-check-label";
+      text.textContent = value;
+      const count = document.createElement("span");
+      count.className = "mobile-check-count";
+      count.textContent = counts.get(value) || 0;
+      label.append(input, box, text, count);
       options.appendChild(label);
     });
-    group.append(title, options);
+
+    group.append(summary, options);
     els.mobileFilters.appendChild(group);
   });
+}
+
+function toggleDraftFilterValue(columnIndex, value, checked) {
+  const current = state.draftFilters[columnIndex] || new Set();
+  if (checked) current.add(value); else current.delete(value);
+  if (current.size) state.draftFilters[columnIndex] = current; else delete state.draftFilters[columnIndex];
+  updateSheetApplyLabel();
+}
+
+function rowsMatchingFilters(filters) {
+  const query = state.query;
+  const entries = Object.entries(filters || {});
+  return state.rows.filter(row => {
+    if (query) {
+      const haystack = visibleColumns().map(column => displayValue(row, column).toLowerCase()).join(" ");
+      if (!haystack.includes(query)) return false;
+    }
+    return entries.every(([index, selected]) => selected.has(displayValue(row, state.columns[Number(index)])));
+  });
+}
+
+function updateSheetApplyLabel() {
+  if (!els.sheetApply) return;
+  const count = rowsMatchingFilters(state.draftFilters).length;
+  els.sheetApply.textContent = `Show ${formatNumber(count)} ${count === 1 ? "student" : "students"}`;
 }
 
 function toggleFilterValue(columnIndex, value, checked, rerender = true) {
@@ -622,11 +1006,7 @@ function renderCards(rows, start) {
   const campusCol = semanticColumn("campus");
   const degreeCol = semanticColumn("degree");
   const roommateCol = semanticColumn("roommate");
-  const noteCol = semanticColumn("note");
-  const telegramCol = semanticColumn("telegram");
   const polimiMailCol = semanticColumn("polimiMail");
-  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol, polimiMailCol].filter(Boolean).map(c => c.index));
-  const extras = visibleColumns().filter(c => !coreIndexes.has(c.index));
 
   rows.forEach((row, offset) => {
     const name = displayValue(row, nameCol) || `Student ${start + offset + 1}`;
@@ -635,12 +1015,24 @@ function renderCards(rows, start) {
     const campus = displayValue(row, campusCol) || "Not specified";
     const degree = displayValue(row, degreeCol) || "Not specified";
     const roommate = displayValue(row, roommateCol) || "Not specified";
-    const note = displayValue(row, noteCol);
-    const telegram = displayValue(row, telegramCol);
     const polimiMail = displayValue(row, polimiMailCol);
+    const slug = studentSlug(row);
 
     const card = document.createElement("article");
-    card.className = "student-card";
+    card.className = "student-card student-card-compact";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Open ${name}'s student profile`);
+    card.dataset.studentSlug = slug;
+
+    const open = () => openStudentProfile(row);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open();
+      }
+    });
 
     const head = document.createElement("div");
     head.className = "student-card-head";
@@ -654,12 +1046,25 @@ function renderCards(rows, start) {
     title.textContent = name;
     const subline = document.createElement("div");
     subline.className = "student-subline";
-    subline.textContent = "POLIMI · 2026/27";
+    subline.textContent = degree;
     identity.append(title, subline);
-    const badge = document.createElement("span");
-    badge.className = `gender-badge ${genderClass(gender)}`;
-    badge.textContent = gender || "Gender —";
-    head.append(avatar, identity, badge);
+
+    const badges = document.createElement("div");
+    badges.className = "student-card-badges";
+    if (gender) {
+      const badge = document.createElement("span");
+      badge.className = `gender-badge ${genderClass(gender)}`;
+      badge.textContent = gender;
+      badges.appendChild(badge);
+    }
+    if (mailtoUrl(polimiMail)) {
+      const verified = document.createElement("span");
+      verified.className = "polimi-mail-badge";
+      verified.textContent = "✓ Polimi mail";
+      verified.title = "Polimi mail provided";
+      badges.appendChild(verified);
+    }
+    head.append(avatar, identity, badges);
 
     const programBlock = document.createElement("div");
     programBlock.className = "program-block";
@@ -667,67 +1072,18 @@ function renderCards(rows, start) {
 
     const facts = document.createElement("div");
     facts.className = "student-facts";
-    facts.append(createFact("Campus", campus), createFact("Degree", degree));
+    facts.append(createFact("Campus", campus), createFact("Roommate", roommate));
 
-    const roommateRow = document.createElement("div");
-    roommateRow.className = "roommate-row";
-    const roommateLabel = document.createElement("span");
-    roommateLabel.textContent = "Looking for a roommate?";
-    const roommateStatus = document.createElement("span");
-    roommateStatus.className = `roommate-status ${roommateClass(roommate)}`;
-    roommateStatus.textContent = roommate;
-    roommateRow.append(roommateLabel, roommateStatus);
+    const footer = document.createElement("div");
+    footer.className = "student-card-footer";
+    const hint = document.createElement("span");
+    hint.textContent = "View full profile";
+    const arrow = document.createElement("span");
+    arrow.className = "student-card-arrow";
+    arrow.textContent = "→";
+    footer.append(hint, arrow);
 
-    card.append(head, programBlock, facts, roommateRow);
-
-    if (note) {
-      const about = document.createElement("div");
-      about.className = "student-about";
-      const aboutHead = document.createElement("div");
-      aboutHead.className = "student-about-head";
-      aboutHead.innerHTML = `<span class="about-icon" aria-hidden="true">✦</span><span>About me</span>`;
-      const aboutText = document.createElement("p");
-      aboutText.textContent = note;
-      about.append(aboutHead, aboutText);
-      card.appendChild(about);
-    }
-
-    if (telegram || polimiMail) {
-      const contacts = document.createElement("div");
-      contacts.className = "contact-actions";
-      if (telegram) {
-        const telegramAction = createTelegramAction(telegram);
-        if (telegramAction) contacts.appendChild(telegramAction);
-      }
-      if (polimiMail) {
-        const mailAction = createMailAction(polimiMail);
-        if (mailAction) contacts.appendChild(mailAction);
-      }
-      if (contacts.childElementCount) card.appendChild(contacts);
-    }
-
-    const filledExtras = extras.filter(column => displayValue(row, column));
-    if (filledExtras.length) {
-      const more = document.createElement("details");
-      more.className = "card-more";
-      const summary = document.createElement("summary");
-      summary.textContent = `More details · ${filledExtras.length}`;
-      const extraWrap = document.createElement("div");
-      extraWrap.className = "extra-fields";
-      filledExtras.forEach(column => {
-        const item = document.createElement("div");
-        item.className = "extra-field";
-        const label = document.createElement("span");
-        label.textContent = shortHeader(column.label);
-        const value = document.createElement("strong");
-        renderCellContent(value, displayValue(row, column));
-        item.append(label, value);
-        extraWrap.appendChild(item);
-      });
-      more.append(summary, extraWrap);
-      card.appendChild(more);
-    }
-
+    card.append(head, programBlock, facts, footer);
     fragment.appendChild(card);
   });
 
@@ -763,6 +1119,15 @@ function renderTable(rows) {
 
   rows.forEach(row => {
     const tr = document.createElement("tr");
+    tr.className = "student-table-row";
+    tr.tabIndex = 0;
+    tr.addEventListener("click", event => {
+      if (event.target.closest("a, button")) return;
+      openStudentProfile(row);
+    });
+    tr.addEventListener("keydown", event => {
+      if (event.key === "Enter") openStudentProfile(row);
+    });
     columns.forEach(column => {
       const td = document.createElement("td");
       renderColumnContent(td, column, displayValue(row, column));
