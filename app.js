@@ -1,24 +1,23 @@
-/*
-  Polimi Students 2026/2027
-  ---------------------------
-  Change the CONFIG values below to personalize the site.
-  The supplied spreadsheet is already connected.
-*/
-
 const CONFIG = {
   sheetId: "1-OQdEoogFykiQuKBvreFRFFujNtr7kuQBTma6aINgOE",
   sheetGid: "0",
-  siteTitle: "Polimi Students\n2026/2027",
-  siteSubtitle: "A calm, searchable and responsive view of your Google Sheet — always synced with the source.",
-  brandName: "Polimi Students 2026/2027",
   rowsPerPage: 24,
-  defaultView: "table",
+  defaultView: "cards",
+  hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail"],
   slicers: [
     { key: "program", label: "Program name", aliases: ["program name", "programme name", "study program", "study programme", "program", "programme"] },
     { key: "gender", label: "Gender", aliases: ["gender", "sex"] },
     { key: "campus", label: "Campus", aliases: ["which campus are you primarily attending", "primary campus", "campus"] },
     { key: "roommate", label: "Want roommate", aliases: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"] },
   ],
+  semantic: {
+    name: ["full name", "name"],
+    gender: ["gender", "sex"],
+    program: ["program name", "programme name", "study program", "study programme", "program", "programme"],
+    campus: ["which campus are you primarily attending", "primary campus", "campus"],
+    degree: ["current degree level", "degree level", "degree"],
+    roommate: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"],
+  }
 };
 
 const state = {
@@ -36,110 +35,155 @@ const els = {};
 
 function cacheElements() {
   [
-    "brandText", "siteTitle", "siteSubtitle", "connectionStatus", "themeToggle", "themeIcon",
-    "statRows", "statColumns", "statVisible", "statUpdated", "searchInput", "filterRow",
-    "tableViewBtn", "cardViewBtn", "clearFilters", "resultText",
-    "tableView", "tableHead", "tableBody", "cardView",
-    "pagination", "prevPage", "nextPage", "pageInfo", "refreshButton"
+    "connectionStatus", "themeToggle", "themeIcon", "statRows", "statVisible", "statPrograms", "statCampuses",
+    "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
+    "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
+    "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
+    "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
-function setupBranding() {
-  els.brandText.textContent = CONFIG.brandName;
-  els.siteTitle.innerHTML = escapeHtml(CONFIG.siteTitle).replace("\n", "<br>").replace("2026/2027", "<em>2026/2027</em>");
-  els.siteSubtitle.textContent = CONFIG.siteSubtitle;
-  document.title = CONFIG.brandName;
+function normalize(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function isHiddenColumn(column) {
+  const header = normalize(column.label);
+  return CONFIG.hiddenColumns.some(item => header === normalize(item) || header.includes(normalize(item)));
+}
+
+function matchColumn(aliases) {
+  const normalizedAliases = aliases.map(normalize);
+  let column = state.columns.find(item => normalizedAliases.includes(normalize(item.label)));
+  if (column) return column;
+  return state.columns.find(item => {
+    const header = normalize(item.label);
+    return normalizedAliases.some(alias => header.includes(alias) || alias.includes(header));
+  }) || null;
+}
+
+function semanticColumn(key) {
+  return matchColumn(CONFIG.semantic[key] || []);
+}
+
+function displayValue(row, column) {
+  if (!column) return "";
+  return String(row[column.index]?.display ?? "").trim();
+}
+
+function visibleColumns() {
+  const columns = state.columns.filter(column => !isHiddenColumn(column));
+  const preferredKeys = ["name", "gender", "program", "campus", "degree", "roommate"];
+  const preferred = preferredKeys.map(semanticColumn).filter(Boolean);
+  const seen = new Set(preferred.map(c => c.index));
+  return [...preferred, ...columns.filter(c => !seen.has(c.index))];
 }
 
 function setupTheme() {
-  const stored = localStorage.getItem("cozy-sheet-theme");
+  const stored = localStorage.getItem("polimi-theme");
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  const theme = stored || (prefersDark ? "dark" : "light");
-  applyTheme(theme);
-
+  applyTheme(stored || (prefersDark ? "dark" : "light"));
   els.themeToggle.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem("polimi-theme", next);
     applyTheme(next);
-    localStorage.setItem("cozy-sheet-theme", next);
   });
 }
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   els.themeIcon.textContent = theme === "dark" ? "☀" : "☾";
-  els.themeToggle.setAttribute("aria-label", theme === "dark" ? "Use light mode" : "Use dark mode");
 }
 
 function setupEvents() {
   els.searchInput.addEventListener("input", debounce(event => {
     state.query = event.target.value.trim().toLowerCase();
     state.page = 1;
+    els.searchClear.hidden = !state.query;
     applyDataPipeline();
-  }, 120));
+  }, 100));
 
-  [els.tableViewBtn, els.cardViewBtn].forEach(button => {
-    button.addEventListener("click", () => setView(button.dataset.view));
-  });
-
-  els.clearFilters.addEventListener("click", () => {
+  els.searchClear.addEventListener("click", () => {
     state.query = "";
-    state.filters = {};
     state.page = 1;
     els.searchInput.value = "";
-    renderFilters();
+    els.searchClear.hidden = true;
     applyDataPipeline();
+    els.searchInput.focus();
   });
 
+  [els.cardViewBtn, els.tableViewBtn].forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
+  els.clearFilters.addEventListener("click", resetAllFilters);
   els.prevPage.addEventListener("click", () => changePage(-1));
   els.nextPage.addEventListener("click", () => changePage(1));
   els.refreshButton.addEventListener("click", loadSheet);
 
+  [els.filterTrigger, els.mobileFilterButton].forEach(button => button.addEventListener("click", openFilterSheet));
+  [els.filterBackdrop, els.filterClose, els.sheetApply].forEach(button => button.addEventListener("click", () => {
+    renderDesktopFilters();
+    renderActiveFilters();
+    closeFilterSheet();
+  }));
+  els.sheetReset.addEventListener("click", () => {
+    state.filters = {};
+    state.page = 1;
+    renderFilters();
+    applyDataPipeline();
+  });
+
   document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeFilterSheet();
     if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
       event.preventDefault();
       els.searchInput.focus();
     }
-    if (event.key === "Escape") {
-      els.filterRow.querySelectorAll("details.slicer[open]").forEach(item => item.open = false);
-    }
   });
+}
 
-  document.addEventListener("click", event => {
-    if (!els.filterRow.contains(event.target)) {
-      els.filterRow.querySelectorAll("details.slicer[open]").forEach(item => item.open = false);
-    }
-  });
+function setStatus(type, text) {
+  els.connectionStatus.className = `connection ${type || ""}`.trim();
+  const label = els.connectionStatus.querySelector(".connection-text");
+  if (label) label.textContent = text;
+}
+
+function openFilterSheet() {
+  renderMobileFilters();
+  els.filterSheet.classList.add("open");
+  els.filterSheet.setAttribute("aria-hidden", "false");
+  els.filterTrigger.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+
+function closeFilterSheet() {
+  els.filterSheet.classList.remove("open");
+  els.filterSheet.setAttribute("aria-hidden", "true");
+  els.filterTrigger.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
 }
 
 function setView(view) {
   state.view = view;
-  els.tableViewBtn.classList.toggle("active", view === "table");
   els.cardViewBtn.classList.toggle("active", view === "cards");
+  els.tableViewBtn.classList.toggle("active", view === "table");
   renderRows();
 }
 
-function setStatus(type, text) {
-  els.connectionStatus.className = `status-pill ${type || ""}`.trim();
-  els.connectionStatus.querySelector("span:last-child").textContent = text;
-}
-
-function showState(kind) {
-  const showData = kind === "data";
-  els.tableView.hidden = !showData || state.view !== "table";
-  els.cardView.hidden = !showData || state.view !== "cards";
-}
-
 function loadSheet() {
-  showState("loading");
-  setStatus("", "Connecting…");
-  els.resultText.textContent = "Loading your sheet…";
+  setStatus("", "Connecting");
+  els.resultText.textContent = "Loading students…";
+  els.cardView.hidden = true;
+  els.tableView.hidden = true;
   els.pagination.hidden = true;
 
   if (!window.google?.charts) {
-    showError("The Google data loader could not start. Check your internet connection or content-blocking settings.");
+    showError("Google data loader did not start.");
     return;
   }
-
   if (!window.google?.visualization) {
     google.charts.load("current", { packages: ["table"] });
     google.charts.setOnLoadCallback(querySheet);
@@ -157,8 +201,7 @@ function querySheet() {
 
 function handleSheetResponse(response) {
   if (response.isError()) {
-    const details = [response.getMessage(), response.getDetailedMessage()].filter(Boolean).join(" — ");
-    showError(details || "Google Sheets returned an error.");
+    showError(response.getMessage() || "Google Sheets returned an error.");
     return;
   }
 
@@ -173,268 +216,199 @@ function handleSheetResponse(response) {
       type: data.getColumnType(index) || "string",
     }));
 
-    state.rows = Array.from({ length: rowCount }, (_, rowIndex) => {
-      return state.columns.map(column => {
-        const raw = data.getValue(rowIndex, column.index);
-        const formatted = data.getFormattedValue(rowIndex, column.index);
-        return {
-          raw,
-          display: formatted ?? (raw == null ? "" : String(raw)),
-        };
-      });
-    }).filter(row => row.some(cell => String(cell.display).trim() !== ""));
+    state.rows = Array.from({ length: rowCount }, (_, rowIndex) =>
+      state.columns.map(column => ({
+        raw: data.getValue(rowIndex, column.index),
+        display: data.getFormattedValue(rowIndex, column.index) ?? ""
+      }))
+    ).filter(row => row.some(cell => String(cell.display).trim() !== ""));
 
     state.query = "";
     state.filters = {};
     state.sort = { index: null, direction: "asc" };
     state.page = 1;
     els.searchInput.value = "";
+    els.searchClear.hidden = true;
 
-    els.statRows.textContent = formatNumber(state.rows.length);
-    els.statColumns.textContent = formatNumber(state.columns.length);
-    els.statUpdated.textContent = new Intl.DateTimeFormat(undefined, {
-      hour: "2-digit", minute: "2-digit"
-    }).format(new Date());
-
+    updateStatsBase();
     renderFilters();
     applyDataPipeline();
     setStatus("online", "Live");
+
+    const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
+    els.updatedText.textContent = `Updated ${now}`;
   } catch (error) {
-    showError(error.message || "The sheet loaded, but the data could not be read.");
+    showError(error.message || "Could not read the sheet.");
   }
 }
 
 function showError(message) {
-  console.error("Sheet error:", message);
-  els.resultText.textContent = "Could not load the sheet. Check sharing settings, then use Refresh data.";
-  els.statRows.textContent = "—";
-  els.statColumns.textContent = "—";
-  els.statVisible.textContent = "—";
-  els.statUpdated.textContent = "—";
+  console.error(message);
   setStatus("error", "Offline");
-  showState("idle");
+  els.resultText.textContent = "Could not load student data. Check the Sheet sharing settings and refresh.";
+  [els.statRows, els.statVisible, els.statPrograms, els.statCampuses].forEach(el => el.textContent = "—");
 }
 
-function normalizeHeader(value) {
-  return String(value ?? "")
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
+function updateStatsBase() {
+  els.statRows.textContent = formatNumber(state.rows.length);
+  const program = semanticColumn("program");
+  const campus = semanticColumn("campus");
+  els.statPrograms.textContent = formatNumber(uniqueValues(program).length);
+  els.statCampuses.textContent = formatNumber(uniqueValues(campus).length);
 }
 
-function findSlicerColumn(definition) {
-  const aliases = definition.aliases.map(normalizeHeader);
-
-  // Prefer an exact header/alias match first.
-  let column = state.columns.find(item => aliases.includes(normalizeHeader(item.label)));
-  if (column) return column;
-
-  // Then use a careful contains match so question-style headers still work.
-  column = state.columns.find(item => {
-    const header = normalizeHeader(item.label);
-    return aliases.some(alias => header.includes(alias) || alias.includes(header));
-  });
-
-  // Final keyword fallbacks for long Google Form question headers.
-  if (!column) {
-    const keyword = { program: "program", gender: "gender", campus: "campus", roommate: "roommate" }[definition.key];
-    if (keyword) column = state.columns.find(item => normalizeHeader(item.label).includes(keyword));
-  }
-
-  return column || null;
+function uniqueValues(column) {
+  if (!column) return [];
+  return [...new Set(state.rows.map(row => displayValue(row, column)).filter(Boolean))];
 }
 
-function getSlicerColumns() {
-  return CONFIG.slicers
-    .map(definition => {
-      const column = findSlicerColumn(definition);
-      if (!column) return null;
-
-      const counts = new Map();
-      state.rows.forEach(row => {
-        const value = String(row[column.index]?.display ?? "").trim();
-        if (!value) return;
-        counts.set(value, (counts.get(value) || 0) + 1);
-      });
-
-      const unique = [...counts.keys()].sort((a, b) =>
-        a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
-      );
-
-      return { definition, column, unique, counts };
-    })
-    .filter(Boolean);
+function getSlicerDefinitions() {
+  return CONFIG.slicers.map(definition => {
+    const column = matchColumn(definition.aliases);
+    if (!column) return null;
+    const counts = new Map();
+    state.rows.forEach(row => {
+      const value = displayValue(row, column);
+      if (!value) return;
+      counts.set(value, (counts.get(value) || 0) + 1);
+    });
+    const values = [...counts.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+    return { definition, column, counts, values };
+  }).filter(Boolean);
 }
 
 function renderFilters() {
-  els.filterRow.innerHTML = "";
-  const slicers = getSlicerColumns();
+  renderDesktopFilters();
+  renderMobileFilters();
+  renderActiveFilters();
+}
 
-  if (!slicers.length) {
-    const note = document.createElement("div");
-    note.className = "filter-placeholder";
-    note.textContent = "Slicer columns could not be detected in this sheet.";
-    els.filterRow.appendChild(note);
-    return;
-  }
-
-  const heading = document.createElement("div");
-  heading.className = "slicer-heading";
-  heading.innerHTML = `<span class="slicer-heading-icon">☷</span><span><strong>Slicers</strong><small>Choose one or more values</small></span>`;
-  els.filterRow.appendChild(heading);
-
-  slicers.forEach(({ definition, column, unique, counts }) => {
+function renderDesktopFilters() {
+  els.desktopFilters.innerHTML = "";
+  const slicers = getSlicerDefinitions();
+  slicers.forEach(({ definition, column, counts, values }) => {
     const details = document.createElement("details");
-    details.className = "slicer";
-    details.dataset.columnIndex = String(column.index);
+    details.className = "filter-group";
     details.addEventListener("toggle", () => {
       if (!details.open) return;
-      els.filterRow.querySelectorAll("details.slicer[open]").forEach(other => {
-        if (other !== details) other.open = false;
-      });
+      els.desktopFilters.querySelectorAll("details[open]").forEach(other => { if (other !== details) other.open = false; });
     });
 
+    const selected = state.filters[column.index] || new Set();
     const summary = document.createElement("summary");
-    summary.className = "slicer-summary";
-
-    const summaryMain = document.createElement("span");
-    summaryMain.className = "slicer-summary-main";
-    const title = document.createElement("span");
-    title.className = "slicer-title";
-    title.textContent = definition.label;
-    const selection = document.createElement("span");
-    selection.className = "slicer-selection";
-    selection.dataset.slicerSelection = String(column.index);
-    summaryMain.append(title, selection);
-
-    const chevron = document.createElement("span");
-    chevron.className = "slicer-chevron";
-    chevron.textContent = "⌄";
-    summary.append(summaryMain, chevron);
+    const selectionText = selected.size === 0 ? "All" : selected.size === 1 ? [...selected][0] : `${selected.size} selected`;
+    summary.innerHTML = `<span class="filter-summary-copy"><small>${escapeHtml(definition.label)}</small><strong>${escapeHtml(selectionText)}</strong></span><span class="filter-chevron">⌄</span>`;
     details.appendChild(summary);
 
-    const panel = document.createElement("div");
-    panel.className = "slicer-panel";
-
-    const panelHead = document.createElement("div");
-    panelHead.className = "slicer-panel-head";
-    const panelTitle = document.createElement("span");
-    panelTitle.textContent = definition.label;
-    const clear = document.createElement("button");
-    clear.className = "slicer-clear";
-    clear.type = "button";
-    clear.textContent = "Clear";
-    clear.addEventListener("click", event => {
-      event.preventDefault();
-      event.stopPropagation();
-      delete state.filters[column.index];
-      panel.querySelectorAll('input[type="checkbox"][data-value]').forEach(input => {
-        input.checked = false;
-      });
-      const allInput = panel.querySelector('input[data-all="true"]');
-      if (allInput) allInput.checked = true;
-      updateSlicerSummary(column.index);
-      state.page = 1;
-      applyDataPipeline();
-    });
-    panelHead.append(panelTitle, clear);
-    panel.appendChild(panelHead);
-
-    const optionList = document.createElement("div");
-    optionList.className = "slicer-options";
-
-    const allLabel = document.createElement("label");
-    allLabel.className = "slicer-option slicer-option-all";
-    const allInput = document.createElement("input");
-    allInput.type = "checkbox";
-    allInput.dataset.all = "true";
-    allInput.checked = !(state.filters[column.index]?.length);
-    const allBox = document.createElement("span");
-    allBox.className = "custom-checkbox";
-    const allText = document.createElement("span");
-    allText.className = "slicer-option-text";
-    allText.textContent = "All";
-    const allCount = document.createElement("span");
-    allCount.className = "slicer-option-count";
-    allCount.textContent = formatNumber(state.rows.length);
-    allLabel.append(allInput, allBox, allText, allCount);
-    optionList.appendChild(allLabel);
-
-    allInput.addEventListener("change", () => {
-      if (!allInput.checked) {
-        allInput.checked = true;
-        return;
-      }
-      delete state.filters[column.index];
-      optionList.querySelectorAll('input[type="checkbox"][data-value]').forEach(input => {
-        input.checked = false;
-      });
-      updateSlicerSummary(column.index);
-      state.page = 1;
-      applyDataPipeline();
-    });
-
-    unique.forEach(value => {
-      const label = document.createElement("label");
-      label.className = "slicer-option";
-
-      const input = document.createElement("input");
-      input.type = "checkbox";
-      input.dataset.value = value;
-      input.checked = (state.filters[column.index] || []).includes(value);
-
-      const box = document.createElement("span");
-      box.className = "custom-checkbox";
-      const text = document.createElement("span");
-      text.className = "slicer-option-text";
-      text.textContent = value;
-      text.title = value;
-      const count = document.createElement("span");
-      count.className = "slicer-option-count";
-      count.textContent = formatNumber(counts.get(value) || 0);
-
-      label.append(input, box, text, count);
-      optionList.appendChild(label);
-
-      input.addEventListener("change", () => {
-        const selected = [...optionList.querySelectorAll('input[type="checkbox"][data-value]:checked')]
-          .map(item => item.dataset.value);
-
-        if (selected.length) state.filters[column.index] = selected;
-        else delete state.filters[column.index];
-
-        allInput.checked = selected.length === 0;
-        updateSlicerSummary(column.index);
-        state.page = 1;
-        applyDataPipeline();
-      });
-    });
-
-    panel.appendChild(optionList);
-    details.appendChild(panel);
-    els.filterRow.appendChild(details);
-
-    updateSlicerSummary(column.index);
+    const options = document.createElement("div");
+    options.className = "filter-options";
+    values.forEach(value => options.appendChild(createDesktopOption(column.index, value, counts.get(value) || 0, selected.has(value))));
+    details.appendChild(options);
+    els.desktopFilters.appendChild(details);
   });
 }
 
-function updateSlicerSummary(columnIndex) {
-  const selectionEl = els.filterRow.querySelector(`[data-slicer-selection="${columnIndex}"]`);
-  if (!selectionEl) return;
+function createDesktopOption(columnIndex, value, count, checked) {
+  const label = document.createElement("label");
+  label.className = "filter-option";
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.checked = checked;
+  input.addEventListener("change", () => {
+    toggleFilterValue(columnIndex, value, input.checked, false);
+    const selectedNow = state.filters[columnIndex] || new Set();
+    const details = input.closest("details");
+    const summaryText = details?.querySelector(".filter-summary-copy strong");
+    if (summaryText) {
+      summaryText.textContent = selectedNow.size === 0 ? "All" : selectedNow.size === 1 ? [...selectedNow][0] : `${selectedNow.size} selected`;
+    }
+  });
+  const box = document.createElement("span");
+  box.className = "check-ui";
+  const text = document.createElement("span");
+  text.className = "option-label";
+  text.textContent = value;
+  const number = document.createElement("span");
+  number.className = "option-count";
+  number.textContent = count;
+  label.append(input, box, text, number);
+  return label;
+}
 
-  const selected = state.filters[columnIndex] || [];
-  if (!selected.length) {
-    selectionEl.textContent = "All";
-    selectionEl.classList.remove("active");
-  } else if (selected.length === 1) {
-    selectionEl.textContent = selected[0];
-    selectionEl.classList.add("active");
-  } else {
-    selectionEl.textContent = `${selected.length} selected`;
-    selectionEl.classList.add("active");
-  }
+function renderMobileFilters() {
+  els.mobileFilters.innerHTML = "";
+  getSlicerDefinitions().forEach(({ definition, column, values }) => {
+    const group = document.createElement("section");
+    group.className = "mobile-filter-group";
+    const title = document.createElement("h3");
+    title.textContent = definition.label;
+    const options = document.createElement("div");
+    options.className = "mobile-filter-options";
+    const selected = state.filters[column.index] || new Set();
+
+    values.forEach(value => {
+      const label = document.createElement("label");
+      label.className = "mobile-check";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = selected.has(value);
+      input.addEventListener("change", () => toggleFilterValue(column.index, value, input.checked, false));
+      const span = document.createElement("span");
+      span.textContent = value;
+      label.append(input, span);
+      options.appendChild(label);
+    });
+    group.append(title, options);
+    els.mobileFilters.appendChild(group);
+  });
+}
+
+function toggleFilterValue(columnIndex, value, checked, rerender = true) {
+  const current = state.filters[columnIndex] || new Set();
+  if (checked) current.add(value); else current.delete(value);
+  if (current.size) state.filters[columnIndex] = current; else delete state.filters[columnIndex];
+  state.page = 1;
+  if (rerender) renderFilters();
+  applyDataPipeline();
+  updateFilterBadges();
+}
+
+function resetAllFilters() {
+  state.query = "";
+  state.filters = {};
+  state.page = 1;
+  els.searchInput.value = "";
+  els.searchClear.hidden = true;
+  renderFilters();
+  applyDataPipeline();
+}
+
+function activeFilterCount() {
+  return Object.values(state.filters).reduce((sum, set) => sum + set.size, 0);
+}
+
+function updateFilterBadges() {
+  const count = activeFilterCount();
+  [els.filterCount, els.mobileFilterBadge].forEach(el => {
+    el.textContent = count;
+    el.hidden = count === 0;
+  });
+}
+
+function renderActiveFilters() {
+  els.activeFilterChips.innerHTML = "";
+  Object.entries(state.filters).forEach(([index, values]) => {
+    const column = state.columns[Number(index)];
+    values.forEach(value => {
+      const chip = document.createElement("span");
+      chip.className = "active-chip";
+      chip.textContent = `${shortHeader(column?.label)}: ${value}`;
+      els.activeFilterChips.appendChild(chip);
+    });
+  });
+  const hasAny = activeFilterCount() > 0 || Boolean(state.query);
+  els.clearFilters.hidden = !hasAny;
+  updateFilterBadges();
 }
 
 function applyDataPipeline() {
@@ -442,291 +416,273 @@ function applyDataPipeline() {
   const filterEntries = Object.entries(state.filters);
 
   let rows = state.rows.filter(row => {
-    const matchesSearch = !query || row.some(cell => String(cell.display).toLowerCase().includes(query));
-    if (!matchesSearch) return false;
-
-    return filterEntries.every(([columnIndex, selectedValues]) => {
-      const value = String(row[Number(columnIndex)]?.display ?? "").trim();
-      return Array.isArray(selectedValues) && selectedValues.includes(value);
-    });
+    if (query) {
+      const haystack = visibleColumns().map(column => displayValue(row, column).toLowerCase()).join(" ");
+      if (!haystack.includes(query)) return false;
+    }
+    return filterEntries.every(([index, selected]) => selected.has(displayValue(row, state.columns[Number(index)])));
   });
 
   if (state.sort.index !== null) {
-    const { index, direction } = state.sort;
-    const factor = direction === "asc" ? 1 : -1;
-    rows = [...rows].sort((a, b) => compareCells(a[index], b[index]) * factor);
+    const index = state.sort.index;
+    const direction = state.sort.direction === "asc" ? 1 : -1;
+    rows = [...rows].sort((a, b) => compareCells(a[index], b[index]) * direction);
   }
 
   state.filteredRows = rows;
   const maxPage = Math.max(1, Math.ceil(rows.length / CONFIG.rowsPerPage));
-  if (state.page > maxPage) state.page = maxPage;
-
+  state.page = Math.min(state.page, maxPage);
   els.statVisible.textContent = formatNumber(rows.length);
-  els.clearFilters.hidden = !(state.query || filterEntries.length);
-  els.resultText.textContent = buildResultText(rows.length);
-
+  els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
+  renderActiveFilters();
   renderRows();
 }
 
-function compareCells(a, b) {
-  const aRaw = a?.raw;
-  const bRaw = b?.raw;
-
-  if (aRaw instanceof Date && bRaw instanceof Date) return aRaw - bRaw;
-  if (typeof aRaw === "number" && typeof bRaw === "number") return aRaw - bRaw;
-
-  return String(a?.display ?? "").localeCompare(String(b?.display ?? ""), undefined, {
-    numeric: true,
-    sensitivity: "base",
-  });
-}
-
-function buildResultText(count) {
-  if (!state.rows.length) return "The sheet is connected, but it has no data rows yet.";
-  const noun = count === 1 ? "record" : "records";
-  if (count === state.rows.length && !state.query && !Object.keys(state.filters).length) {
-    return `${formatNumber(count)} ${noun} · click any column heading to sort`;
-  }
-  return `${formatNumber(count)} ${noun} match your current view`;
-}
-
 function renderRows() {
-  if (!state.rows.length) {
-    showState("idle");
-    els.tableBody.innerHTML = "";
-    els.cardView.innerHTML = "";
-    els.pagination.hidden = true;
-    return;
-  }
-
-  // Keep the selected data view visible even when filters/search return zero rows.
-  // The compact result count already communicates the empty result, so no large
-  // placeholder panel is needed.
-  showState("data");
-  renderTableHead();
-
-  if (!state.filteredRows.length) {
-    els.tableBody.innerHTML = "";
-    els.cardView.innerHTML = "";
-    els.pagination.hidden = true;
-    return;
-  }
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const effectiveView = isMobile ? "cards" : state.view;
+  els.cardView.hidden = effectiveView !== "cards";
+  els.tableView.hidden = effectiveView !== "table";
 
   const start = (state.page - 1) * CONFIG.rowsPerPage;
-  const end = start + CONFIG.rowsPerPage;
-  const pageRows = state.filteredRows.slice(start, end);
+  const pageRows = state.filteredRows.slice(start, start + CONFIG.rowsPerPage);
 
-  if (state.view === "table") renderTable(pageRows, start);
-  else renderCards(pageRows, start);
-
+  renderCards(pageRows, start);
+  if (!isMobile) renderTable(pageRows);
   renderPagination();
 }
 
-function renderTableHead() {
-  els.tableHead.innerHTML = "";
-  const tr = document.createElement("tr");
-
-  state.columns.forEach(column => {
-    const th = document.createElement("th");
-    const isSorted = state.sort.index === column.index;
-    th.classList.toggle("sorted", isSorted);
-    th.innerHTML = `<span>${escapeHtml(column.label)}</span><span class="sort-indicator">${isSorted ? (state.sort.direction === "asc" ? "↑" : "↓") : "↕"}</span>`;
-    th.addEventListener("click", () => sortByColumn(column.index));
-    tr.appendChild(th);
-  });
-
-  els.tableHead.appendChild(tr);
-}
-
-function renderTable(rows) {
-  els.tableBody.innerHTML = "";
-  const fragment = document.createDocumentFragment();
-
-  rows.forEach(row => {
-    const tr = document.createElement("tr");
-    row.forEach(cell => {
-      const td = document.createElement("td");
-      td.dir = "auto";
-      renderCellContent(td, cell.display);
-      tr.appendChild(td);
-    });
-    fragment.appendChild(tr);
-  });
-
-  els.tableBody.appendChild(fragment);
-}
-
-function renderCards(rows, offset) {
+function renderCards(rows, start) {
   els.cardView.innerHTML = "";
   const fragment = document.createDocumentFragment();
+  const nameCol = semanticColumn("name");
+  const genderCol = semanticColumn("gender");
+  const programCol = semanticColumn("program");
+  const campusCol = semanticColumn("campus");
+  const degreeCol = semanticColumn("degree");
+  const roommateCol = semanticColumn("roommate");
+  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol].filter(Boolean).map(c => c.index));
+  const extras = visibleColumns().filter(c => !coreIndexes.has(c.index));
 
-  rows.forEach((row, rowIndex) => {
+  rows.forEach((row, offset) => {
+    const name = displayValue(row, nameCol) || `Student ${start + offset + 1}`;
+    const gender = displayValue(row, genderCol);
+    const program = displayValue(row, programCol) || "Program not specified";
+    const campus = displayValue(row, campusCol) || "Not specified";
+    const degree = displayValue(row, degreeCol) || "Not specified";
+    const roommate = displayValue(row, roommateCol) || "Not specified";
+
     const card = document.createElement("article");
-    card.className = "record-card";
+    card.className = "student-card";
 
-    const index = document.createElement("span");
-    index.className = "record-index";
-    index.textContent = `#${offset + rowIndex + 1}`;
-    card.appendChild(index);
-
+    const head = document.createElement("div");
+    head.className = "student-card-head";
+    const avatar = document.createElement("div");
+    avatar.className = "student-avatar";
+    avatar.textContent = initials(name);
+    const identity = document.createElement("div");
+    identity.className = "student-identity";
     const title = document.createElement("h3");
-    title.className = "record-title";
-    title.dir = "auto";
-    const titleValue = firstUsefulCell(row)?.display || `Record ${offset + rowIndex + 1}`;
-    title.textContent = titleValue;
-    card.appendChild(title);
+    title.className = "student-name";
+    title.textContent = name;
+    const subline = document.createElement("div");
+    subline.className = "student-subline";
+    subline.textContent = "POLIMI · 2026/27";
+    identity.append(title, subline);
+    const badge = document.createElement("span");
+    badge.className = `gender-badge ${genderClass(gender)}`;
+    badge.textContent = gender || "Gender —";
+    head.append(avatar, identity, badge);
 
-    const dl = document.createElement("dl");
-    dl.className = "record-fields";
+    const programBlock = document.createElement("div");
+    programBlock.className = "program-block";
+    programBlock.innerHTML = `<span>Program</span><strong>${escapeHtml(program)}</strong>`;
 
-    state.columns.forEach((column, colIndex) => {
-      const value = row[colIndex]?.display;
-      if (!String(value ?? "").trim()) return;
+    const facts = document.createElement("div");
+    facts.className = "student-facts";
+    facts.append(createFact("Campus", campus), createFact("Degree", degree));
 
-      const group = document.createElement("div");
-      group.className = "record-field";
-      const dt = document.createElement("dt");
-      dt.textContent = column.label;
-      const dd = document.createElement("dd");
-      dd.dir = "auto";
-      renderCellContent(dd, value);
-      group.append(dt, dd);
-      dl.appendChild(group);
-    });
+    const roommateRow = document.createElement("div");
+    roommateRow.className = "roommate-row";
+    const roommateLabel = document.createElement("span");
+    roommateLabel.textContent = "Looking for a roommate?";
+    const roommateStatus = document.createElement("span");
+    roommateStatus.className = `roommate-status ${roommateClass(roommate)}`;
+    roommateStatus.textContent = roommate;
+    roommateRow.append(roommateLabel, roommateStatus);
 
-    card.appendChild(dl);
+    card.append(head, programBlock, facts, roommateRow);
+
+    const filledExtras = extras.filter(column => displayValue(row, column));
+    if (filledExtras.length) {
+      const more = document.createElement("details");
+      more.className = "card-more";
+      const summary = document.createElement("summary");
+      summary.textContent = `More details · ${filledExtras.length}`;
+      const extraWrap = document.createElement("div");
+      extraWrap.className = "extra-fields";
+      filledExtras.forEach(column => {
+        const item = document.createElement("div");
+        item.className = "extra-field";
+        const label = document.createElement("span");
+        label.textContent = shortHeader(column.label);
+        const value = document.createElement("strong");
+        renderCellContent(value, displayValue(row, column));
+        item.append(label, value);
+        extraWrap.appendChild(item);
+      });
+      more.append(summary, extraWrap);
+      card.appendChild(more);
+    }
+
     fragment.appendChild(card);
   });
 
   els.cardView.appendChild(fragment);
 }
 
-function firstUsefulCell(row) {
-  return row.find(cell => String(cell?.display ?? "").trim()) || null;
+function createFact(label, value) {
+  const item = document.createElement("div");
+  item.className = "fact";
+  const key = document.createElement("span");
+  key.textContent = label;
+  const val = document.createElement("strong");
+  val.textContent = value;
+  val.title = value;
+  item.append(key, val);
+  return item;
 }
 
-function renderCellContent(container, value) {
-  const text = String(value ?? "").trim();
-  if (!text) {
-    const span = document.createElement("span");
-    span.className = "cell-muted";
-    span.textContent = "—";
-    container.appendChild(span);
-    return;
-  }
+function renderTable(rows) {
+  const columns = visibleColumns();
+  els.tableHead.innerHTML = "";
+  els.tableBody.innerHTML = "";
 
-  if (isImageUrl(text)) {
-    const img = document.createElement("img");
-    img.className = "cell-image";
-    img.src = text;
-    img.alt = "Sheet image";
-    img.loading = "lazy";
-    img.referrerPolicy = "no-referrer";
-    img.addEventListener("error", () => {
-      img.replaceWith(document.createTextNode(text));
+  const headRow = document.createElement("tr");
+  columns.forEach(column => {
+    const th = document.createElement("th");
+    if (state.sort.index === column.index) th.classList.add("sorted");
+    th.innerHTML = `${escapeHtml(shortHeader(column.label))}<span class="sort-indicator">${state.sort.index === column.index ? (state.sort.direction === "asc" ? "↑" : "↓") : "↕"}</span>`;
+    th.addEventListener("click", () => sortBy(column.index));
+    headRow.appendChild(th);
+  });
+  els.tableHead.appendChild(headRow);
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+    columns.forEach(column => {
+      const td = document.createElement("td");
+      renderCellContent(td, displayValue(row, column));
+      tr.appendChild(td);
     });
-    container.appendChild(img);
-    return;
-  }
-
-  if (isUrl(text)) {
-    const a = document.createElement("a");
-    a.className = "cell-link";
-    a.href = text;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = tidyUrl(text);
-    container.appendChild(a);
-    return;
-  }
-
-  if (isEmail(text)) {
-    const a = document.createElement("a");
-    a.className = "cell-link";
-    a.href = `mailto:${text}`;
-    a.textContent = text;
-    container.appendChild(a);
-    return;
-  }
-
-  container.textContent = text;
+    els.tableBody.appendChild(tr);
+  });
 }
 
-function sortByColumn(index) {
-  if (state.sort.index === index) {
-    state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
-  } else {
-    state.sort.index = index;
-    state.sort.direction = "asc";
-  }
+function sortBy(index) {
+  if (state.sort.index === index) state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
+  else state.sort = { index, direction: "asc" };
   state.page = 1;
   applyDataPipeline();
 }
 
 function renderPagination() {
-  const totalPages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
-  els.pagination.hidden = totalPages <= 1;
+  const pages = Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage);
+  els.pagination.hidden = pages <= 1;
+  els.pageInfo.textContent = `${state.page} / ${Math.max(1, pages)}`;
   els.prevPage.disabled = state.page <= 1;
-  els.nextPage.disabled = state.page >= totalPages;
-  els.pageInfo.textContent = `Page ${state.page} of ${totalPages}`;
+  els.nextPage.disabled = state.page >= pages;
 }
 
-function changePage(delta) {
-  const totalPages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
-  state.page = Math.min(totalPages, Math.max(1, state.page + delta));
+function changePage(direction) {
+  const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
+  state.page = Math.max(1, Math.min(pages, state.page + direction));
   renderRows();
-  document.querySelector(".result-meta")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.querySelector(".explore-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function isUrl(value) {
-  return /^https?:\/\/[^\s]+$/i.test(value);
+function compareCells(a, b) {
+  const av = a?.raw ?? a?.display ?? "";
+  const bv = b?.raw ?? b?.display ?? "";
+  if (typeof av === "number" && typeof bv === "number") return av - bv;
+  return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: "base" });
 }
 
-function isImageUrl(value) {
-  return isUrl(value) && /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i.test(value);
-}
-
-function isEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function tidyUrl(value) {
-  try {
-    const url = new URL(value);
-    return `${url.hostname.replace(/^www\./, "")}${url.pathname === "/" ? "" : url.pathname}`;
-  } catch {
-    return value;
+function renderCellContent(container, value) {
+  const text = String(value ?? "").trim();
+  if (!text) { container.textContent = "—"; return; }
+  if (/^https?:\/\//i.test(text)) {
+    if (/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(text)) {
+      const img = document.createElement("img");
+      img.className = "cell-image";
+      img.src = text;
+      img.alt = "";
+      img.loading = "lazy";
+      container.appendChild(img);
+    } else {
+      const a = document.createElement("a");
+      a.className = "cell-link";
+      a.href = text;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = "Open link ↗";
+      container.appendChild(a);
+    }
+    return;
   }
+  container.textContent = text;
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function shortHeader(label) {
+  const text = String(label || "");
+  const n = normalize(text);
+  if (n.includes("which campus")) return "Campus";
+  if (n.includes("roommate")) return "Roommate";
+  if (n.includes("degree")) return "Degree";
+  if (n.includes("program")) return "Program";
+  if (n === "full name") return "Name";
+  return text.length > 28 ? `${text.slice(0, 26)}…` : text;
+}
+
+function initials(name) {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "P";
+  return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+}
+
+function genderClass(value) {
+  const n = normalize(value);
+  if (n.includes("female") || n.includes("woman")) return "female";
+  if (n.includes("male") || n.includes("man")) return "male";
+  return "other";
+}
+
+function roommateClass(value) {
+  const n = normalize(value);
+  if (n === "no" || n.includes("not")) return "no";
+  if (n.includes("maybe") || n.includes("possibly") || n.includes("not sure")) return "maybe";
+  return "yes";
 }
 
 function formatNumber(value) {
   return new Intl.NumberFormat().format(value);
 }
 
-function debounce(fn, delay = 150) {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn(...args), delay);
-  };
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 }
 
-function init() {
+function debounce(fn, wait) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), wait); };
+}
+
+window.addEventListener("resize", debounce(renderRows, 120));
+
+document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
-  setupBranding();
   setupTheme();
   setupEvents();
   setView(CONFIG.defaultView);
   loadSheet();
-}
-
-document.addEventListener("DOMContentLoaded", init);
+});
