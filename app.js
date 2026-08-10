@@ -845,6 +845,24 @@ function createProfileDetail(label, value, iconText) {
   return item;
 }
 
+function activateTelegramLink(anchor, href) {
+  if (!anchor || !href) return anchor;
+  anchor.href = href;
+  anchor.removeAttribute("target");
+  anchor.rel = "external noopener noreferrer";
+  anchor.addEventListener("click", event => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    try {
+      // Same-tab navigation is much more reliable from installed PWAs and mobile browsers.
+      window.location.assign(href);
+    } catch (_) {
+      window.location.href = href;
+    }
+  });
+  return anchor;
+}
+
 function createProfileContactButton(type, value) {
   const isTelegram = type === "telegram";
   const href = isTelegram ? telegramUrl(value) : mailtoUrl(value);
@@ -853,8 +871,7 @@ function createProfileContactButton(type, value) {
   a.className = `profile-contact-btn ${isTelegram ? "telegram" : "mail"}`;
   a.href = href;
   if (isTelegram) {
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
+    activateTelegramLink(a, href);
     a.setAttribute("aria-label", `Open ${telegramLabel(value)} on Telegram`);
     a.append(telegramIcon());
   } else {
@@ -1589,9 +1606,7 @@ function createTelegramAction(value) {
   if (!url) return null;
   const a = document.createElement("a");
   a.className = "telegram-action";
-  a.href = url;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
+  activateTelegramLink(a, url);
   a.setAttribute("aria-label", `Open ${telegramLabel(value)} on Telegram`);
 
   const copy = document.createElement("span");
@@ -1615,9 +1630,7 @@ function createTelegramInlineLink(value) {
   if (!url) return null;
   const a = document.createElement("a");
   a.className = "telegram-inline";
-  a.href = url;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
+  activateTelegramLink(a, url);
   a.append(telegramIcon());
   const label = document.createElement("span");
   label.textContent = telegramLabel(value);

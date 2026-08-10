@@ -329,24 +329,72 @@ function closeAnnouncement(options = {}) {
   }
 }
 
+async function copyAnnouncementLink(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+  let copied = false;
+  try { copied = document.execCommand("copy"); } catch (_) {}
+  textarea.remove();
+  return copied;
+}
+
+function showAnnouncementShareFeedback(id, copied) {
+  document.querySelectorAll(`[data-share-announcement="${CSS.escape(id)}"]`).forEach(button => {
+    const label = button.querySelector("strong");
+    if (label) {
+      const previous = label.textContent;
+      label.textContent = copied ? "Link copied" : "Copy failed";
+      setTimeout(() => { label.textContent = previous; }, 1800);
+    } else {
+      const previous = button.textContent;
+      button.textContent = copied ? "✓" : "!";
+      button.setAttribute("aria-label", copied ? "Announcement link copied" : "Could not copy announcement link");
+      setTimeout(() => {
+        button.textContent = previous;
+        button.setAttribute("aria-label", "Share announcement");
+      }, 1800);
+    }
+  });
+}
+
 async function shareAnnouncement(id) {
   const item = POLIMI_ANNOUNCEMENTS.find(x => x.id === id);
   if (!item) return;
   const url = `${location.origin}${location.pathname}#${encodeURIComponent(id)}`;
   const data = { title: item.title, text: item.summary, url };
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches;
 
-  try {
-    if (navigator.share) {
+  // Native share is ideal on phones/tablets. On desktop, copying the stable link is more predictable.
+  if (navigator.share && coarsePointer) {
+    try {
       await navigator.share(data);
       return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
     }
-    await navigator.clipboard.writeText(url);
-    document.querySelectorAll(`[data-share-announcement="${CSS.escape(id)}"] strong`).forEach(label => {
-      const previous = label.textContent;
-      label.textContent = "Link copied";
-      setTimeout(() => { label.textContent = previous; }, 1600);
-    });
-  } catch (_) {}
+  }
+
+  const copied = await copyAnnouncementLink(url);
+  showAnnouncementShareFeedback(id, copied);
+  if (!copied) {
+    // Last-resort desktop fallback: expose the URL to the user.
+    window.prompt("Copy this announcement link:", url);
+  }
 }
 
 function bindAnnouncementControls() {

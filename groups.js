@@ -24,6 +24,14 @@ const TELEGRAM_GROUPS = [
     url: "https://t.me/+E-ZbMJk_9FthYTY0"
   }
 ];
+function openTelegramLink(href) {
+  try {
+    window.location.assign(href);
+  } catch (_) {
+    window.location.href = href;
+  }
+}
+
 
 const grid = document.getElementById("telegramGroupGrid");
 const search = document.getElementById("groupSearch");
@@ -99,8 +107,12 @@ function renderGroups() {
     const button = document.createElement("a");
     button.className = "telegram-join-btn";
     button.href = item.url;
-    button.target = "_blank";
-    button.rel = "noopener noreferrer";
+    button.rel = "external noopener noreferrer";
+    button.addEventListener("click", event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      openTelegramLink(item.url);
+    });
     button.innerHTML = '<span>Open Telegram group</span><span aria-hidden="true">↗</span>';
     button.setAttribute("aria-label", `Open ${item.program} Telegram group`);
 
