@@ -2969,3 +2969,57 @@ button, a, select, input { -webkit-tap-highlight-color: transparent; }
     transition-duration: .001ms !important;
   }
 }
+
+/* Project artwork as the visible app brand icon. */
+.brand-mark,
+.access-brand-mark {
+  overflow: hidden;
+  padding: 0;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, #7898b5 22%, var(--line));
+  box-shadow: 0 7px 22px rgba(30, 69, 105, .15);
+}
+.brand-mark img,
+.access-brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Permanent creator marker; intentionally replaces the temporary New badge for Kamyab. */
+.card-creator-badge,
+.creator-badge {
+  min-height: 20px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 210, 92, .18), rgba(255, 159, 67, .12));
+  border: 1px solid rgba(212, 145, 32, .30);
+  color: #9a5b00;
+  font-size: 6.8px;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.profile-creator-badge {
+  min-height: 29px;
+  padding-inline: 10px;
+  font-size: 8px;
+  text-transform: none;
+  letter-spacing: .015em;
+}
+[data-theme="dark"] .card-creator-badge,
+[data-theme="dark"] .creator-badge {
+  background: linear-gradient(135deg, rgba(255, 205, 92, .17), rgba(255, 159, 67, .11));
+  border-color: rgba(255, 199, 80, .30);
+  color: #ffd37a;
+}
+@media (max-width: 760px) {
+  .card-creator-badge { min-height: 18px; padding-inline: 5px; font-size: 5.8px; }
+  .profile-creator-badge { min-height: 25px; padding-inline: 8px; font-size: 7px; }
+}

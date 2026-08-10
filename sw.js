@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-shell-v2";
+const CACHE_NAME = "polimi-students-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,7 +6,10 @@ const APP_SHELL = [
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png",
+  "./icons/favicon-64.png",
+  "./icons/app-icon-1024.png"
 ];
 
 self.addEventListener("install", event => {

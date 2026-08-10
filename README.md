@@ -55,3 +55,11 @@ Then enable GitHub Pages for the branch/root folder. HTTPS is required for servi
 ## Important security note
 
 The email gate is a user-experience/membership gate. If the Google Sheet itself is publicly readable, a technically determined visitor can still access the underlying public data endpoint outside the UI. Strong data privacy would require putting the sheet/API behind a server-side authenticated endpoint.
+
+## Creator & reporting
+
+This project was created by **Kamyab Safaei**. Kamyab's student profile receives a permanent **Creator** badge (instead of the temporary New badge). Profile reports are routed to Kamyab using the contact details in Kamyab's own sheet row, preferring Telegram and falling back to Polimi/form email when needed.
+
+## App icon
+
+The PWA, favicon, Apple touch icon, and in-app brand mark use the upgraded community artwork in the `icons/` directory.

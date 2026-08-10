@@ -5,6 +5,7 @@ const CONFIG = {
   defaultView: "cards",
   formUrl: "https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog",
   reportEmail: "",
+  creatorName: "Kamyab Safaei",
   cacheMaxAgeMs: 7 * 24 * 60 * 60 * 1000,
   hiddenColumns: ["timestamp", "email address", "email", "e-mail", "e mail", "show telegram", "display telegram", "telegram visibility", "share telegram", "show polimi mail", "display polimi mail", "polimi mail visibility", "share polimi mail"],
   slicers: [
@@ -752,6 +753,13 @@ function renderStudentProfile(row) {
     genderBadge.textContent = gender;
     badges.appendChild(genderBadge);
   }
+  if (isCreatorRow(row)) {
+    const creatorBadge = document.createElement("span");
+    creatorBadge.className = "creator-badge profile-creator-badge";
+    creatorBadge.textContent = "✦ Creator";
+    creatorBadge.title = "Creator of Polimi Students 2026/2027";
+    badges.appendChild(creatorBadge);
+  }
   if (mailtoUrl(polimiMail)) {
     const mailBadge = document.createElement("span");
     mailBadge.className = "polimi-mail-badge profile-polimi-badge";
@@ -1344,7 +1352,12 @@ function renderCards(rows, start) {
     title.textContent = name;
     titleRow.appendChild(title);
 
-    if (isRecentStudent(row)) {
+    if (isCreatorRow(row)) {
+      const creatorBadge = document.createElement("span");
+      creatorBadge.className = "card-creator-badge";
+      creatorBadge.textContent = "Creator";
+      titleRow.appendChild(creatorBadge);
+    } else if (isRecentStudent(row)) {
       const fresh = document.createElement("span");
       fresh.className = "card-new-badge";
       fresh.textContent = "New";
@@ -2022,18 +2035,72 @@ function closeProfileMenu() {
 function updateProfileMenuForRow(row) {
   const own = row === currentUserRow();
   if (els.profileUpdateAction) els.profileUpdateAction.hidden = !own;
+  if (els.profileReportAction) els.profileReportAction.textContent = `⚑ Report to ${CONFIG.creatorName}`;
+}
+
+function isCreatorRow(row) {
+  if (!row) return false;
+  const name = normalize(displayValue(row, semanticColumn("name")));
+  const creator = normalize(CONFIG.creatorName);
+  return Boolean(name && creator && (name === creator || name.startsWith(`${creator} `)));
+}
+
+function creatorRow() {
+  return state.rows.find(row => isCreatorRow(row)) || null;
+}
+
+function creatorReportDestination(profileRow, slug) {
+  const creator = creatorRow();
+  if (!creator) return null;
+
+  const creatorName = displayValue(creator, semanticColumn("name")) || CONFIG.creatorName;
+  const telegram = displayValue(creator, semanticColumn("telegram"));
+  const polimiMail = displayValue(creator, semanticColumn("polimiMail"));
+  const formEmail = displayValue(creator, semanticColumn("email"));
+  const reportedName = displayValue(profileRow, semanticColumn("name")) || "Polimi student";
+  const reportText = `Hi ${creatorName}, I want to report outdated or incorrect information on this Polimi Students profile:\n\n${profileUrl(slug)}\n\nProfile: ${reportedName}\n\nIssue: `;
+
+  const telegramHref = telegramUrl(telegram);
+  if (telegramHref) {
+    if (/^https?:\/\//i.test(telegramHref)) {
+      const separator = telegramHref.includes("?") ? "&" : "?";
+      return { type: "telegram", href: `${telegramHref}${separator}text=${encodeURIComponent(reportText)}`, creatorName };
+    }
+    return { type: "telegram", href: telegramHref, creatorName };
+  }
+
+  const email = polimiMail || formEmail || CONFIG.reportEmail;
+  if (email) {
+    const subject = encodeURIComponent(`Polimi Students profile report: ${reportedName}`);
+    const body = encodeURIComponent(reportText);
+    return { type: "email", href: `mailto:${email}?subject=${subject}&body=${body}`, creatorName };
+  }
+
+  return { type: "profile", creator, creatorName };
 }
 
 function reportActiveProfile() {
   const slug = state.activeProfileSlug;
   const row = state.profileBySlug.get(slug);
   if (!row) return;
-  const name = displayValue(row, semanticColumn("name")) || "Polimi student";
-  const subject = encodeURIComponent(`Polimi Students profile report: ${name}`);
-  const body = encodeURIComponent(`I want to report outdated or incorrect information on this profile:\n\n${profileUrl(slug)}\n\nIssue:\n`);
-  const recipient = CONFIG.reportEmail ? encodeURIComponent(CONFIG.reportEmail) : "";
-  window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+
+  const destination = creatorReportDestination(row, slug);
   closeProfileMenu();
+
+  if (!destination) {
+    showToast(`Creator contact is temporarily unavailable.`);
+    return;
+  }
+
+  if (destination.type === "profile") {
+    closeStudentProfile(false);
+    window.setTimeout(() => openStudentProfile(destination.creator), 120);
+    showToast(`Open ${destination.creatorName}'s profile to contact the creator.`);
+    return;
+  }
+
+  showToast(`Opening ${destination.creatorName} for your report…`);
+  window.location.href = destination.href;
 }
 
 function contactVisibilityAllows(value) {
