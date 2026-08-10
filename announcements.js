@@ -81,6 +81,77 @@ const POLIMI_ANNOUNCEMENTS = [
 
 window.POLIMI_ANNOUNCEMENTS = POLIMI_ANNOUNCEMENTS;
 
+const ANNOUNCEMENTS_READ_KEY = "polimi_read_announcements_v1";
+
+function getReadAnnouncementIds() {
+  try {
+    const value = JSON.parse(localStorage.getItem(ANNOUNCEMENTS_READ_KEY) || "[]");
+    return new Set(Array.isArray(value) ? value : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+
+function isAnnouncementRead(id) {
+  return getReadAnnouncementIds().has(id);
+}
+
+function unreadAnnouncementCount() {
+  const read = getReadAnnouncementIds();
+  return POLIMI_ANNOUNCEMENTS.reduce((count, item) => count + (read.has(item.id) ? 0 : 1), 0);
+}
+
+function updateAnnouncementUnreadUI() {
+  const unread = unreadAnnouncementCount();
+  const topCount = document.getElementById("announcementsTopCount");
+  if (topCount) {
+    topCount.textContent = String(unread);
+    topCount.hidden = unread === 0;
+  }
+
+  const topLink = topCount?.closest(".top-notices-btn");
+  if (topLink) {
+    topLink.classList.toggle("has-unread", unread > 0);
+    topLink.setAttribute("aria-label", unread > 0
+      ? `Open university announcements · ${unread} unread`
+      : "Open university announcements");
+  }
+
+  const accessBadge = document.getElementById("accessAnnouncementsUnread");
+  if (accessBadge) {
+    accessBadge.textContent = String(unread);
+    accessBadge.hidden = unread === 0;
+  }
+
+  const mobileBadge = document.getElementById("mobileAnnouncementsUnread");
+  if (mobileBadge) {
+    mobileBadge.textContent = String(unread);
+    mobileBadge.hidden = unread === 0;
+  }
+}
+
+function markAnnouncementRead(id) {
+  if (!id) return;
+  const read = getReadAnnouncementIds();
+  if (read.has(id)) return;
+  read.add(id);
+  try { localStorage.setItem(ANNOUNCEMENTS_READ_KEY, JSON.stringify([...read])); } catch (_) {}
+  updateAnnouncementUnreadUI();
+
+  const card = document.querySelector(`[data-announcement-id="${CSS.escape(id)}"]`);
+  if (card) {
+    card.classList.remove("is-unread");
+    card.querySelector(".announcement-unread-pill")?.remove();
+  }
+
+  const count = document.getElementById("announcementsCount");
+  if (count && document.getElementById("announcementGrid")) {
+    const visible = filteredAnnouncements().length;
+    const unread = unreadAnnouncementCount();
+    count.textContent = `${visible} ${visible === 1 ? "announcement" : "announcements"}${unread ? ` · ${unread} unread` : " · all read"}`;
+  }
+}
+
 const announcementState = {
   query: "",
   filter: "all",
@@ -171,13 +242,17 @@ function fullTextMarkup(item) {
 function announcementCardMarkup(item) {
   const status = announcementStatus(item);
   const primaryTag = (item.tags || [])[0] || item.category;
+  const unread = !isAnnouncementRead(item.id);
   return `
-    <article class="announcement-card-v3 announcement-${escapeHtml(item.tone || "general")}" data-announcement-id="${escapeHtml(item.id)}">
+    <article class="announcement-card-v3 announcement-${escapeHtml(item.tone || "general")}${unread ? " is-unread" : ""}" data-announcement-id="${escapeHtml(item.id)}">
       <button class="announcement-card-button" type="button" aria-label="Open announcement: ${escapeHtml(item.title)}">
         <span class="announcement-card-accent" aria-hidden="true"></span>
         <span class="announcement-card-top">
           <span class="announcement-card-icon" aria-hidden="true">${escapeHtml(item.icon || "!")}</span>
-          <span class="announcement-card-status announcement-status ${status.className}">${escapeHtml(status.label)}</span>
+          <span class="announcement-card-top-right">
+            ${unread ? '<span class="announcement-unread-pill"><i></i>Unread</span>' : ""}
+            <span class="announcement-card-status announcement-status ${status.className}">${escapeHtml(status.label)}</span>
+          </span>
         </span>
 
         <span class="announcement-card-date-row">
@@ -221,14 +296,12 @@ function renderAnnouncements() {
   const topCount = document.getElementById("announcementsTopCount");
   const empty = document.getElementById("announcementsEmpty");
 
-  if (topCount) {
-    topCount.textContent = String(POLIMI_ANNOUNCEMENTS.length);
-    topCount.hidden = POLIMI_ANNOUNCEMENTS.length === 0;
-  }
+  updateAnnouncementUnreadUI();
   if (!grid) return;
 
   const items = filteredAnnouncements();
-  if (count) count.textContent = `${items.length} ${items.length === 1 ? "announcement" : "announcements"}`;
+  const unread = unreadAnnouncementCount();
+  if (count) count.textContent = `${items.length} ${items.length === 1 ? "announcement" : "announcements"}${unread ? ` · ${unread} unread` : " · all read"}`;
   if (empty) empty.hidden = items.length > 0;
   grid.innerHTML = items.map(announcementCardMarkup).join("");
   updateFilterCounts();
@@ -301,6 +374,7 @@ function openAnnouncement(id, options = {}) {
   if (!item) return;
 
   announcementState.openId = id;
+  markAnnouncementRead(id);
   renderAnnouncementModal(item);
 
   const modal = document.getElementById("announcementModal");
@@ -469,6 +543,13 @@ if (announcementsThemeToggle) {
     setAnnouncementsTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   });
 }
+
+window.addEventListener("storage", event => {
+  if (event.key === ANNOUNCEMENTS_READ_KEY) {
+    updateAnnouncementUnreadUI();
+    if (document.getElementById("announcementGrid")) renderAnnouncements();
+  }
+});
 
 bindAnnouncementControls();
 renderAnnouncements();

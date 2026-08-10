@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260811-links-fonts-v1" />
+  <link rel="stylesheet" href="styles.css?v=20260811-unread-v1" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -41,7 +41,7 @@
           <span class="access-primary-copy"><strong>Add my profile</strong><small>Open the Polimi Students form</small></span>
           <span class="access-primary-arrow" aria-hidden="true">↗</span>
         </a>
-        <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University announcements</span><span aria-hidden="true">→</span></a>
+        <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University announcements</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span aria-hidden="true">→</span></a>
 
         <div class="access-divider"><span>Already submitted?</span></div>
         <p class="access-return-copy">Enter the same email you used in the form to open the directory.</p>
@@ -196,10 +196,11 @@
         </div>
       </div>
 
-      <div class="pagination" id="pagination" hidden>
-        <button id="prevPage" type="button" aria-label="Previous page">←</button>
-        <span id="pageInfo">1 / 1</span>
-        <button id="nextPage" type="button" aria-label="Next page">→</button>
+      <div class="pagination pagination-v2" id="pagination" hidden aria-label="Student directory pagination">
+        <button class="pagination-nav" id="prevPage" type="button" aria-label="Previous page">← <span>Previous</span></button>
+        <div class="pagination-pages" id="pageNumbers" aria-label="Page numbers"></div>
+        <button class="pagination-nav" id="nextPage" type="button" aria-label="Next page"><span>Next</span> →</button>
+        <span class="pagination-info" id="pageInfo">Page 1 of 1 · 24 per page</span>
       </div>
     </section>
   </main>
@@ -280,7 +281,7 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="announcements.js?v=20260811-links-fonts-v1"></script>
-  <script src="app.js?v=20260811-links-fonts-v1"></script>
+  <script src="announcements.js?v=20260811-unread-v1"></script>
+  <script src="app.js?v=20260811-unread-v1"></script>
 </body>
 </html>

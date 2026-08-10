@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-shell-v8-links-fonts";
+const CACHE_NAME = "polimi-students-pagination-v2";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -70,7 +70,7 @@ function cacheElements() {
     "directoryIntroTitle", "directoryIntroText", "sortSelect", "savedTrigger", "savedCount", "savedBanner", "savedReset",
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
     "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
-    "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
+    "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "pageNumbers", "filterSheet", "filterBackdrop",
     "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
@@ -1472,18 +1472,56 @@ function sortBy(index) {
 }
 
 function renderPagination() {
-  const pages = Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage);
+  const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
   els.pagination.hidden = pages <= 1;
-  els.pageInfo.textContent = `${state.page} / ${Math.max(1, pages)}`;
+  els.pageInfo.textContent = `Page ${state.page} of ${pages} · ${CONFIG.rowsPerPage} per page`;
   els.prevPage.disabled = state.page <= 1;
   els.nextPage.disabled = state.page >= pages;
+
+  if (!els.pageNumbers) return;
+  els.pageNumbers.innerHTML = "";
+
+  const visiblePages = paginationWindow(state.page, pages);
+  visiblePages.forEach(item => {
+    if (item === "…") {
+      const ellipsis = document.createElement("span");
+      ellipsis.className = "pagination-ellipsis";
+      ellipsis.textContent = "…";
+      ellipsis.setAttribute("aria-hidden", "true");
+      els.pageNumbers.appendChild(ellipsis);
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "pagination-page";
+    button.textContent = item;
+    button.setAttribute("aria-label", `Go to page ${item}`);
+    if (item === state.page) {
+      button.classList.add("is-active");
+      button.setAttribute("aria-current", "page");
+    }
+    button.addEventListener("click", () => goToPage(item));
+    els.pageNumbers.appendChild(button);
+  });
+}
+
+function paginationWindow(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, "…", total];
+  if (current >= total - 3) return [1, "…", total - 4, total - 3, total - 2, total - 1, total];
+  return [1, "…", current - 1, current, current + 1, "…", total];
+}
+
+function goToPage(page) {
+  const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
+  state.page = Math.max(1, Math.min(pages, Number(page) || 1));
+  renderRows();
+  document.querySelector(".explore-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function changePage(direction) {
-  const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
-  state.page = Math.max(1, Math.min(pages, state.page + direction));
-  renderRows();
-  document.querySelector(".explore-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  goToPage(state.page + direction);
 }
 
 function compareCells(a, b) {

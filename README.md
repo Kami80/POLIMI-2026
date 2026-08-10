@@ -109,3 +109,11 @@ To add a future notice, add one object to `POLIMI_ANNOUNCEMENTS` in `announcemen
 ### Pinned main community group
 - Polimi Free Forum — https://t.me/+hVdotxBWIWUwMDU0
 - Shown as the pinned main group above program-specific Telegram groups.
+
+## Unread announcements
+Announcement read state is stored locally under `polimi_read_announcements_v1`. New announcement IDs are automatically treated as unread. Opening a notice marks only that notice as read and updates badges immediately.
+
+
+## Latest UI update
+- Student directory uses 24 records per page with numbered pagination.
+- Announcement cards use larger desktop typography for dates, summaries, tags and footer labels.
