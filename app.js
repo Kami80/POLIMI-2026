@@ -22,6 +22,7 @@ const CONFIG = {
     telegram: ["telegram id", "telegram username", "telegram", "telegram account"],
     polimiMail: ["polimi mail", "polimi email", "polimi e-mail", "polimi e mail", "politecnico mail", "politecnico email", "university mail", "university email"],
     email: ["email address", "email", "e-mail", "e mail"],
+    timestamp: ["timestamp", "submitted at", "submission time", "date submitted"],
   }
 };
 
@@ -45,6 +46,7 @@ const state = {
   roommateMatchMode: false,
   roommateReferenceRow: null,
   roommateMatchMeta: new WeakMap(),
+  preferencesRestored: false,
 };
 
 const els = {};
@@ -58,7 +60,8 @@ function cacheElements() {
     "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
     "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions",
-    "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset"
+    "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
+    "quickFilters", "emptyState", "emptyReset"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
@@ -136,7 +139,7 @@ function setupEvents() {
 
   els.accessEmail.addEventListener("input", () => {
     els.accessNotFound.hidden = true;
-    if (state.sheetReady) setAccessStatus("", "Use the same email you submitted in the form.");
+    if (state.sheetReady) setAccessStatus("", "Enter the same email you used in the form.");
   });
 
   els.changeEmailButton?.addEventListener("click", lockDirectory);
@@ -145,6 +148,7 @@ function setupEvents() {
     state.query = event.target.value.trim().toLowerCase();
     state.page = 1;
     els.searchClear.hidden = !state.query;
+    persistDirectoryPreferences();
     applyDataPipeline();
   }, 100));
 
@@ -153,12 +157,14 @@ function setupEvents() {
     state.page = 1;
     els.searchInput.value = "";
     els.searchClear.hidden = true;
+    persistDirectoryPreferences();
     applyDataPipeline();
     els.searchInput.focus();
   });
 
   [els.cardViewBtn, els.tableViewBtn].forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
   els.clearFilters.addEventListener("click", resetAllFilters);
+  els.emptyReset?.addEventListener("click", resetAllFilters);
   els.prevPage.addEventListener("click", () => changePage(-1));
   els.nextPage.addEventListener("click", () => changePage(1));
   els.refreshButton?.addEventListener("click", loadSheet);
@@ -301,17 +307,13 @@ function unlockDirectory(email) {
   els.protectedApp.hidden = false;
   document.body.classList.add("directory-unlocked");
 
-  state.query = "";
-  state.filters = {};
   state.sort = { index: null, direction: "asc" };
   state.page = 1;
-  state.roommateMatchMode = false;
-  state.roommateReferenceRow = null;
   state.roommateMatchMeta = new WeakMap();
-  els.searchInput.value = "";
-  els.searchClear.hidden = true;
+  restoreDirectoryPreferences();
 
   renderFilters();
+  renderQuickFilters();
   updateRoommateMatchUI();
   applyDataPipeline();
   setStatus("online", "Live");
@@ -341,7 +343,7 @@ function lockDirectory() {
   els.accessEmail.value = "";
   els.accessNotFound.hidden = true;
   setAccessBusy(false, "Check & enter");
-  setAccessStatus("", "Use the same email you submitted in the form.");
+  setAccessStatus("", "Enter the same email you used in the form.");
   requestAnimationFrame(() => els.accessEmail.focus());
 }
 
@@ -376,6 +378,8 @@ function applyDraftFilters() {
   state.filters = cloneFilters(state.draftFilters);
   state.page = 1;
   renderDesktopFilters();
+  persistDirectoryPreferences();
+  renderQuickFilters();
   applyDataPipeline();
   closeFilterSheet();
 }
@@ -389,6 +393,7 @@ function setView(view) {
   state.view = view;
   els.cardViewBtn.classList.toggle("active", view === "cards");
   els.tableViewBtn.classList.toggle("active", view === "table");
+  persistDirectoryPreferences();
   renderRows();
 }
 
@@ -456,7 +461,7 @@ function handleSheetResponse(response) {
       requestAccess(rememberedEmail, { silent: true });
     } else {
       setAccessBusy(false, "Check & enter");
-      setAccessStatus("", "Directory ready. Enter the same email you submitted in the form.");
+      setAccessStatus("", "Directory ready. Enter the same email you used in the form.");
       requestAnimationFrame(() => els.accessEmail.focus());
     }
   } catch (error) {
@@ -866,6 +871,7 @@ function enterRoommateMatchMode() {
   state.page = 1;
   state.sort = { index: null, direction: "asc" };
   updateRoommateMatchUI();
+  persistDirectoryPreferences();
   applyDataPipeline();
   document.querySelector(".results-bar")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -876,6 +882,7 @@ function exitRoommateMatchMode() {
   state.roommateMatchMeta = new WeakMap();
   state.page = 1;
   updateRoommateMatchUI();
+  persistDirectoryPreferences();
   applyDataPipeline();
 }
 
@@ -921,6 +928,7 @@ function renderFilters() {
   renderDesktopFilters();
   renderMobileFilters();
   renderActiveFilters();
+  renderQuickFilters();
 }
 
 function renderDesktopFilters() {
@@ -1056,7 +1064,9 @@ function toggleFilterValue(columnIndex, value, checked, rerender = true) {
   if (checked) current.add(value); else current.delete(value);
   if (current.size) state.filters[columnIndex] = current; else delete state.filters[columnIndex];
   state.page = 1;
+  persistDirectoryPreferences();
   if (rerender) renderFilters();
+  else renderQuickFilters();
   applyDataPipeline();
   updateFilterBadges();
 }
@@ -1067,7 +1077,9 @@ function resetAllFilters() {
   state.page = 1;
   els.searchInput.value = "";
   els.searchClear.hidden = true;
+  persistDirectoryPreferences();
   renderFilters();
+  renderQuickFilters();
   applyDataPipeline();
 }
 
@@ -1143,8 +1155,10 @@ function applyDataPipeline() {
 function renderRows() {
   const isMobile = window.matchMedia("(max-width: 720px)").matches;
   const effectiveView = isMobile ? "cards" : state.view;
-  els.cardView.hidden = effectiveView !== "cards";
-  els.tableView.hidden = effectiveView !== "table";
+  const hasRows = state.filteredRows.length > 0;
+  if (els.emptyState) els.emptyState.hidden = hasRows;
+  els.cardView.hidden = !hasRows || effectiveView !== "cards";
+  els.tableView.hidden = !hasRows || effectiveView !== "table";
 
   const start = (state.page - 1) * CONFIG.rowsPerPage;
   const pageRows = state.filteredRows.slice(start, start + CONFIG.rowsPerPage);
@@ -1193,6 +1207,13 @@ function renderCards(rows, start) {
     title.className = "student-name";
     title.textContent = name;
     titleRow.appendChild(title);
+
+    if (isRecentStudent(row)) {
+      const fresh = document.createElement("span");
+      fresh.className = "card-new-badge";
+      fresh.textContent = "New";
+      titleRow.appendChild(fresh);
+    }
 
     const programLine = document.createElement("div");
     programLine.className = "student-card-program student-card-program-simple";
@@ -1486,6 +1507,148 @@ function initials(name) {
   const parts = String(name).trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return "P";
   return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+}
+
+const PREFS_KEY = "polimi-directory-preferences-v1";
+
+function persistDirectoryPreferences() {
+  if (!state.columns.length) return;
+  try {
+    const filters = Object.entries(state.filters).map(([index, values]) => ({
+      label: state.columns[Number(index)]?.label || "",
+      values: [...values]
+    })).filter(item => item.label && item.values.length);
+    localStorage.setItem(PREFS_KEY, JSON.stringify({
+      query: state.query,
+      view: state.view,
+      filters,
+      roommateMatchMode: state.roommateMatchMode
+    }));
+  } catch (_) {}
+}
+
+function restoreDirectoryPreferences() {
+  state.query = "";
+  state.filters = {};
+  state.view = CONFIG.defaultView;
+  state.roommateMatchMode = false;
+  state.roommateReferenceRow = null;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || "null");
+    if (saved && typeof saved === "object") {
+      state.query = String(saved.query || "").trim().toLowerCase();
+      state.view = saved.view === "table" ? "table" : "cards";
+      (Array.isArray(saved.filters) ? saved.filters : []).forEach(item => {
+        const column = state.columns.find(col => normalize(col.label) === normalize(item.label));
+        if (!column) return;
+        const available = new Set(state.rows.map(row => displayValue(row, column)).filter(Boolean));
+        const selected = new Set((Array.isArray(item.values) ? item.values : []).filter(value => available.has(value)));
+        if (selected.size) state.filters[column.index] = selected;
+      });
+      if (saved.roommateMatchMode) {
+        const reference = currentUserRow();
+        if (reference) {
+          state.roommateMatchMode = true;
+          state.roommateReferenceRow = reference;
+        }
+      }
+    }
+  } catch (_) {}
+
+  els.searchInput.value = state.query;
+  els.searchClear.hidden = !state.query;
+  els.cardViewBtn.classList.toggle("active", state.view === "cards");
+  els.tableViewBtn.classList.toggle("active", state.view === "table");
+  state.preferencesRestored = true;
+}
+
+function quickFilterSpec() {
+  const specs = [];
+  const roommateCol = semanticColumn("roommate");
+  if (roommateCol) {
+    const values = [...new Set(state.rows.map(row => displayValue(row, roommateCol)).filter(Boolean))]
+      .filter(value => roommateIntent(value).score >= 42);
+    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "⌂" });
+  }
+
+  const campusCol = semanticColumn("campus");
+  if (campusCol) {
+    const counts = new Map();
+    state.rows.forEach(row => {
+      const value = displayValue(row, campusCol);
+      if (value) counts.set(value, (counts.get(value) || 0) + 1);
+    });
+    const preferred = ["leonardo", "bovisa"];
+    const chosen = [];
+    preferred.forEach(term => {
+      const hit = [...counts.keys()].find(value => normalize(value).includes(term));
+      if (hit && !chosen.includes(hit)) chosen.push(hit);
+    });
+    [...counts.entries()].sort((a,b) => b[1]-a[1]).forEach(([value]) => {
+      if (chosen.length < 2 && !chosen.includes(value)) chosen.push(value);
+    });
+    chosen.slice(0,2).forEach(value => {
+      const n = normalize(value);
+      let label = value;
+      if (n.includes("leonardo")) label = "Leonardo";
+      else if (n.includes("bovisa")) label = "Bovisa";
+      specs.push({ label, column: campusCol, values: [value], icon: "⌖" });
+    });
+  }
+
+  const degreeCol = semanticColumn("degree");
+  if (degreeCol) {
+    const values = [...new Set(state.rows.map(row => displayValue(row, degreeCol)).filter(Boolean))];
+    const masters = values.filter(value => {
+      const n = normalize(value);
+      return n.includes("master") || n.includes("magistrale") || n.includes("msc");
+    });
+    if (masters.length) specs.push({ label: "Master", column: degreeCol, values: masters, icon: "◇" });
+  }
+  return specs;
+}
+
+function quickFilterActive(spec) {
+  const selected = state.filters[spec.column.index] || new Set();
+  return selected.size === spec.values.length && spec.values.every(value => selected.has(value));
+}
+
+function renderQuickFilters() {
+  if (!els.quickFilters || !state.sheetReady) return;
+  els.quickFilters.innerHTML = "";
+  quickFilterSpec().forEach(spec => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `quick-filter-chip${quickFilterActive(spec) ? " active" : ""}`;
+    button.innerHTML = `<span aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
+    button.addEventListener("click", () => {
+      if (quickFilterActive(spec)) delete state.filters[spec.column.index];
+      else state.filters[spec.column.index] = new Set(spec.values);
+      state.page = 1;
+      persistDirectoryPreferences();
+      renderFilters();
+      applyDataPipeline();
+    });
+    els.quickFilters.appendChild(button);
+  });
+
+  const more = document.createElement("button");
+  more.type = "button";
+  more.className = "quick-filter-chip quick-filter-more";
+  more.innerHTML = `<span aria-hidden="true">☷</span><strong>More filters</strong>`;
+  more.addEventListener("click", openFilterSheet);
+  els.quickFilters.appendChild(more);
+}
+
+function isRecentStudent(row) {
+  const column = semanticColumn("timestamp");
+  if (!column) return false;
+  const cell = row[column.index];
+  let date = cell?.raw instanceof Date ? cell.raw : new Date(cell?.display || cell?.raw || "");
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
+  const age = Date.now() - date.getTime();
+  return age >= 0 && age <= 14 * 24 * 60 * 60 * 1000;
 }
 
 function cardAccentClass(value) {

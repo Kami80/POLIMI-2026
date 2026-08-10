@@ -1,32 +1,33 @@
 # Polimi Students 2026/2027
 
-A mobile-first student directory for GitHub Pages, powered by a public Google Sheet.
+Static HTML/CSS/JavaScript student directory designed for GitHub Pages.
 
-## Features
-- Responsive mobile-app style interface
-- Student cards as the primary view
-- Gender badge beside each student's name
-- Program, campus, degree and roommate information prioritized
-- Email and timestamp hidden from all directory views
-- Email submission gate: visitors must use an email already present in the Google Form responses before the directory opens
-- Multi-select checkbox filters for program, gender, campus and roommate preference
-- Search, sorting, pagination and dark mode
-- Google Form button for adding a student profile
-- Desktop table view; mobile automatically uses cards
+## Current UX
 
-## Deploy on GitHub Pages
-1. Upload `index.html`, `styles.css`, and `app.js` to the root of your GitHub repository.
-2. In GitHub, open **Settings → Pages**.
-3. Choose **Deploy from a branch**, select your main branch and `/ (root)`.
-4. Save and wait for GitHub Pages to publish the site.
+- New visitors see **Add my profile** first, followed by the email access check for students who already submitted the form.
+- The directory automatically checks the submitted email against the Google Sheet and redirects unknown emails to the Google Form.
+- Verified access is stored in `localStorage`, so returning users on the same browser are not asked for their email again.
+- Search, selected filters, Card/Table preference, and roommate-matching mode are also remembered locally.
+- Student cards stay intentionally minimal (name + program) with subtle pink/sky-blue gender gradients.
+- Student profiles open in a full desktop modal / mobile bottom sheet with About Me, campus, degree, roommate preference, Telegram, Polimi mail and sharing.
+- Shareable student URLs use `?student=student-slug`.
+- Quick filters surface Roommates, common campuses and Master-level students, while the full multi-select filter sheet remains available.
+- Recently submitted profiles can receive a small `New` marker when a timestamp column is available.
+- Mobile navigation provides Students, Filters, Roommates and Update.
 
-The connected Google Sheet must be publicly viewable for browser-only GitHub Pages access.
+## Deploy to GitHub Pages
 
+Upload these four files to the root of your repository:
 
-## Student profiles
-Cards automatically include the optional self-description, turn Telegram usernames/IDs into profile links when possible, and show the Polimi mail as a clickable email action. The form-login email and timestamp remain hidden from the public UI.
+- `index.html`
+- `styles.css`
+- `app.js`
+- `README.md`
 
-## Member access gate
-The page checks the visitor-entered email against the hidden email column in the connected Google Sheet. The match is case-insensitive and the email remains hidden from cards, search, and tables. A verified email is remembered in this browser using localStorage, so refreshes and later visits on the same browser do not ask again. Using “Change email” clears the saved verification.
+Then enable GitHub Pages from the repository settings and publish from your chosen branch/root folder.
 
-**Important:** this is a client-side membership gate. Because GitHub Pages is static and the Google Sheet is publicly readable, it is not strong access control against someone who intentionally inspects the page/network or opens the Sheet endpoint directly. For real private access, use verified sign-in plus a backend/private Sheet.
+## Data source
+
+The site reads the configured Google Sheet using Google Visualization / GViz. The Sheet must remain readable by the browser for this static deployment model to work.
+
+> The email check is an application-level membership gate. If the underlying Google Sheet is public, it is not equivalent to server-side access control for sensitive data.
