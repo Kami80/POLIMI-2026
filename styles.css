@@ -326,10 +326,10 @@ kbd {
 .view-button.active { background: var(--surface-solid); color: var(--ink); box-shadow: var(--shadow-sm); }
 .filter-row {
   min-height: 45px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 150px repeat(4, minmax(0, 1fr));
   gap: 9px;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: start;
   padding-top: 14px;
 }
 .filter-placeholder { color: var(--ink-soft); font-size: 13px; }
@@ -357,10 +357,9 @@ kbd {
 .slicer-heading small { color: var(--ink-soft); font-size: 10px; white-space: nowrap; }
 
 .slicer {
-  position: relative;
-  min-width: 176px;
+  min-width: 0;
 }
-.slicer[open] { z-index: 20; }
+.slicer[open] { z-index: 1; }
 .slicer-summary {
   min-height: 46px;
   display: flex;
@@ -416,16 +415,14 @@ kbd {
 .slicer[open] .slicer-chevron { transform: rotate(180deg); }
 
 .slicer-panel {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 8px);
-  width: min(320px, calc(100vw - 36px));
+  position: static;
+  width: 100%;
+  margin-top: 8px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface-solid);
-  box-shadow: 0 22px 55px rgba(49, 45, 39, .18);
-  z-index: 30;
+  box-shadow: 0 14px 34px rgba(49, 45, 39, .12);
 }
 [data-theme="dark"] .slicer-panel { box-shadow: 0 22px 55px rgba(0, 0, 0, .36); }
 .slicer-panel-head {
@@ -680,6 +677,8 @@ tbody tr:hover { background: color-mix(in srgb, var(--surface-2) 65%, transparen
 
 @media (max-width: 940px) {
   .hero { grid-template-columns: 1fr; gap: 18px; padding-top: 42px; }
+  .filter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .slicer-heading { grid-column: 1 / -1; }
   .hero-art { min-height: 220px; max-width: 470px; width: 100%; justify-self: center; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -704,8 +703,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--surface-2) 65%, transparen
   .view-switch { width: 100%; }
   .view-button { flex: 1; }
   .filter-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     align-items: stretch;
     overflow: visible;
     padding-bottom: 3px;
@@ -713,9 +711,9 @@ tbody tr:hover { background: color-mix(in srgb, var(--surface-2) 65%, transparen
   .slicer-heading { grid-column: 1 / -1; min-height: 38px; padding-left: 2px; }
   .slicer { min-width: 0; }
   .slicer-summary { width: 100%; }
-  .slicer-selection { max-width: 110px; }
-  .slicer-panel { position: fixed; left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; max-height: min(70vh, 520px); }
-  .slicer-options { max-height: min(55vh, 390px); }
+  .slicer-selection { max-width: min(58vw, 240px); }
+  .slicer-panel { width: 100%; max-height: none; }
+  .slicer-options { max-height: 260px; }
   .cards-grid { grid-template-columns: 1fr; }
   .site-footer { padding: 30px 0; align-items: flex-start; flex-direction: column; }
   .pagination { gap: 10px; }

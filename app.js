@@ -99,6 +99,15 @@ function setupEvents() {
       event.preventDefault();
       els.searchInput.focus();
     }
+    if (event.key === "Escape") {
+      els.filterRow.querySelectorAll("details.slicer[open]").forEach(item => item.open = false);
+    }
+  });
+
+  document.addEventListener("click", event => {
+    if (!els.filterRow.contains(event.target)) {
+      els.filterRow.querySelectorAll("details.slicer[open]").forEach(item => item.open = false);
+    }
   });
 }
 
@@ -280,6 +289,12 @@ function renderFilters() {
     const details = document.createElement("details");
     details.className = "slicer";
     details.dataset.columnIndex = String(column.index);
+    details.addEventListener("toggle", () => {
+      if (!details.open) return;
+      els.filterRow.querySelectorAll("details.slicer[open]").forEach(other => {
+        if (other !== details) other.open = false;
+      });
+    });
 
     const summary = document.createElement("summary");
     summary.className = "slicer-summary";
