@@ -4,17 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b57d0" />
-  <meta name="description" content="Important announcements and deadlines for Polimi Students 2026/2027." />
+  <meta name="description" content="Important announcements, dates and deadlines for Polimi Students 2026/2027." />
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v1" />
+  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v2" />
   <title>Announcements · Polimi Students 2026/2027</title>
 </head>
-<body class="announcements-page">
+<body class="announcements-page announcements-page-v2">
   <div class="app-bg"></div>
 
   <header class="app-bar announcements-app-bar">
@@ -36,33 +36,56 @@
   </header>
 
   <main class="shell announcements-main">
-    <section class="announcements-hero" aria-labelledby="announcementsTitle">
+    <section class="announcements-hero announcements-hero-v2" aria-labelledby="announcementsTitle">
       <div class="announcements-hero-copy">
         <span class="announcements-kicker">POLIMI UPDATES · 2026/27</span>
-        <h1 id="announcementsTitle">Important things to <span>know right now.</span></h1>
-        <p>Deadlines, closures and useful university information for incoming Polimi students — collected in one place.</p>
+        <h1 id="announcementsTitle">University updates,<br><span>without the clutter.</span></h1>
+        <p>Important dates, deadlines, closures and useful information for incoming students. Tap any notice to read the full university announcement.</p>
+        <div class="announcements-hero-guide" aria-label="How this page works">
+          <span><i>1</i> Scan the summary</span>
+          <span><i>2</i> Tap to expand</span>
+          <span><i>3</i> Use official links when needed</span>
+        </div>
       </div>
-      <div class="announcements-hero-badge" aria-hidden="true">
-        <span>!</span>
-      </div>
+      <div class="announcements-hero-badge" aria-hidden="true"><span>!</span></div>
     </section>
 
     <section class="announcements-directory" aria-label="University announcements">
-      <div class="announcements-toolbar">
+      <div class="announcements-toolbar announcements-toolbar-v2">
         <div>
           <span class="announcements-section-kicker">LATEST UPDATES</span>
-          <h2>University announcements</h2>
+          <h2>Announcements</h2>
+          <p class="announcements-toolbar-copy">Sorted by what matters now.</p>
         </div>
         <span class="announcements-count" id="announcementsCount">2 announcements</span>
       </div>
 
-      <div class="announcement-grid" id="announcementGrid"></div>
+      <div class="announcements-discovery" aria-label="Search and filter announcements">
+        <label class="announcements-search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input id="announcementsSearch" type="search" autocomplete="off" placeholder="Search announcements, dates, courses…" aria-label="Search announcements" />
+        </label>
+        <div class="announcement-filter-row" role="group" aria-label="Filter announcements">
+          <button class="announcement-filter active" type="button" data-announcement-filter="all" aria-pressed="true">All <i>2</i></button>
+          <button class="announcement-filter" type="button" data-announcement-filter="courses" aria-pressed="false">Courses <i>1</i></button>
+          <button class="announcement-filter" type="button" data-announcement-filter="closures" aria-pressed="false">Closures <i>1</i></button>
+        </div>
+      </div>
+
+      <div class="announcement-grid announcement-feed" id="announcementGrid"></div>
+
+      <div class="announcements-empty" id="announcementsEmpty" hidden>
+        <span aria-hidden="true">⌕</span>
+        <h3>No announcements found</h3>
+        <p>Try another keyword or reset the filters.</p>
+        <button id="clearAnnouncementSearch" type="button">Show all announcements</button>
+      </div>
 
       <aside class="announcements-note">
         <span class="announcements-note-icon" aria-hidden="true">i</span>
         <div>
-          <strong>Keep an eye on official Polimi channels too.</strong>
-          <p>This page is a convenient student summary. For critical deadlines or changes, always follow the university's official communications.</p>
+          <strong>Use this page as a student-friendly summary.</strong>
+          <p>For critical deadlines or last-minute changes, always confirm details through official Politecnico di Milano communications.</p>
         </div>
       </aside>
     </section>
@@ -79,6 +102,6 @@
     <span>Created by Kamyab</span>
   </footer>
 
-  <script src="announcements.js?v=20260811-announcements-v1"></script>
+  <script src="announcements.js?v=20260811-announcements-v2"></script>
 </body>
 </html>

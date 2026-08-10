@@ -86,3 +86,19 @@ University notices are available at `announcements.html`. The page currently inc
 - Free online Italian language courses and assessment registration: August 26–September 11, 2026.
 
 To add another notice later, add a new object to the `POLIMI_ANNOUNCEMENTS` array in `announcements.js`. Each item supports a title, summary, date/status window, detail bullets, source and optional action links.
+
+## Announcements v2
+
+`announcements.html` now uses a compact expandable feed. Each announcement supports:
+
+- event/date labels
+- status (Active / Upcoming / Ended)
+- tags
+- search and category filters
+- compact summary card
+- click/tap-to-expand full announcement
+- key-info highlights
+- official actions (email / external link)
+- shareable announcement URL hashes such as `announcements.html#italian-course-2026`
+
+To add a future notice, add one object to `POLIMI_ANNOUNCEMENTS` in `announcements.js`.
