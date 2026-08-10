@@ -2004,6 +2004,74 @@ tbody tr:hover { background: var(--surface-2); }
 .card-accent-4 { --card-accent: #d78b24; --card-accent-soft: rgba(215, 139, 36, .13); }
 .card-accent-5 { --card-accent: #2f9d67; --card-accent-soft: rgba(47, 157, 103, .12); }
 
+.student-card.student-card-v2.student-card-simple.card-gender-female {
+  background:
+    linear-gradient(135deg, rgba(255, 123, 186, .12) 0%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(circle at 92% 10%, rgba(255, 123, 186, .11), transparent 36%),
+    var(--surface);
+  border-color: color-mix(in srgb, #ff7bba 14%, var(--line));
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-female::before {
+  background: linear-gradient(180deg, #ff9acb 0%, #ff7bba 100%);
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-female::after {
+  background: rgba(255, 123, 186, .12);
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-female .student-card-simple-chevron {
+  background: color-mix(in srgb, #ff7bba 10%, var(--surface));
+  color: #d8559b;
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-female:hover .student-card-simple-chevron {
+  background: color-mix(in srgb, #ff7bba 15%, var(--surface));
+  color: #c44789;
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male {
+  background:
+    linear-gradient(135deg, rgba(116, 201, 255, .12) 0%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(circle at 92% 10%, rgba(116, 201, 255, .11), transparent 36%),
+    var(--surface);
+  border-color: color-mix(in srgb, #74c9ff 14%, var(--line));
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male::before {
+  background: linear-gradient(180deg, #8fddff 0%, #62bfff 100%);
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male::after {
+  background: rgba(116, 201, 255, .12);
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male .student-card-simple-chevron {
+  background: color-mix(in srgb, #74c9ff 10%, var(--surface));
+  color: #2793d9;
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male:hover .student-card-simple-chevron {
+  background: color-mix(in srgb, #74c9ff 15%, var(--surface));
+  color: #1f7fc0;
+}
+
+[data-theme="dark"] .student-card.student-card-v2.student-card-simple.card-gender-female {
+  background:
+    linear-gradient(135deg, rgba(255, 123, 186, .14) 0%, rgba(255,255,255,0) 54%),
+    radial-gradient(circle at 92% 10%, rgba(255, 123, 186, .16), transparent 38%),
+    var(--surface);
+  border-color: color-mix(in srgb, #ff7bba 24%, var(--line));
+}
+
+[data-theme="dark"] .student-card.student-card-v2.student-card-simple.card-gender-male {
+  background:
+    linear-gradient(135deg, rgba(116, 201, 255, .14) 0%, rgba(255,255,255,0) 54%),
+    radial-gradient(circle at 92% 10%, rgba(116, 201, 255, .16), transparent 38%),
+    var(--surface);
+  border-color: color-mix(in srgb, #74c9ff 24%, var(--line));
+}
+
 [data-theme="dark"] .student-card.student-card-v2.student-card-simple {
   background:
     radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--card-accent) 16%, transparent), transparent 38%),
@@ -2097,5 +2165,194 @@ tbody tr:hover { background: var(--surface-2); }
   .student-card-simple .student-card-simple-chevron {
     justify-self: center;
     align-self: center;
+  }
+}
+
+/* Desktop profile readability enhancement */
+@media (min-width: 761px) {
+  .profile-panel {
+    width: min(860px, calc(100vw - 48px));
+    max-height: min(90vh, 900px);
+  }
+
+  .profile-toolbar {
+    min-height: 72px;
+    padding: 12px 18px;
+  }
+
+  .profile-toolbar-label {
+    font-size: 11px;
+    letter-spacing: .14em;
+  }
+
+  .profile-toolbar-btn {
+    min-width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+
+  .profile-share {
+    padding-inline: 16px;
+    font-size: 12px;
+  }
+
+  .profile-share svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .profile-body {
+    padding: 38px 32px 36px;
+  }
+
+  .profile-hero {
+    grid-template-columns: 94px minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .profile-avatar {
+    width: 94px;
+    height: 94px;
+    border-radius: 28px;
+    font-size: 28px;
+  }
+
+  .profile-kicker {
+    font-size: 10px;
+    letter-spacing: .14em;
+  }
+
+  .profile-identity h2 {
+    margin: 8px 0 12px;
+    font-size: clamp(36px, 4vw, 48px);
+    line-height: 1.08;
+  }
+
+  .profile-badges {
+    gap: 8px;
+  }
+
+  .profile-badges .gender-badge,
+  .profile-polimi-badge {
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 11px;
+  }
+
+  .profile-program {
+    margin-top: 30px;
+    padding: 21px 22px;
+    border-radius: 21px;
+  }
+
+  .profile-program span,
+  .profile-extra-item > span {
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: .09em;
+  }
+
+  .profile-program strong {
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  .profile-detail-grid {
+    margin-top: 14px;
+    gap: 12px;
+  }
+
+  .profile-detail {
+    min-height: 104px;
+    padding: 17px;
+    gap: 13px;
+    border-radius: 20px;
+  }
+
+  .profile-detail-icon {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    border-radius: 12px;
+    font-size: 17px;
+  }
+
+  .profile-detail > div > span {
+    font-size: 10px;
+    letter-spacing: .07em;
+  }
+
+  .profile-detail > div > strong {
+    margin-top: 7px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .profile-about,
+  .profile-extra-section {
+    margin-top: 20px;
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .profile-section-title {
+    gap: 10px;
+  }
+
+  .profile-section-title > span {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 14px;
+  }
+
+  .profile-section-title strong {
+    font-size: 13px;
+  }
+
+  .profile-about p {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .profile-extra-grid {
+    margin-top: 17px;
+    gap: 12px;
+  }
+
+  .profile-extra-item {
+    padding: 16px;
+    border-radius: 17px;
+  }
+
+  .profile-extra-item strong {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .profile-contact-bar {
+    padding: 15px 18px 18px;
+    gap: 12px;
+  }
+
+  .profile-contact-btn {
+    min-height: 62px;
+    border-radius: 18px;
+    font-size: 14px;
+    gap: 11px;
+  }
+
+  .profile-contact-btn .telegram-icon,
+  .profile-contact-btn .mail-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
+  .profile-contact-btn .telegram-icon svg,
+  .profile-contact-btn .mail-icon svg {
+    width: 19px;
+    height: 19px;
   }
 }

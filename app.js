@@ -1159,14 +1159,16 @@ function renderCards(rows, start) {
   const fragment = document.createDocumentFragment();
   const nameCol = semanticColumn("name");
   const programCol = semanticColumn("program");
+  const genderCol = semanticColumn("gender");
 
   rows.forEach((row, offset) => {
     const name = displayValue(row, nameCol) || `Student ${start + offset + 1}`;
     const program = displayValue(row, programCol) || "Program not specified";
+    const gender = displayValue(row, genderCol);
     const slug = studentSlug(row);
 
     const card = document.createElement("article");
-    card.className = `student-card student-card-v2 student-card-simple ${cardAccentClass(program || name)}`;
+    card.className = `student-card student-card-v2 student-card-simple ${cardAccentClass(program || name)} card-gender-${genderClass(gender)}`;
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
