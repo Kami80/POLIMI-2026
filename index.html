@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260810-creator-v3" />
+  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v1" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -41,6 +41,7 @@
           <span class="access-primary-copy"><strong>Add my profile</strong><small>Open the Polimi Students form</small></span>
           <span class="access-primary-arrow" aria-hidden="true">↗</span>
         </a>
+        <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University announcements</span><span aria-hidden="true">→</span></a>
 
         <div class="access-divider"><span>Already submitted?</span></div>
         <p class="access-return-copy">Enter the same email you used in the form to open the directory.</p>
@@ -87,6 +88,7 @@
           <span class="connection-dot"></span>
           <span class="connection-text">Connecting</span>
         </span>
+        <a class="top-notices-btn" href="announcements.html" aria-label="Open university announcements"><span aria-hidden="true">!</span><span class="top-notices-label">Notices</span><i id="announcementsTopCount" hidden>0</i></a>
         <a class="top-groups-btn" href="groups.html" aria-label="Open Telegram groups"><span aria-hidden="true">✈</span><span class="top-groups-label">Groups</span></a>
         <button class="top-profile-btn" id="myProfileButton" type="button" aria-label="Open my profile">
           <span class="top-profile-avatar" id="myProfileAvatar">ME</span><span class="top-profile-label">My profile</span>
@@ -278,6 +280,7 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="app.js?v=20260811-groups-v1"></script>
+  <script src="announcements.js?v=20260811-announcements-v1"></script>
+  <script src="app.js?v=20260811-announcements-v1"></script>
 </body>
 </html>

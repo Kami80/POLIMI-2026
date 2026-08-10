@@ -76,3 +76,13 @@ To add another group later, edit the `TELEGRAM_GROUPS` array near the top of `gr
 ```
 
 The page updates automatically; no HTML changes are needed.
+
+
+## Announcements page
+
+University notices are available at `announcements.html`. The page currently includes:
+
+- Polimi summer office closure: August 8–23, 2026.
+- Free online Italian language courses and assessment registration: August 26–September 11, 2026.
+
+To add another notice later, add a new object to the `POLIMI_ANNOUNCEMENTS` array in `announcements.js`. Each item supports a title, summary, date/status window, detail bullets, source and optional action links.

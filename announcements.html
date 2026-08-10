@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b57d0" />
+  <meta name="description" content="Important announcements and deadlines for Polimi Students 2026/2027." />
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v1" />
+  <title>Announcements · Polimi Students 2026/2027</title>
+</head>
+<body class="announcements-page">
+  <div class="app-bg"></div>
+
+  <header class="app-bar announcements-app-bar">
+    <div class="shell app-bar-inner">
+      <a class="brand" href="index.html" aria-label="Back to Polimi Students">
+        <span class="brand-mark" aria-hidden="true"><img src="icons/icon-192.png" alt="" /></span>
+        <span class="brand-copy">
+          <strong>Polimi Students</strong>
+          <small>Announcements · 2026/2027</small>
+        </span>
+      </a>
+
+      <div class="app-actions announcements-header-actions">
+        <a class="announcements-header-link" href="groups.html"><span aria-hidden="true">✈</span><span>Groups</span></a>
+        <a class="announcements-back-link" href="index.html"><span aria-hidden="true">←</span><span>Students</span></a>
+        <button class="icon-btn" id="announcementsThemeToggle" type="button" aria-label="Toggle theme"><span id="announcementsThemeIcon">☾</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell announcements-main">
+    <section class="announcements-hero" aria-labelledby="announcementsTitle">
+      <div class="announcements-hero-copy">
+        <span class="announcements-kicker">POLIMI UPDATES · 2026/27</span>
+        <h1 id="announcementsTitle">Important things to <span>know right now.</span></h1>
+        <p>Deadlines, closures and useful university information for incoming Polimi students — collected in one place.</p>
+      </div>
+      <div class="announcements-hero-badge" aria-hidden="true">
+        <span>!</span>
+      </div>
+    </section>
+
+    <section class="announcements-directory" aria-label="University announcements">
+      <div class="announcements-toolbar">
+        <div>
+          <span class="announcements-section-kicker">LATEST UPDATES</span>
+          <h2>University announcements</h2>
+        </div>
+        <span class="announcements-count" id="announcementsCount">2 announcements</span>
+      </div>
+
+      <div class="announcement-grid" id="announcementGrid"></div>
+
+      <aside class="announcements-note">
+        <span class="announcements-note-icon" aria-hidden="true">i</span>
+        <div>
+          <strong>Keep an eye on official Polimi channels too.</strong>
+          <p>This page is a convenient student summary. For critical deadlines or changes, always follow the university's official communications.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <nav class="announcements-mobile-nav" aria-label="Mobile navigation">
+    <a href="index.html"><span>⌂</span><small>Students</small></a>
+    <a href="groups.html"><span>✈</span><small>Groups</small></a>
+    <a href="announcements.html" class="active" aria-current="page"><span>!</span><small>Notices</small></a>
+  </nav>
+
+  <footer class="site-footer shell announcements-footer">
+    <span><strong>Polimi Students</strong> · Announcements</span>
+    <span>Created by Kamyab</span>
+  </footer>
+
+  <script src="announcements.js?v=20260811-announcements-v1"></script>
+</body>
+</html>

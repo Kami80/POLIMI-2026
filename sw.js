@@ -1,9 +1,11 @@
-const CACHE_NAME = "polimi-students-shell-v4-groups";
+const CACHE_NAME = "polimi-students-shell-v5-announcements";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./groups.html",
   "./groups.js",
+  "./announcements.html",
+  "./announcements.js",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
@@ -33,10 +35,9 @@ self.addEventListener("fetch", event => {
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy));
+        if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
         return response;
-      }).catch(() => caches.match("./index.html"))
+      }).catch(() => caches.match(request).then(cached => cached || caches.match("./index.html")))
     );
     return;
   }
