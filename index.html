@@ -1,79 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="Polimi Students 2026/2027 — find classmates, campuses, programs and potential roommates." />
-  <meta name="theme-color" content="#f7f8fb" />
+  <meta name="description" content="Polimi Students 2026/2027 — discover students, programs, campuses and potential roommates." />
+  <meta name="theme-color" content="#0b57d0" />
   <title>Polimi Students 2026/2027</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%230b57d0'/%3E%3Cstop offset='1' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M19 18h17c7 0 12 4 12 11 0 8-6 12-13 12h-7v8h-9V18zm9 8v8h7c3 0 5-1 5-4s-2-4-5-4h-7z' fill='white'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="shell topbar-inner">
+  <div class="app-bg" aria-hidden="true"></div>
+
+  <header class="app-bar">
+    <div class="shell app-bar-inner">
       <a class="brand" href="#top" aria-label="Polimi Students home">
-        <span class="brand-mark">P</span>
+        <span class="brand-mark" aria-hidden="true">P</span>
         <span class="brand-copy">
           <strong>Polimi Students</strong>
-          <small>2026 / 2027</small>
+          <small>Community · 2026/2027</small>
         </span>
       </a>
 
-      <div class="top-actions">
-        <span class="live-state" id="connectionStatus"><i></i><span>Connecting</span></span>
-        <a class="join-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-          <span class="join-plus">+</span><span class="join-label">Add your profile</span>
+      <div class="app-actions">
+        <span class="connection" id="connectionStatus" title="Google Sheet connection">
+          <span class="connection-dot"></span>
+          <span class="connection-text">Connecting</span>
+        </span>
+        <a class="top-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+          <span class="top-cta-plus">＋</span><span class="top-cta-label">Add your profile</span>
         </a>
-        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode"><span id="themeIcon">☾</span></button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme"><span id="themeIcon">☾</span></button>
       </div>
     </div>
   </header>
 
-  <main id="top" class="shell main-content">
-    <section class="intro">
-      <div>
-        <h1>Student directory</h1>
-        <p>Find classmates, campus connections and potential roommates for 2026/2027.</p>
-      </div>
-      <a class="intro-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-        Add your profile <span>↗</span>
-      </a>
-    </section>
-
-    <section class="directory" aria-label="Student directory">
-      <div class="toolbar">
-        <label class="search-box" for="searchInput">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65A8 8 0 1 1 3 11a8 8 0 0 1 16 0Z"/></svg>
-          <input id="searchInput" type="search" placeholder="Search students, programs or campuses" autocomplete="off" />
-          <button id="searchClear" type="button" aria-label="Clear search" hidden>×</button>
-        </label>
-
-        <button class="filter-button" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
-          <span>Filters</span>
-          <strong id="filterCount" hidden>0</strong>
-        </button>
-
-        <div class="view-toggle" aria-label="Choose directory view">
-          <button id="cardViewBtn" class="active" data-view="cards" type="button" aria-label="Card view">▦</button>
-          <button id="tableViewBtn" data-view="table" type="button" aria-label="Table view">☷</button>
+  <main id="top" class="shell main-shell">
+    <section class="welcome-card">
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+      <div class="welcome-copy">
+        <span class="eyebrow"><i></i> POLIMI COMMUNITY · 2026/27</span>
+        <h1>Meet the people you’ll call <span>classmates.</span></h1>
+        <p>Discover incoming Politecnico di Milano students by program and campus, connect earlier, and find people looking for roommates.</p>
+        <div class="hero-pills" aria-label="Directory features">
+          <span>Programs</span><span>Campuses</span><span>Roommates</span>
         </div>
       </div>
 
-      <div class="quick-filters" id="desktopFilters" aria-label="Directory filters"></div>
+      <div class="hero-side">
+        <div class="hero-side-label">JOIN THE DIRECTORY</div>
+        <h2>Make yourself discoverable.</h2>
+        <p>Add your profile in less than a minute. Your email is never shown on this page.</p>
+        <a class="welcome-action" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+          <span>Join the student list</span><span class="arrow">↗</span>
+        </a>
+      </div>
+    </section>
 
-      <div class="results-row">
+    <section class="stats-strip" aria-label="Student statistics">
+      <article class="stat-item stat-blue"><span class="stat-icon">01</span><strong id="statRows">—</strong><span>Students</span></article>
+      <article class="stat-item stat-violet"><span class="stat-icon">02</span><strong id="statVisible">—</strong><span>Showing now</span></article>
+      <article class="stat-item stat-cyan"><span class="stat-icon">03</span><strong id="statPrograms">—</strong><span>Programs</span></article>
+      <article class="stat-item stat-coral"><span class="stat-icon">04</span><strong id="statCampuses">—</strong><span>Campuses</span></article>
+    </section>
+
+    <section class="explore-section" aria-label="Explore students">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">STUDENT DIRECTORY</span>
+          <h2>Find your community</h2>
+          <p>Search by name or explore with multiple filters.</p>
+        </div>
+        <div class="desktop-view-switch" aria-label="Choose view">
+          <button id="cardViewBtn" class="seg-btn active" type="button" data-view="cards"><span>▦</span> Cards</button>
+          <button id="tableViewBtn" class="seg-btn" type="button" data-view="table"><span>☷</span> Table</button>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <label class="search-field" for="searchInput">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="Search name, program, campus…" autocomplete="off" />
+          <span class="search-shortcut" aria-hidden="true">/</span>
+          <button id="searchClear" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+        </label>
+
+        <button class="filter-trigger" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
+          <span class="filter-symbol">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
+        </button>
+
+        <div class="desktop-filters" id="desktopFilters"></div>
+      </div>
+
+      <div class="results-bar">
         <p id="resultText">Loading students…</p>
-        <div class="active-chips" id="activeFilterChips"></div>
-        <button class="reset-link" id="clearFilters" type="button" hidden>Clear all</button>
+        <div class="active-filter-chips" id="activeFilterChips"></div>
+        <button class="clear-all" id="clearFilters" type="button" hidden>Reset filters</button>
       </div>
 
       <div id="cardView" class="student-grid" hidden></div>
 
-      <div id="tableView" class="table-wrap" hidden>
+      <div id="tableView" class="table-view" hidden>
         <div class="table-scroll">
           <table>
             <thead id="tableHead"></thead>
@@ -93,32 +124,28 @@
   <aside class="filter-sheet" id="filterSheet" aria-hidden="true">
     <button class="sheet-backdrop" id="filterBackdrop" type="button" aria-label="Close filters"></button>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-      <div class="sheet-grabber" aria-hidden="true"></div>
-      <div class="sheet-header">
-        <div>
-          <span>FILTERS</span>
-          <h2 id="filterTitle">Refine students</h2>
-          <p>Select as many options as you want.</p>
-        </div>
-        <button id="filterClose" class="sheet-close" type="button" aria-label="Close filters">×</button>
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div><span>FILTERS</span><h2 id="filterTitle">Refine students</h2><p>Choose multiple values if you like.</p></div>
+        <button class="sheet-close" id="filterClose" type="button" aria-label="Close filters">×</button>
       </div>
-      <div id="mobileFilters" class="mobile-filters"></div>
-      <div class="sheet-footer">
-        <button id="sheetReset" class="sheet-reset" type="button">Reset</button>
-        <button id="sheetApply" class="sheet-apply" type="button">Show students</button>
+      <div class="mobile-filter-content" id="mobileFilters"></div>
+      <div class="sheet-actions">
+        <button class="sheet-reset" id="sheetReset" type="button">Reset</button>
+        <button class="sheet-apply" id="sheetApply" type="button">Show students</button>
       </div>
     </div>
   </aside>
 
   <nav class="mobile-nav" aria-label="Mobile navigation">
-    <a class="mobile-nav-item active" href="#top"><span>⌂</span><small>Home</small></a>
+    <a href="#top" class="mobile-nav-item active"><span>⌂</span><small>Home</small></a>
     <button id="mobileFilterButton" class="mobile-nav-item" type="button"><span>☷</span><small>Filters</small><i id="mobileFilterBadge" hidden>0</i></button>
-    <a class="mobile-nav-item mobile-add" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer"><span>＋</span><small>Add</small></a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" class="mobile-nav-item mobile-add"><span>＋</span><small>Add profile</small></a>
     <button id="refreshButton" class="mobile-nav-item" type="button"><span>↻</span><small>Refresh</small></button>
   </nav>
 
-  <footer class="shell footer">
-    <span>Polimi Students · 2026/2027</span>
+  <footer class="site-footer shell">
+    <span><strong>Polimi Students</strong> · 2026/2027</span>
     <span id="updatedText">Live from Google Sheets</span>
   </footer>
 
