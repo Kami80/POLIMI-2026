@@ -129,7 +129,6 @@ This build additionally includes:
 - 24-per-page pagination with remembered page and grid-level smooth scrolling
 - sticky mobile Telegram / Polimi Mail profile actions
 - Mark all announcements as read + new-since-last-visit messaging
-- personalized Telegram group recommendation + pinned Polimi Free Forum
 - recently-updated profile badges when the sheet exposes update data or a newer repeated submission
 - skeleton loading and cached/offline freshness labels
 - contextual empty states with Clear filters / See all students
