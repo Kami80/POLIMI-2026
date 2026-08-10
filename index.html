@@ -87,6 +87,7 @@
           <span class="connection-dot"></span>
           <span class="connection-text">Connecting</span>
         </span>
+        <a class="top-groups-btn" href="groups.html" aria-label="Open Telegram groups"><span aria-hidden="true">✈</span><span class="top-groups-label">Groups</span></a>
         <button class="top-profile-btn" id="myProfileButton" type="button" aria-label="Open my profile">
           <span class="top-profile-avatar" id="myProfileAvatar">ME</span><span class="top-profile-label">My profile</span>
         </button>
@@ -106,9 +107,12 @@
         <h1 id="directoryIntroTitle">Find your people.</h1>
         <p id="directoryIntroText">Browse classmates, open profiles, connect directly, or switch to roommate matching.</p>
       </div>
-      <a class="directory-update-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-        <span>Update my info</span><span aria-hidden="true">↗</span>
-      </a>
+      <div class="directory-intro-actions">
+        <a class="directory-groups-link" href="groups.html"><span aria-hidden="true">✈</span><span>Telegram groups</span></a>
+        <a class="directory-update-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+          <span>Update my info</span><span aria-hidden="true">↗</span>
+        </a>
+      </div>
     </section>
 
     <section class="explore-section" id="directory" aria-label="Explore students">
@@ -249,6 +253,7 @@
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span>⌂</span><small>Students</small></button>
     <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span>♡</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
+    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span>✈</span><small>Groups</small></a>
     <button id="mobileRoommateButton" class="mobile-nav-item mobile-roommate" type="button" aria-pressed="false"><span>⌁</span><small>Roommates</small></button>
     <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span>◎</span><small>Me</small></button>
   </nav>
@@ -274,6 +279,6 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="app.js?v=20260810-creator-v3"></script>
+  <script src="app.js?v=20260811-groups-v1"></script>
 </body>
 </html>

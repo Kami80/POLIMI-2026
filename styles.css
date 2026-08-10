@@ -3023,3 +3023,156 @@ button, a, select, input { -webkit-tap-highlight-color: transparent; }
   .card-creator-badge { min-height: 18px; padding-inline: 5px; font-size: 5.8px; }
   .profile-creator-badge { min-height: 25px; padding-inline: 8px; font-size: 7px; }
 }
+
+/* =========================================================
+   Telegram groups directory
+   ========================================================= */
+.groups-page { padding-bottom: 0; }
+.groups-main { padding-top: 34px; padding-bottom: 34px; }
+.groups-app-bar .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: inherit; }
+.groups-header-actions { gap: 10px; }
+.groups-back-link {
+  min-height: 42px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink-soft);
+  text-decoration: none; font-size: 12px; font-weight: 800; box-shadow: var(--shadow-sm);
+  transition: transform .16s ease, border-color .16s ease;
+}
+.groups-back-link:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+.groups-hero {
+  position: relative; overflow: hidden; min-height: 280px; padding: 42px 46px; display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px; align-items: center; gap: 32px;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 30px;
+  background: linear-gradient(125deg, #071f4a 0%, #0b57d0 56%, #7047eb 100%); color: white;
+  box-shadow: 0 24px 64px rgba(24, 62, 130, .20);
+}
+.groups-hero::before {
+  content: ""; position: absolute; inset: 0; opacity: .17;
+  background-image: linear-gradient(rgba(255,255,255,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.10) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, black, transparent 84%);
+}
+.groups-hero-copy, .groups-hero-badge { position: relative; z-index: 1; }
+.groups-kicker { color: #a8ddff; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.groups-hero h1 { max-width: 760px; margin: 13px 0 14px; font-size: clamp(38px, 5vw, 62px); line-height: 1; letter-spacing: -.055em; }
+.groups-hero h1 span { color: #a8ddff; }
+.groups-hero p { max-width: 650px; margin: 0; color: rgba(255,255,255,.74); font-size: 14px; line-height: 1.72; }
+.groups-hero-badge {
+  width: 132px; height: 132px; justify-self: end; display: grid; place-items: center; border-radius: 38px;
+  color: white; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.20); backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 20px 50px rgba(3,21,52,.18);
+}
+.groups-hero-badge svg { width: 72px; height: 72px; }
+.groups-directory { padding: 26px 0 50px; }
+.groups-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.groups-search {
+  width: min(520px, 100%); min-height: 54px; padding: 0 12px 0 16px; display: grid; grid-template-columns: 28px minmax(0, 1fr) 34px;
+  align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.groups-search > span { color: var(--muted); font-size: 22px; }
+.groups-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 14px; font-weight: 700; }
+.groups-search input::placeholder { color: var(--muted-2); }
+.groups-search button { width: 32px; height: 32px; border: 0; border-radius: 10px; background: var(--surface-3); color: var(--muted); cursor: pointer; }
+.groups-count { margin: 0; color: var(--muted); font-size: 12px; font-weight: 800; }
+.telegram-group-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.telegram-group-card {
+  --group-accent: #2aabee; --group-soft: rgba(42,171,238,.11);
+  min-height: 280px; padding: 22px; display: flex; flex-direction: column; position: relative; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--group-accent) 15%, var(--line)); border-radius: 23px;
+  background: radial-gradient(circle at 96% 0%, var(--group-soft), transparent 34%), var(--surface);
+  box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.telegram-group-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--group-accent), color-mix(in srgb, var(--group-accent) 55%, #7047eb)); }
+.telegram-group-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--group-accent) 28%, var(--line)); }
+.telegram-group-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.telegram-group-avatar { width: 50px; height: 50px; display: grid; place-items: center; border-radius: 16px; background: color-mix(in srgb, var(--group-accent) 10%, var(--surface-2)); color: var(--group-accent); font-size: 15px; font-weight: 800; letter-spacing: -.03em; }
+.telegram-group-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; background: #2aabee; color: white; box-shadow: 0 8px 20px rgba(42,171,238,.22); }
+.telegram-group-mark svg { width: 22px; height: 22px; }
+.telegram-group-body { margin-top: 27px; }
+.telegram-group-label { color: var(--group-accent); font-size: 9px; font-weight: 800; letter-spacing: .13em; }
+.telegram-group-body h2 { margin: 8px 0 9px; font-size: 21px; line-height: 1.22; letter-spacing: -.035em; }
+.telegram-group-body p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.telegram-join-btn { margin-top: auto; min-height: 48px; padding: 0 14px 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 14px; background: color-mix(in srgb, var(--group-accent) 9%, var(--surface-2)); color: color-mix(in srgb, var(--group-accent) 80%, var(--ink)); text-decoration: none; font-size: 12px; font-weight: 800; transition: background .16s ease, transform .16s ease; }
+.telegram-join-btn:hover { background: color-mix(in srgb, var(--group-accent) 15%, var(--surface)); transform: translateY(-1px); }
+.telegram-group-accent-1 { --group-accent: #5f79ec; --group-soft: rgba(95,121,236,.11); }
+.telegram-group-accent-2 { --group-accent: #7a5ee8; --group-soft: rgba(122,94,232,.10); }
+.telegram-group-accent-3 { --group-accent: #19a57a; --group-soft: rgba(25,165,122,.10); }
+.telegram-group-accent-4 { --group-accent: #e76d77; --group-soft: rgba(231,109,119,.10); }
+.groups-empty { padding: 70px 20px; text-align: center; color: var(--muted); }
+.groups-empty > span { display: inline-grid; place-items: center; width: 54px; height: 54px; border-radius: 17px; background: var(--surface-3); font-size: 27px; }
+.groups-empty h2 { margin: 13px 0 5px; color: var(--ink); font-size: 21px; }
+.groups-empty p { margin: 0; font-size: 12px; }
+.groups-contribute {
+  margin-top: 22px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.groups-contribute > div { display: flex; align-items: center; gap: 14px; }
+.groups-contribute-icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 13px; background: var(--primary-soft); color: var(--primary); font-size: 20px; font-weight: 800; }
+.groups-contribute strong { display: block; font-size: 13px; }
+.groups-contribute p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+.groups-contribute-btn { min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; border-radius: 13px; background: var(--ink); color: var(--surface); text-decoration: none; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.groups-mobile-nav { display: none; }
+.groups-footer { padding-bottom: 26px; }
+[data-theme="dark"] .telegram-group-card { background: radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--group-accent) 13%, transparent), transparent 36%), var(--surface); }
+
+@media (max-width: 960px) {
+  .telegram-group-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .groups-hero { grid-template-columns: minmax(0, 1fr) 112px; padding: 36px; }
+  .groups-hero-badge { width: 104px; height: 104px; border-radius: 29px; }
+  .groups-hero-badge svg { width: 58px; height: 58px; }
+}
+
+@media (max-width: 760px) {
+  .groups-page { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .groups-main { width: min(calc(100% - 24px), var(--shell)); padding-top: 16px; }
+  .groups-header-actions .groups-back-link { display: none; }
+  .groups-app-bar .app-bar-inner { height: 64px; }
+  .groups-app-bar .brand-copy small { display: none; }
+  .groups-hero { min-height: 0; padding: 28px 24px; grid-template-columns: minmax(0, 1fr); border-radius: 24px; }
+  .groups-hero h1 { margin-top: 10px; font-size: 37px; }
+  .groups-hero p { font-size: 12px; line-height: 1.65; }
+  .groups-hero-badge { display: none; }
+  .groups-directory { padding-top: 18px; }
+  .groups-toolbar { align-items: stretch; flex-direction: column; gap: 9px; }
+  .groups-search { width: 100%; min-height: 52px; }
+  .groups-count { padding-left: 3px; }
+  .telegram-group-grid { grid-template-columns: 1fr; gap: 11px; }
+  .telegram-group-card { min-height: 218px; padding: 18px; border-radius: 20px; }
+  .telegram-group-avatar { width: 44px; height: 44px; border-radius: 14px; font-size: 13px; }
+  .telegram-group-mark { width: 37px; height: 37px; border-radius: 12px; }
+  .telegram-group-body { margin-top: 20px; }
+  .telegram-group-body h2 { font-size: 18px; }
+  .telegram-group-body p { font-size: 11px; }
+  .telegram-join-btn { min-height: 46px; font-size: 11px; }
+  .groups-contribute { align-items: stretch; flex-direction: column; padding: 17px; }
+  .groups-contribute-btn { width: 100%; }
+  .groups-footer { display: none; }
+  .groups-mobile-nav {
+    position: fixed; z-index: 70; left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom));
+    min-height: 60px; padding: 5px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius: 19px;
+    background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: 0 14px 38px rgba(26,42,70,.17);
+  }
+  .groups-mobile-nav a { min-height: 48px; display: grid; place-items: center; align-content: center; gap: 1px; border-radius: 14px; color: var(--muted); text-decoration: none; }
+  .groups-mobile-nav a span { font-size: 17px; line-height: 1; }
+  .groups-mobile-nav a small { font-size: 8px; font-weight: 800; }
+  .groups-mobile-nav a.active { background: var(--primary-soft); color: var(--primary); }
+}
+
+
+/* Main app Telegram groups navigation */
+.top-groups-btn { min-height: 42px; padding: 0 13px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink-soft); text-decoration: none; font-size: 11px; font-weight: 800; box-shadow: var(--shadow-sm); transition: transform .16s ease, border-color .16s ease; }
+.top-groups-btn:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+.top-groups-btn > span:first-child { color: #2aabee; font-size: 15px; }
+.directory-intro-actions { display: flex; align-items: center; gap: 9px; }
+.directory-groups-link { min-height: 44px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid color-mix(in srgb, #2aabee 20%, var(--line)); border-radius: 14px; background: color-mix(in srgb, #2aabee 7%, var(--surface)); color: color-mix(in srgb, #2aabee 78%, var(--ink)); text-decoration: none; font-size: 11px; font-weight: 800; }
+.directory-groups-link > span:first-child { font-size: 15px; }
+.mobile-nav-item.mobile-groups-link { text-decoration: none; }
+@media (max-width: 760px) {
+  .mobile-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .mobile-nav-item small { font-size: 7px; }
+  .top-groups-label { display: none; }
+  .top-groups-btn { width: 42px; padding: 0; justify-content: center; }
+  .directory-intro-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+  .directory-groups-link, .directory-update-link { justify-content: center; }
+}

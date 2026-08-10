@@ -63,3 +63,16 @@ This project was created by **Kamyab Safaei**. Kamyab's student profile receives
 ## App icon
 
 The PWA, favicon, Apple touch icon, and in-app brand mark use the upgraded community artwork in the `icons/` directory.
+
+
+## Telegram Groups page
+
+The project now includes `groups.html`, a searchable directory of Telegram groups by program.
+
+To add another group later, edit the `TELEGRAM_GROUPS` array near the top of `groups.js`:
+
+```js
+{ program: "Mechanical Engineering", url: "https://t.me/your-group-link" }
+```
+
+The page updates automatically; no HTML changes are needed.

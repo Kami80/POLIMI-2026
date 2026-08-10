@@ -1,7 +1,9 @@
-const CACHE_NAME = "polimi-students-shell-v3";
+const CACHE_NAME = "polimi-students-shell-v4-groups";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./groups.html",
+  "./groups.js",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
