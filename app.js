@@ -233,8 +233,42 @@ function requestAccess(rawEmail, options = {}) {
   setAccessBusy(true, "Redirecting…");
   setAccessStatus("loading", "Email not found. Redirecting you to the submission form…");
 
-  // Keep this page in browser history so the user can come back after submitting the form.
-  window.location.assign(CONFIG.formUrl);
+  // Redirect in the current tab. Using a real anchor click first is more reliable
+  // in iOS Safari and embedded mobile browsers than popup-style navigation.
+  redirectToForm();
+}
+
+function redirectToForm() {
+  const url = CONFIG.formUrl;
+
+  // Native same-tab link navigation works reliably on mobile and in-app browsers.
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_self";
+  link.rel = "noreferrer";
+  link.style.position = "fixed";
+  link.style.left = "-9999px";
+  link.style.width = "1px";
+  link.style.height = "1px";
+  document.body.appendChild(link);
+
+  try {
+    link.click();
+  } catch (error) {
+    // Ignore and fall through to the hard-navigation fallback below.
+  }
+
+  // Some embedded mobile webviews can ignore a synthetic click. If the page is
+  // still alive a moment later, force a same-tab navigation without opening a popup.
+  window.setTimeout(() => {
+    try {
+      window.location.href = url;
+    } catch (error) {
+      try {
+        document.location.href = url;
+      } catch (_) {}
+    }
+  }, 80);
 }
 
 function unlockDirectory(email) {
