@@ -108,19 +108,6 @@
         <button class="text-button" id="clearFilters" type="button" hidden>Clear filters</button>
       </div>
 
-      <section id="loadingState" class="state-card" aria-live="polite">
-        <div class="loader" aria-hidden="true"></div>
-        <h2>Warming things up…</h2>
-        <p>Fetching the latest rows from Google Sheets.</p>
-      </section>
-
-      <section id="errorState" class="state-card error-state" hidden>
-        <div class="state-icon">!</div>
-        <h2>We couldn’t load the sheet</h2>
-        <p id="errorMessage">Please check the sheet sharing settings and try again.</p>
-        <button class="primary-button" id="retryButton" type="button">Try again</button>
-      </section>
-
       <section id="emptyState" class="state-card" hidden>
         <div class="state-icon">⌕</div>
         <h2>No matching records</h2>

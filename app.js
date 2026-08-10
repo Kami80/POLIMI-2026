@@ -34,8 +34,8 @@ function cacheElements() {
   [
     "brandText", "siteTitle", "siteSubtitle", "connectionStatus", "themeToggle", "themeIcon",
     "statRows", "statColumns", "statVisible", "statUpdated", "searchInput", "filterRow",
-    "tableViewBtn", "cardViewBtn", "clearFilters", "resultText", "loadingState", "errorState",
-    "errorMessage", "retryButton", "emptyState", "tableView", "tableHead", "tableBody", "cardView",
+    "tableViewBtn", "cardViewBtn", "clearFilters", "resultText", "emptyState",
+    "tableView", "tableHead", "tableBody", "cardView",
     "pagination", "prevPage", "nextPage", "pageInfo", "refreshButton"
   ].forEach(id => els[id] = document.getElementById(id));
 }
@@ -88,7 +88,6 @@ function setupEvents() {
 
   els.prevPage.addEventListener("click", () => changePage(-1));
   els.nextPage.addEventListener("click", () => changePage(1));
-  els.retryButton.addEventListener("click", loadSheet);
   els.refreshButton.addEventListener("click", loadSheet);
 
   document.addEventListener("keydown", event => {
@@ -112,8 +111,6 @@ function setStatus(type, text) {
 }
 
 function showState(kind) {
-  els.loadingState.hidden = kind !== "loading";
-  els.errorState.hidden = kind !== "error";
   els.emptyState.hidden = kind !== "empty";
   const showData = kind === "data";
   els.tableView.hidden = !showData || state.view !== "table";
@@ -197,14 +194,13 @@ function handleSheetResponse(response) {
 
 function showError(message) {
   console.error("Sheet error:", message);
-  els.errorMessage.textContent = `${message} Make sure the spreadsheet is shared as “Anyone with the link · Viewer”.`;
-  els.resultText.textContent = "Data unavailable";
+  els.resultText.textContent = "Could not load the sheet. Check sharing settings, then use Refresh data.";
   els.statRows.textContent = "—";
   els.statColumns.textContent = "—";
   els.statVisible.textContent = "—";
   els.statUpdated.textContent = "—";
   setStatus("error", "Offline");
-  showState("error");
+  showState("idle");
 }
 
 function getAutoFilterColumns() {
