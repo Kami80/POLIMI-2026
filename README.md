@@ -24,9 +24,9 @@ The connected Google Sheet must be publicly viewable for browser-only GitHub Pag
 
 
 ## Student profiles
-Cards automatically include the optional self-description and turn Telegram usernames/IDs into profile links when possible. Timestamp and email remain hidden from the public UI.
+Cards automatically include the optional self-description, turn Telegram usernames/IDs into profile links when possible, and show the Polimi mail as a clickable email action. The form-login email and timestamp remain hidden from the public UI.
 
 ## Member access gate
-The page checks the visitor-entered email against the hidden email column in the connected Google Sheet. The match is case-insensitive and the email remains hidden from cards, search, and tables. A verified email is remembered only for the current browser tab/session.
+The page checks the visitor-entered email against the hidden email column in the connected Google Sheet. The match is case-insensitive and the email remains hidden from cards, search, and tables. A verified email is remembered in this browser using localStorage, so refreshes and later visits on the same browser do not ask again. Using “Change email” clears the saved verification.
 
 **Important:** this is a client-side membership gate. Because GitHub Pages is static and the Google Sheet is publicly readable, it is not strong access control against someone who intentionally inspects the page/network or opens the Sheet endpoint directly. For real private access, use verified sign-in plus a backend/private Sheet.

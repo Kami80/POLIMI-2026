@@ -20,6 +20,7 @@ const CONFIG = {
     roommate: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"],
     note: ["maybe a note to describe yourself", "note to describe yourself", "about me", "bio", "note", "description"],
     telegram: ["telegram id", "telegram username", "telegram", "telegram account"],
+    polimiMail: ["polimi mail", "polimi email", "polimi e-mail", "polimi e mail", "politecnico mail", "politecnico email", "university mail", "university email"],
     email: ["email address", "email", "e-mail", "e mail"],
   }
 };
@@ -70,6 +71,7 @@ function isValidEmail(value) {
 }
 
 function isHiddenColumn(column) {
+  if (isPolimiMailColumn(column)) return false;
   const header = normalize(column.label);
   return CONFIG.hiddenColumns.some(item => header === normalize(item) || header.includes(normalize(item)));
 }
@@ -95,7 +97,7 @@ function displayValue(row, column) {
 
 function visibleColumns() {
   const columns = state.columns.filter(column => !isHiddenColumn(column));
-  const preferredKeys = ["name", "gender", "program", "campus", "degree", "roommate", "note", "telegram"];
+  const preferredKeys = ["name", "gender", "program", "campus", "degree", "roommate", "note", "telegram", "polimiMail"];
   const preferred = preferredKeys.map(semanticColumn).filter(Boolean);
   const seen = new Set(preferred.map(c => c.index));
   return [...preferred, ...columns.filter(c => !seen.has(c.index))];
@@ -220,18 +222,19 @@ function requestAccess(rawEmail, options = {}) {
   }
 
   if (exists) {
-    sessionStorage.setItem("polimi-verified-email", email);
+    localStorage.setItem("polimi-verified-email", email);
     unlockDirectory(email);
     return;
   }
 
-  sessionStorage.removeItem("polimi-verified-email");
+  localStorage.removeItem("polimi-verified-email");
   state.authorized = false;
   state.authorizedEmail = "";
-  setAccessBusy(false, "Check & enter");
-  setAccessStatus("error", "We couldn’t match that email with a submitted profile. Make sure it’s the same address you used in the form.");
-  els.accessNotFound.hidden = false;
-  if (!options.silent) els.accessEmail.focus();
+  setAccessBusy(true, "Redirecting…");
+  setAccessStatus("loading", "Email not found. Redirecting you to the submission form…");
+
+  // Keep this page in browser history so the user can come back after submitting the form.
+  window.location.assign(CONFIG.formUrl);
 }
 
 function unlockDirectory(email) {
@@ -261,7 +264,7 @@ function unlockDirectory(email) {
 }
 
 function lockDirectory() {
-  sessionStorage.removeItem("polimi-verified-email");
+  localStorage.removeItem("polimi-verified-email");
   state.authorized = false;
   state.authorizedEmail = "";
   state.pendingEmail = "";
@@ -362,7 +365,7 @@ function handleSheetResponse(response) {
     state.sheetReady = true;
     setStatus("online", "Ready");
 
-    const rememberedEmail = state.authorizedEmail || state.pendingEmail || sessionStorage.getItem("polimi-verified-email") || "";
+    const rememberedEmail = state.authorizedEmail || state.pendingEmail || localStorage.getItem("polimi-verified-email") || "";
     if (rememberedEmail) {
       requestAccess(rememberedEmail, { silent: true });
     } else {
@@ -587,7 +590,8 @@ function renderCards(rows, start) {
   const roommateCol = semanticColumn("roommate");
   const noteCol = semanticColumn("note");
   const telegramCol = semanticColumn("telegram");
-  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol].filter(Boolean).map(c => c.index));
+  const polimiMailCol = semanticColumn("polimiMail");
+  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol, polimiMailCol].filter(Boolean).map(c => c.index));
   const extras = visibleColumns().filter(c => !coreIndexes.has(c.index));
 
   rows.forEach((row, offset) => {
@@ -599,6 +603,7 @@ function renderCards(rows, start) {
     const roommate = displayValue(row, roommateCol) || "Not specified";
     const note = displayValue(row, noteCol);
     const telegram = displayValue(row, telegramCol);
+    const polimiMail = displayValue(row, polimiMailCol);
 
     const card = document.createElement("article");
     card.className = "student-card";
@@ -653,9 +658,18 @@ function renderCards(rows, start) {
       card.appendChild(about);
     }
 
-    if (telegram) {
-      const telegramAction = createTelegramAction(telegram);
-      if (telegramAction) card.appendChild(telegramAction);
+    if (telegram || polimiMail) {
+      const contacts = document.createElement("div");
+      contacts.className = "contact-actions";
+      if (telegram) {
+        const telegramAction = createTelegramAction(telegram);
+        if (telegramAction) contacts.appendChild(telegramAction);
+      }
+      if (polimiMail) {
+        const mailAction = createMailAction(polimiMail);
+        if (mailAction) contacts.appendChild(mailAction);
+      }
+      if (contacts.childElementCount) card.appendChild(contacts);
     }
 
     const filledExtras = extras.filter(column => displayValue(row, column));
@@ -755,11 +769,73 @@ function compareCells(a, b) {
 
 
 function renderColumnContent(container, column, value) {
+  if (isPolimiMailColumn(column)) {
+    const action = createMailInlineLink(value);
+    if (action) { container.appendChild(action); return; }
+  }
   if (isTelegramColumn(column)) {
     const action = createTelegramInlineLink(value);
     if (action) { container.appendChild(action); return; }
   }
   renderCellContent(container, value);
+}
+
+function isPolimiMailColumn(column) {
+  if (!column) return false;
+  const n = normalize(column.label);
+  return (n.includes("polimi") || n.includes("politecnico") || n.includes("university")) && (n.includes("mail") || n.includes("email"));
+}
+
+function mailtoUrl(value) {
+  const email = String(value ?? "").trim();
+  return isValidEmail(email) ? `mailto:${email}` : null;
+}
+
+function mailIcon() {
+  const span = document.createElement("span");
+  span.className = "mail-icon";
+  span.setAttribute("aria-hidden", "true");
+  span.innerHTML = `<svg viewBox="0 0 24 24" focusable="false"><path d="M3.75 5.75h16.5a1.5 1.5 0 0 1 1.5 1.5v9.5a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5v-9.5a1.5 1.5 0 0 1 1.5-1.5Zm.12 1.5L12 13.18l8.13-5.93H3.87Zm16.38 9.5V9.1l-7.37 5.38a1.5 1.5 0 0 1-1.76 0L3.75 9.1v7.65h16.5Z" fill="currentColor"/></svg>`;
+  return span;
+}
+
+function createMailAction(value) {
+  const url = mailtoUrl(value);
+  if (!url) return null;
+  const email = String(value).trim();
+  const a = document.createElement("a");
+  a.className = "mail-action";
+  a.href = url;
+  a.setAttribute("aria-label", `Email ${email}`);
+
+  const copy = document.createElement("span");
+  copy.className = "mail-copy";
+  const eyebrow = document.createElement("small");
+  eyebrow.textContent = "Polimi mail";
+  const label = document.createElement("strong");
+  label.textContent = email;
+  copy.append(eyebrow, label);
+
+  const arrow = document.createElement("span");
+  arrow.className = "mail-arrow";
+  arrow.textContent = "↗";
+
+  a.append(mailIcon(), copy, arrow);
+  return a;
+}
+
+function createMailInlineLink(value) {
+  const url = mailtoUrl(value);
+  if (!url) return null;
+  const email = String(value).trim();
+  const a = document.createElement("a");
+  a.className = "mail-inline";
+  a.href = url;
+  a.append(mailIcon());
+  const label = document.createElement("span");
+  label.textContent = email;
+  a.append(label);
+  return a;
 }
 
 function isTelegramColumn(column) {
@@ -872,6 +948,7 @@ function shortHeader(label) {
   if (n.includes("roommate")) return "Roommate";
   if (n.includes("degree")) return "Degree";
   if (n.includes("program")) return "Program";
+  if (isPolimiMailColumn({ label: text })) return "Polimi mail";
   if (n.includes("telegram")) return "Telegram";
   if (n.includes("describe yourself") || n === "note" || n.includes("about me")) return "About";
   if (n === "full name") return "Name";

@@ -701,3 +701,81 @@ tbody tr:hover { background: var(--surface-2); }
   .access-privacy { margin-top: 17px; font-size: 7px; }
   .access-visual { display: none; }
 }
+
+/* Student contact actions */
+.contact-actions {
+  margin-top: 11px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 9px;
+}
+.contact-actions .telegram-action,
+.contact-actions .mail-action { margin-top: 0; }
+.mail-action {
+  min-height: 54px;
+  padding: 9px 10px 9px 12px;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--line));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--primary-soft) 50%, var(--surface));
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.mail-action:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+  background: color-mix(in srgb, var(--primary-soft) 72%, var(--surface));
+}
+.mail-icon {
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  color: inherit;
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+}
+.mail-icon svg { width: 19px; height: 19px; display: block; }
+.mail-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mail-copy small { color: var(--ink-muted); font-size: 7px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.mail-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-size: 10px; font-weight: 800; }
+.mail-arrow {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  font-size: 14px;
+}
+.mail-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--primary);
+  font-weight: 750;
+  text-decoration: none;
+}
+.mail-inline .mail-icon {
+  width: 27px;
+  height: 27px;
+  border-radius: 9px;
+  color: #fff;
+  background: var(--primary);
+}
+.mail-inline .mail-icon svg { width: 15px; height: 15px; }
+.mail-inline:hover span:last-child { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .contact-actions { margin-top: 9px; grid-template-columns: 1fr; gap: 8px; }
+  .mail-action { min-height: 52px; border-radius: 14px; }
+  .mail-copy strong { font-size: 9px; }
+}
