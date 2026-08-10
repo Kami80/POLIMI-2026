@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260811-unread-v1" />
+  <link rel="stylesheet" href="styles.css?v=20260811-ux15-v1" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -124,7 +124,6 @@
           <p>Search, filter, or tap a card to open the full profile.</p>
         </div>
         <div class="directory-heading-tools">
-          <label class="sort-control" for="sortSelect"><span>Sort</span><select id="sortSelect" aria-label="Sort students"><option value="recent">Recently joined</option><option value="name">Name A–Z</option><option value="program">Program A–Z</option></select></label>
           <div class="desktop-view-switch" aria-label="Choose view">
             <button id="cardViewBtn" class="seg-btn active" type="button" data-view="cards"><span>▦</span> Cards</button>
             <button id="tableViewBtn" class="seg-btn" type="button" data-view="table"><span>☷</span> Table</button>
@@ -139,10 +138,23 @@
           <span class="search-shortcut" aria-hidden="true">/</span>
           <button id="searchClear" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
         </label>
+        <div class="search-suggestions" id="searchSuggestions" hidden role="listbox" aria-label="Search suggestions"></div>
 
         <button class="filter-trigger" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
           <span class="filter-symbol">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
         </button>
+
+        <label class="sort-control sort-control-inline" for="sortSelect">
+          <span>Sort</span>
+          <select id="sortSelect" aria-label="Sort students">
+            <option value="recommended">Recommended</option>
+            <option value="recent">Recently joined</option>
+            <option value="name">Name A–Z</option>
+            <option value="same-program">Same program first</option>
+            <option value="same-campus">Same campus first</option>
+            <option value="best" hidden>Best matches</option>
+          </select>
+        </label>
 
         <button class="roommate-match-trigger" id="roommateMatchButton" type="button" aria-pressed="false">
           <span class="roommate-match-icon" aria-hidden="true">⌂</span>
@@ -157,6 +169,14 @@
       </div>
 
       <div class="quick-filter-row" id="quickFilters" aria-label="Quick filters"></div>
+
+      <section class="telegram-recommendations" id="telegramRecommendations" hidden aria-label="Recommended Telegram groups"></section>
+
+      <div class="first-use-hint" id="firstUseHint" hidden>
+        <span aria-hidden="true">✦</span>
+        <p><strong>Quick tip:</strong> Tap any student to open their full profile. Use <b>Classmates</b> or <b>Same campus</b> to narrow the directory instantly.</p>
+        <button id="firstUseHintClose" type="button" aria-label="Dismiss tip">×</button>
+      </div>
 
       <div class="results-bar">
         <p id="resultText">Loading students…</p>
@@ -182,7 +202,10 @@
         <span class="directory-empty-icon" aria-hidden="true">⌕</span>
         <h3>No students match this view</h3>
         <p>Try another search or clear your filters to see everyone again.</p>
-        <button id="emptyReset" type="button">Clear search & filters</button>
+        <div class="directory-empty-actions">
+          <button id="emptyReset" type="button">Clear filters</button>
+          <button id="emptyShowAll" class="secondary" type="button">See all students</button>
+        </div>
       </div>
 
       <div id="cardView" class="student-grid" hidden></div>
@@ -228,7 +251,14 @@
       <div class="profile-handle" aria-hidden="true"></div>
       <header class="profile-toolbar">
         <button class="profile-toolbar-btn" id="profileClose" type="button" aria-label="Close profile">×</button>
-        <span class="profile-toolbar-label">STUDENT PROFILE</span>
+        <div class="profile-toolbar-center">
+          <span class="profile-toolbar-label">STUDENT PROFILE</span>
+          <div class="profile-browser-nav" id="profileBrowserNav" aria-label="Browse student profiles">
+            <button id="profilePrev" type="button" aria-label="Previous student">← <span>Previous</span></button>
+            <span id="profilePosition">1 / 1</span>
+            <button id="profileNext" type="button" aria-label="Next student"><span>Next</span> →</button>
+          </div>
+        </div>
         <div class="profile-toolbar-actions">
           <button class="profile-toolbar-btn profile-save" id="profileSave" type="button" aria-label="Save student profile" aria-pressed="false">♡</button>
           <button class="profile-toolbar-btn profile-share" id="profileShare" type="button" aria-label="Share student profile">
@@ -245,6 +275,7 @@
         </div>
       </header>
       <div class="profile-scroll">
+        <div class="profile-swipe-hint" id="profileSwipeHint" aria-hidden="true">← Swipe to browse →</div>
         <div class="profile-body" id="profileBody"></div>
       </div>
       <p class="profile-contact-privacy" id="profileContactPrivacy" hidden>Contact details are visible only to students who joined the directory.</p>
@@ -281,7 +312,8 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="announcements.js?v=20260811-unread-v1"></script>
-  <script src="app.js?v=20260811-unread-v1"></script>
+  <script src="announcements.js?v=20260811-ux15-v1"></script>
+  <script src="app.js?v=20260811-ux15-v1"></script>
+  <script src="ux-enhancements.js?v=20260811-ux15-v1"></script>
 </body>
 </html>

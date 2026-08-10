@@ -4552,3 +4552,118 @@ body.announcement-modal-open {
   .pagination-ellipsis { flex: 0 0 22px; width: 22px; }
   .pagination-v2 .pagination-info { font-size: 9px; }
 }
+
+/* =========================================================
+   UX continuity & discovery enhancements · Aug 2026
+   ========================================================= */
+.controls-panel { position: relative; grid-template-columns: minmax(260px, 1fr) auto auto auto auto; }
+.sort-control-inline { align-self: stretch; }
+.sort-control-inline.best-match-active { border-color: color-mix(in srgb, var(--violet) 35%, var(--line)); background: var(--violet-soft); }
+.sort-control-inline.best-match-active select { color: var(--violet); font-weight: 850; }
+
+.search-suggestions {
+  position: absolute;
+  z-index: 45;
+  top: 77px;
+  left: 13px;
+  width: min(620px, calc(100% - 26px));
+  padding: 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--surface) 97%, transparent);
+  box-shadow: 0 20px 55px rgba(17, 29, 52, .18);
+  backdrop-filter: blur(18px);
+}
+.search-suggestion {
+  width: 100%; min-height: 50px; padding: 8px 10px 8px 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 0; border-radius: 12px; background: transparent; color: var(--ink); text-align: left; cursor: pointer;
+}
+.search-suggestion:hover, .search-suggestion.is-active { background: var(--primary-soft); color: var(--primary); }
+.search-suggestion span { min-width: 0; display: grid; gap: 2px; }
+.search-suggestion small { color: var(--muted); font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.search-suggestion strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 800; }
+.search-suggestion b { font-size: 12px; color: var(--muted-2); }
+
+.active-chip-removable { gap: 7px; border: 0; cursor: pointer; transition: transform .14s ease, background .14s ease; }
+.active-chip-removable:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--primary-soft) 76%, var(--surface)); }
+.active-chip-removable b { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 999px; background: color-mix(in srgb, var(--primary) 12%, transparent); font-size: 11px; line-height: 1; }
+.active-chip-removable.mode-chip { background: var(--violet-soft); color: var(--violet); }
+.active-chip-removable.search-chip { background: var(--cyan-soft); color: var(--cyan); }
+.clear-all { min-height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+
+.telegram-recommendations { margin: 12px 0 4px; padding: 13px; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--surface-2) 80%, var(--surface)); }
+.telegram-recommendation-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.telegram-recommendation-heading > span { color: var(--muted); font-size: 8px; font-weight: 850; letter-spacing: .11em; }
+.telegram-recommendation-heading a { color: var(--primary); font-size: 9px; font-weight: 800; text-decoration: none; }
+.telegram-recommendation-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.telegram-recommendation-card { min-width: 0; min-height: 58px; padding: 8px 12px; display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: center; border: 1px solid color-mix(in srgb, #2aa8df 25%, var(--line)); border-radius: 14px; background: color-mix(in srgb, #e9f8ff 54%, var(--surface)); text-decoration: none; transition: transform .14s ease, border-color .14s ease; }
+.telegram-recommendation-card:hover { transform: translateY(-2px); border-color: #35aee5; }
+.telegram-recommendation-card.pinned { border-color: color-mix(in srgb, var(--violet) 23%, var(--line)); background: color-mix(in srgb, var(--violet-soft) 44%, var(--surface)); }
+.telegram-recommendation-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; background: #2aa8df; color: white; }
+.telegram-recommendation-card.pinned .telegram-recommendation-icon { background: var(--violet); }
+.telegram-recommendation-card > span:nth-child(2) { min-width: 0; display: grid; gap: 2px; }
+.telegram-recommendation-card small { color: var(--muted); font-size: 7.5px; font-weight: 800; text-transform: uppercase; }
+.telegram-recommendation-card strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: var(--ink-soft); }
+.telegram-recommendation-card b { color: var(--muted); }
+
+.first-use-hint { margin: 10px 0 2px; padding: 10px 12px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--primary-soft) 38%, var(--surface)); }
+.first-use-hint > span { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 9px; background: var(--primary); color: white; }
+.first-use-hint p { margin: 0; color: var(--ink-soft); font-size: 9.5px; line-height: 1.55; }
+.first-use-hint button { width: 30px; height: 30px; border: 0; border-radius: 9px; background: var(--surface); color: var(--muted); cursor: pointer; font-size: 17px; }
+
+.directory-empty-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.directory-empty-actions button.secondary { border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft); }
+
+.card-updated-badge { min-height: 20px; padding: 0 7px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--cyan-soft); color: var(--cyan); font-size: 7px; font-weight: 850; white-space: nowrap; }
+
+.profile-toolbar-center { min-width: 0; display: grid; justify-items: center; gap: 4px; }
+.profile-browser-nav { display: flex; align-items: center; gap: 6px; }
+.profile-browser-nav button { min-height: 28px; padding: 0 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); color: var(--ink-soft); cursor: pointer; font-size: 8px; font-weight: 800; }
+.profile-browser-nav button:disabled { opacity: .35; cursor: default; }
+.profile-browser-nav span { min-width: 42px; color: var(--muted); text-align: center; font-size: 8px; font-weight: 800; }
+.profile-swipe-hint { display: none; }
+
+/* Keep contact actions visibly anchored to the mobile profile sheet. */
+.profile-contact-bar { position: sticky; bottom: 0; z-index: 10; box-shadow: 0 -8px 24px color-mix(in srgb, var(--ink) 7%, transparent); }
+
+@media (max-width: 1180px) and (min-width: 761px) {
+  .controls-panel { grid-template-columns: minmax(280px, 1fr) repeat(3, auto); }
+  .sort-control-inline { grid-row: 2; grid-column: 1 / 2; justify-self: start; }
+  .desktop-filters { grid-row: 3; }
+}
+
+@media (max-width: 760px) {
+  .controls-panel { grid-template-columns: 1fr auto auto; }
+  .search-field { grid-column: 1 / -1; }
+  .search-suggestions { top: 70px; left: 9px; width: calc(100% - 18px); }
+  .sort-control-inline { min-width: 112px; }
+  .sort-control-inline select { max-width: 104px; }
+  .telegram-recommendations { padding: 10px; border-radius: 15px; }
+  .telegram-recommendation-heading { margin-bottom: 7px; }
+  .telegram-recommendation-cards { grid-template-columns: 1fr; }
+  .telegram-recommendation-card { min-height: 54px; }
+  .first-use-hint { padding: 9px 10px; }
+  .first-use-hint p { font-size: 8.5px; }
+  .profile-browser-nav { display: none; }
+  .profile-swipe-hint { display: block; padding: 5px 12px 4px; color: var(--muted-2); text-align: center; font-size: 7.5px; font-weight: 750; background: var(--surface); }
+  .profile-toolbar-center { gap: 0; }
+  .profile-contact-bar { bottom: 0; padding-bottom: calc(11px + env(safe-area-inset-bottom)); }
+}
+
+/* Announcement read-state controls */
+.announcements-toolbar-status { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.announcements-since { min-height: 34px; padding: 0 11px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 10px; font-weight: 800; }
+.announcements-since.all-read { background: var(--green-soft); color: var(--green); }
+.mark-all-read { min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--ink-soft); cursor: pointer; font-size: 10px; font-weight: 800; }
+.mark-all-read:hover { border-color: color-mix(in srgb, var(--primary) 30%, var(--line)); color: var(--primary); }
+.announcement-card-v3.is-unread { border-color: color-mix(in srgb, var(--primary) 38%, var(--line)) !important; box-shadow: 0 13px 34px color-mix(in srgb, var(--primary) 12%, transparent); }
+.announcement-card-v3.is-unread .announcement-card-button { background: linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 23%, var(--surface)), var(--surface)); }
+.announcement-card-v3.is-unread .announcement-card-title { color: color-mix(in srgb, var(--primary) 30%, var(--ink)); }
+
+@media (max-width: 760px) {
+  .announcements-toolbar-status { justify-content: flex-start; width: 100%; }
+  .announcements-since { font-size: 9px; }
+  .mark-all-read { min-height: 34px; font-size: 9px; }
+}
+.profile-updated-badge { min-height: 27px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--cyan-soft); color: var(--cyan); font-size: 8px; font-weight: 850; }

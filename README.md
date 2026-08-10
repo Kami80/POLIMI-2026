@@ -117,3 +117,21 @@ Announcement read state is stored locally under `polimi_read_announcements_v1`. 
 ## Latest UI update
 - Student directory uses 24 records per page with numbered pagination.
 - Announcement cards use larger desktop typography for dates, summaries, tags and footer labels.
+
+## UX enhancement pass (Aug 11, 2026)
+
+This build additionally includes:
+- preserved scroll position when opening/closing profiles
+- swipe profile browsing on mobile and Previous/Next on desktop
+- removable active-filter chips + Clear all
+- smart program/campus/student search suggestions
+- personalized sorting: Recommended, Recently joined, Name A–Z, Same program, Same campus
+- 24-per-page pagination with remembered page and grid-level smooth scrolling
+- sticky mobile Telegram / Polimi Mail profile actions
+- Mark all announcements as read + new-since-last-visit messaging
+- personalized Telegram group recommendation + pinned Polimi Free Forum
+- recently-updated profile badges when the sheet exposes update data or a newer repeated submission
+- skeleton loading and cached/offline freshness labels
+- contextual empty states with Clear filters / See all students
+- keyboard shortcuts: / search, Esc close, Left/Right profile navigation
+- lightweight first-use hints shown only once
