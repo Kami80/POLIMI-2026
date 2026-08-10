@@ -20,3 +20,7 @@ A mobile-first student directory for GitHub Pages, powered by a public Google Sh
 4. Save and wait for GitHub Pages to publish the site.
 
 The connected Google Sheet must be publicly viewable for browser-only GitHub Pages access.
+
+
+## Student profiles
+Cards automatically include the optional self-description and turn Telegram usernames/IDs into profile links when possible. Timestamp and email remain hidden from the public UI.

@@ -17,6 +17,8 @@ const CONFIG = {
     campus: ["which campus are you primarily attending", "primary campus", "campus"],
     degree: ["current degree level", "degree level", "degree"],
     roommate: ["do you want a roommate", "want roommate", "roommate", "looking for roommate"],
+    note: ["maybe a note to describe yourself", "note to describe yourself", "about me", "bio", "note", "description"],
+    telegram: ["telegram id", "telegram username", "telegram", "telegram account"],
   }
 };
 
@@ -78,7 +80,7 @@ function displayValue(row, column) {
 
 function visibleColumns() {
   const columns = state.columns.filter(column => !isHiddenColumn(column));
-  const preferredKeys = ["name", "gender", "program", "campus", "degree", "roommate"];
+  const preferredKeys = ["name", "gender", "program", "campus", "degree", "roommate", "note", "telegram"];
   const preferred = preferredKeys.map(semanticColumn).filter(Boolean);
   const seen = new Set(preferred.map(c => c.index));
   return [...preferred, ...columns.filter(c => !seen.has(c.index))];
@@ -461,7 +463,9 @@ function renderCards(rows, start) {
   const campusCol = semanticColumn("campus");
   const degreeCol = semanticColumn("degree");
   const roommateCol = semanticColumn("roommate");
-  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol].filter(Boolean).map(c => c.index));
+  const noteCol = semanticColumn("note");
+  const telegramCol = semanticColumn("telegram");
+  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol].filter(Boolean).map(c => c.index));
   const extras = visibleColumns().filter(c => !coreIndexes.has(c.index));
 
   rows.forEach((row, offset) => {
@@ -471,6 +475,8 @@ function renderCards(rows, start) {
     const campus = displayValue(row, campusCol) || "Not specified";
     const degree = displayValue(row, degreeCol) || "Not specified";
     const roommate = displayValue(row, roommateCol) || "Not specified";
+    const note = displayValue(row, noteCol);
+    const telegram = displayValue(row, telegramCol);
 
     const card = document.createElement("article");
     card.className = "student-card";
@@ -512,6 +518,23 @@ function renderCards(rows, start) {
     roommateRow.append(roommateLabel, roommateStatus);
 
     card.append(head, programBlock, facts, roommateRow);
+
+    if (note) {
+      const about = document.createElement("div");
+      about.className = "student-about";
+      const aboutHead = document.createElement("div");
+      aboutHead.className = "student-about-head";
+      aboutHead.innerHTML = `<span class="about-icon" aria-hidden="true">✦</span><span>About me</span>`;
+      const aboutText = document.createElement("p");
+      aboutText.textContent = note;
+      about.append(aboutHead, aboutText);
+      card.appendChild(about);
+    }
+
+    if (telegram) {
+      const telegramAction = createTelegramAction(telegram);
+      if (telegramAction) card.appendChild(telegramAction);
+    }
 
     const filledExtras = extras.filter(column => displayValue(row, column));
     if (filledExtras.length) {
@@ -572,7 +595,7 @@ function renderTable(rows) {
     const tr = document.createElement("tr");
     columns.forEach(column => {
       const td = document.createElement("td");
-      renderCellContent(td, displayValue(row, column));
+      renderColumnContent(td, column, displayValue(row, column));
       tr.appendChild(td);
     });
     els.tableBody.appendChild(tr);
@@ -608,6 +631,93 @@ function compareCells(a, b) {
   return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: "base" });
 }
 
+
+function renderColumnContent(container, column, value) {
+  if (isTelegramColumn(column)) {
+    const action = createTelegramInlineLink(value);
+    if (action) { container.appendChild(action); return; }
+  }
+  renderCellContent(container, value);
+}
+
+function isTelegramColumn(column) {
+  if (!column) return false;
+  const n = normalize(column.label);
+  return n.includes("telegram");
+}
+
+function telegramUrl(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+
+  if (/^https?:\/\/(?:www\.)?(?:t\.me|telegram\.me)\//i.test(raw)) return raw;
+  if (/^(?:www\.)?(?:t\.me|telegram\.me)\//i.test(raw)) return `https://${raw.replace(/^www\./i, "")}`;
+
+  const withoutAt = raw.replace(/^@/, "").trim();
+  if (/^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(withoutAt)) return `https://t.me/${withoutAt}`;
+
+  if (/^\d+$/.test(raw)) return `tg://user?id=${raw}`;
+  return null;
+}
+
+function telegramLabel(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "Telegram";
+  const match = raw.match(/(?:t\.me|telegram\.me)\/([^/?#]+)/i);
+  const handle = match?.[1] || raw.replace(/^@/, "");
+  if (/^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(handle)) return `@${handle}`;
+  return raw;
+}
+
+function telegramIcon() {
+  const span = document.createElement("span");
+  span.className = "telegram-icon";
+  span.setAttribute("aria-hidden", "true");
+  span.innerHTML = `<svg viewBox="0 0 24 24" focusable="false"><path d="M21.5 3.2 18.3 20c-.24 1.18-.88 1.47-1.78.91l-4.88-3.6-2.35 2.27c-.26.26-.48.48-.98.48l.35-4.97 9.05-8.18c.39-.35-.09-.55-.61-.2L5.92 13.75l-4.82-1.5c-1.05-.33-1.07-1.05.22-1.55L20.16 3.44c.87-.32 1.63.2 1.34-.24Z" fill="currentColor"/></svg>`;
+  return span;
+}
+
+function createTelegramAction(value) {
+  const url = telegramUrl(value);
+  if (!url) return null;
+  const a = document.createElement("a");
+  a.className = "telegram-action";
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.setAttribute("aria-label", `Open ${telegramLabel(value)} on Telegram`);
+
+  const copy = document.createElement("span");
+  copy.className = "telegram-copy";
+  const eyebrow = document.createElement("small");
+  eyebrow.textContent = "Telegram";
+  const label = document.createElement("strong");
+  label.textContent = telegramLabel(value);
+  copy.append(eyebrow, label);
+
+  const arrow = document.createElement("span");
+  arrow.className = "telegram-arrow";
+  arrow.textContent = "↗";
+
+  a.append(telegramIcon(), copy, arrow);
+  return a;
+}
+
+function createTelegramInlineLink(value) {
+  const url = telegramUrl(value);
+  if (!url) return null;
+  const a = document.createElement("a");
+  a.className = "telegram-inline";
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.append(telegramIcon());
+  const label = document.createElement("span");
+  label.textContent = telegramLabel(value);
+  a.append(label);
+  return a;
+}
+
 function renderCellContent(container, value) {
   const text = String(value ?? "").trim();
   if (!text) { container.textContent = "—"; return; }
@@ -640,6 +750,8 @@ function shortHeader(label) {
   if (n.includes("roommate")) return "Roommate";
   if (n.includes("degree")) return "Degree";
   if (n.includes("program")) return "Program";
+  if (n.includes("telegram")) return "Telegram";
+  if (n.includes("describe yourself") || n === "note" || n.includes("about me")) return "About";
   if (n === "full name") return "Name";
   return text.length > 28 ? `${text.slice(0, 26)}…` : text;
 }
