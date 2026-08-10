@@ -1239,3 +1239,501 @@ tbody tr:hover { background: var(--surface-2); }
   font-size: 7px;
   font-weight: 800;
 }
+
+
+/* =========================================================
+   Compact directory cards v2
+   - lightweight preview cards
+   - optimized touch layout on phones
+   ========================================================= */
+.student-grid {
+  gap: 11px;
+}
+
+.student-card.student-card-v2 {
+  min-height: 112px;
+  padding: 13px 13px 12px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 28px;
+  gap: 11px;
+  align-items: center;
+  overflow: visible;
+  border-radius: 18px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
+}
+
+.student-card.student-card-v2::before {
+  display: none;
+}
+
+.student-card.student-card-v2:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .08);
+}
+
+.student-card-v2 .student-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  align-self: start;
+  font-size: 12px;
+}
+
+.student-card-content {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.student-card-title-row {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.student-card-title-row .student-name {
+  min-width: 0;
+  flex: 0 1 auto;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.compact-badge,
+.compact-polimi-badge {
+  flex: 0 0 auto;
+  min-height: 20px;
+  padding: 0 6px;
+  font-size: 6.5px;
+  line-height: 1;
+}
+
+.compact-badge {
+  max-width: 72px;
+}
+
+.compact-polimi-badge {
+  border-color: transparent;
+  background: var(--green-soft);
+}
+
+.student-card-program {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  font-size: 9.5px;
+  line-height: 1.45;
+  font-weight: 720;
+  letter-spacing: -.01em;
+}
+
+.student-card-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.student-meta-chip {
+  min-width: 0;
+  max-width: 42%;
+  height: 23px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--muted-2);
+  font-size: 7px;
+  font-weight: 760;
+}
+
+.student-meta-chip.roommate-chip {
+  max-width: 46%;
+}
+
+.student-meta-chip.roommate-chip.yes {
+  border-color: color-mix(in srgb, var(--green) 15%, var(--line));
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.student-meta-chip.roommate-chip.maybe {
+  border-color: color-mix(in srgb, var(--amber) 14%, var(--line));
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.student-card-chevron {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--muted-2);
+  font-size: 20px;
+  line-height: 1;
+  transition: transform .16s ease, background .16s ease, color .16s ease;
+}
+
+.student-card-v2:hover .student-card-chevron {
+  transform: translateX(2px);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Hide the old card building blocks if legacy markup is cached briefly. */
+.student-card-v2 .program-block,
+.student-card-v2 .student-facts,
+.student-card-v2 .student-card-footer,
+.student-card-v2 .student-card-badges,
+.student-card-v2 .student-card-head {
+  display: none !important;
+}
+
+@media (min-width: 1100px) {
+  .student-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .student-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .student-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .student-card.student-card-v2 {
+    min-height: 91px;
+    padding: 10px 9px 10px 10px;
+    grid-template-columns: 40px minmax(0, 1fr) 25px;
+    gap: 9px;
+    border-radius: 15px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .student-card.student-card-v2:hover {
+    transform: none;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+  }
+
+  .student-card.student-card-v2:active {
+    transform: scale(.988);
+    background: var(--surface-2);
+  }
+
+  .student-card-v2 .student-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+
+  .student-card-content {
+    gap: 4px;
+  }
+
+  .student-card-title-row {
+    gap: 4px;
+  }
+
+  .student-card-title-row .student-name {
+    font-size: 11.5px;
+    line-height: 1.2;
+  }
+
+  .compact-badge,
+  .compact-polimi-badge {
+    min-height: 18px;
+    padding: 0 5px;
+    font-size: 6px;
+  }
+
+  .compact-polimi-badge {
+    font-size: 0;
+    width: 18px;
+    padding: 0;
+    border-radius: 6px;
+  }
+
+  .compact-polimi-badge::after {
+    content: "✓";
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .student-card-program {
+    font-size: 8.5px;
+    line-height: 1.35;
+  }
+
+  .student-card-meta {
+    gap: 4px;
+  }
+
+  .student-meta-chip {
+    height: 20px;
+    max-width: 39%;
+    padding: 0 6px;
+    border-radius: 7px;
+    font-size: 6.5px;
+  }
+
+  .student-meta-chip.degree-chip {
+    display: none;
+  }
+
+  .student-meta-chip.campus-chip {
+    max-width: 46%;
+  }
+
+  .student-meta-chip.roommate-chip {
+    max-width: 54%;
+  }
+
+  .student-card-chevron {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    font-size: 18px;
+    background: transparent;
+  }
+}
+
+@media (max-width: 370px) {
+  .student-card.student-card-v2 {
+    grid-template-columns: 37px minmax(0, 1fr) 20px;
+    gap: 7px;
+    padding-inline: 9px 7px;
+  }
+
+  .student-card-v2 .student-card-avatar {
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+  }
+
+  .compact-badge {
+    max-width: 54px;
+  }
+
+  .student-card-title-row .student-name {
+    font-size: 11px;
+  }
+
+  .student-card-chevron {
+    width: 20px;
+    height: 22px;
+  }
+}
+
+/* =========================================================
+   Smart roommate matching
+   ========================================================= */
+.roommate-match-trigger {
+  min-height: 55px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid color-mix(in srgb, var(--violet) 18%, var(--line));
+  border-radius: 16px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--violet) 7%, var(--surface)), var(--surface-2));
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+.roommate-match-trigger:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--violet) 40%, var(--line));
+  color: var(--violet);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--violet) 9%, transparent);
+}
+.roommate-match-trigger.active {
+  border-color: color-mix(in srgb, var(--violet) 48%, var(--line));
+  background: linear-gradient(135deg, var(--primary-soft), color-mix(in srgb, var(--violet) 11%, var(--surface)));
+  color: var(--violet);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--violet) 8%, transparent);
+}
+.roommate-match-icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--violet) 10%, var(--surface));
+  color: var(--violet);
+  font-size: 14px;
+}
+.roommate-match-trigger.active .roommate-match-icon {
+  background: var(--violet);
+  color: #fff;
+}
+
+.roommate-match-banner {
+  margin: 0 0 12px;
+  padding: 12px 13px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid color-mix(in srgb, var(--violet) 19%, var(--line));
+  border-radius: 17px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, var(--surface)), color-mix(in srgb, var(--violet) 7%, var(--surface)));
+}
+.roommate-match-banner-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--violet));
+  color: #fff;
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--primary) 18%, transparent);
+  font-size: 13px;
+}
+.roommate-match-banner-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.roommate-match-banner-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 850;
+}
+.roommate-match-banner-copy span {
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.45;
+}
+.roommate-match-banner button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.roommate-match-badge {
+  min-height: 20px;
+  padding: 0 6px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--violet) 15%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--violet) 7%, var(--surface));
+  color: var(--violet);
+  font-size: 6.3px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.roommate-match-badge.strong {
+  border-color: color-mix(in srgb, var(--green) 18%, var(--line));
+  background: var(--green-soft);
+  color: var(--green);
+}
+.roommate-match-card .compact-polimi-badge { display: none; }
+.roommate-match-card {
+  border-color: color-mix(in srgb, var(--violet) 13%, var(--line)) !important;
+}
+.roommate-match-reasons {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+.roommate-match-reasons span {
+  min-width: 0;
+  height: 19px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface-2));
+  color: var(--muted-2);
+  font-size: 6.2px;
+  font-weight: 780;
+}
+
+.mobile-roommate.active {
+  color: var(--violet);
+  background: color-mix(in srgb, var(--violet) 9%, var(--surface));
+}
+
+@media (max-width: 760px) {
+  .roommate-match-trigger { display: none; }
+  .roommate-match-banner {
+    margin-bottom: 9px;
+    padding: 10px;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 9px;
+    border-radius: 15px;
+  }
+  .roommate-match-banner-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+  .roommate-match-banner-copy strong { font-size: 9px; }
+  .roommate-match-banner-copy span {
+    max-height: 2.8em;
+    overflow: hidden;
+    font-size: 7px;
+  }
+  .roommate-match-banner button {
+    min-height: 31px;
+    padding: 0 8px;
+    font-size: 7px;
+  }
+  .roommate-match-card.student-card.student-card-v2 {
+    min-height: 116px;
+  }
+  .roommate-match-reasons span:nth-child(n+3) { display: none; }
+  .roommate-match-badge { font-size: 6px; }
+}
+
+@media (max-width: 390px) {
+  .roommate-match-banner {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+  .roommate-match-banner button {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .roommate-match-badge { max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
+}

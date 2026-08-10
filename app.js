@@ -42,6 +42,9 @@ const state = {
   profileBySlug: new Map(),
   slugByRow: new WeakMap(),
   activeProfileSlug: "",
+  roommateMatchMode: false,
+  roommateReferenceRow: null,
+  roommateMatchMeta: new WeakMap(),
 };
 
 const els = {};
@@ -54,7 +57,8 @@ function cacheElements() {
     "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
     "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "filterSheet", "filterBackdrop",
     "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
-    "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions"
+    "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions",
+    "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
@@ -157,7 +161,10 @@ function setupEvents() {
   els.clearFilters.addEventListener("click", resetAllFilters);
   els.prevPage.addEventListener("click", () => changePage(-1));
   els.nextPage.addEventListener("click", () => changePage(1));
-  els.refreshButton.addEventListener("click", loadSheet);
+  els.refreshButton?.addEventListener("click", loadSheet);
+
+  [els.roommateMatchButton, els.mobileRoommateButton].filter(Boolean).forEach(button => button.addEventListener("click", toggleRoommateMatchMode));
+  els.roommateMatchReset?.addEventListener("click", exitRoommateMatchMode);
 
   [els.filterTrigger, els.mobileFilterButton].forEach(button => button.addEventListener("click", openFilterSheet));
   [els.filterBackdrop, els.filterClose].forEach(button => button.addEventListener("click", closeFilterSheet));
@@ -298,10 +305,14 @@ function unlockDirectory(email) {
   state.filters = {};
   state.sort = { index: null, direction: "asc" };
   state.page = 1;
+  state.roommateMatchMode = false;
+  state.roommateReferenceRow = null;
+  state.roommateMatchMeta = new WeakMap();
   els.searchInput.value = "";
   els.searchClear.hidden = true;
 
   renderFilters();
+  updateRoommateMatchUI();
   applyDataPipeline();
   setStatus("online", "Live");
   setAccessBusy(false, "Check & enter");
@@ -319,6 +330,9 @@ function lockDirectory() {
   state.authorized = false;
   state.authorizedEmail = "";
   state.pendingEmail = "";
+  state.roommateMatchMode = false;
+  state.roommateReferenceRow = null;
+  state.roommateMatchMeta = new WeakMap();
   closeFilterSheet();
   closeStudentProfile({ syncUrl: false });
   els.protectedApp.hidden = true;
@@ -760,6 +774,134 @@ function flashShareLabel(text) {
   }, 1600);
 }
 
+
+function currentUserRow() {
+  const emailColumn = semanticColumn("email");
+  if (!emailColumn || !state.authorizedEmail) return null;
+  const target = normalizeEmail(state.authorizedEmail);
+  return state.rows.find(row => normalizeEmail(displayValue(row, emailColumn)) === target) || null;
+}
+
+function roommateIntent(value) {
+  const n = normalize(value);
+  if (!n) return { score: 12, eligible: true, label: "Roommate preference not specified" };
+  if (n === "no" || n === "nope" || n.includes("dont") || n.includes("do not") || n.includes("not looking") || n.includes("no roommate")) {
+    return { score: 0, eligible: false, label: "Not looking for a roommate" };
+  }
+  if (n.includes("maybe") || n.includes("possibly") || n.includes("not sure") || n.includes("depends")) {
+    return { score: 42, eligible: true, label: "Maybe looking for a roommate" };
+  }
+  if (n === "yes" || n.includes("yes") || n.includes("looking") || n.includes("want") || n.includes("need") || n.includes("sure")) {
+    return { score: 60, eligible: true, label: "Looking for a roommate" };
+  }
+  return { score: 28, eligible: true, label: String(value || "Roommate preference") };
+}
+
+function comparableParts(value) {
+  return String(value || "")
+    .split(/[,;/|]+|\s+and\s+/i)
+    .map(normalize)
+    .filter(Boolean);
+}
+
+function valuesOverlap(a, b) {
+  const aa = comparableParts(a);
+  const bb = comparableParts(b);
+  if (!aa.length || !bb.length) return false;
+  return aa.some(x => bb.some(y => x === y || (x.length > 4 && y.includes(x)) || (y.length > 4 && x.includes(y))));
+}
+
+function calculateRoommateMatch(referenceRow, candidateRow) {
+  const roommateCol = semanticColumn("roommate");
+  const campusCol = semanticColumn("campus");
+  const programCol = semanticColumn("program");
+  const genderCol = semanticColumn("gender");
+  const degreeCol = semanticColumn("degree");
+
+  const intent = roommateIntent(displayValue(candidateRow, roommateCol));
+  if (!intent.eligible) return { eligible: false, score: 0, reasons: [] };
+
+  let score = intent.score;
+  const reasons = [];
+  if (intent.score >= 42) reasons.push(intent.score >= 55 ? "Wants a roommate" : "Open to a roommate");
+
+  const sameCampus = valuesOverlap(displayValue(referenceRow, campusCol), displayValue(candidateRow, campusCol));
+  const sameProgram = valuesOverlap(displayValue(referenceRow, programCol), displayValue(candidateRow, programCol));
+  const sameGender = valuesOverlap(displayValue(referenceRow, genderCol), displayValue(candidateRow, genderCol));
+  const sameDegree = valuesOverlap(displayValue(referenceRow, degreeCol), displayValue(candidateRow, degreeCol));
+
+  if (sameCampus) { score += 30; reasons.push("Same campus"); }
+  if (sameProgram) { score += 25; reasons.push("Same program"); }
+  // Gender is intentionally only a light tie-breaker because the form currently
+  // stores gender, not an explicit roommate-gender preference.
+  if (sameGender) { score += 8; reasons.push("Same gender"); }
+  if (sameDegree) { score += 5; reasons.push("Same degree level"); }
+
+  return { eligible: true, score, reasons, sameCampus, sameProgram, sameGender, sameDegree };
+}
+
+function roommateMatchTier(meta) {
+  if (!meta) return "Match";
+  if (meta.score >= 108) return "Best match";
+  if (meta.score >= 88) return "Great match";
+  if (meta.score >= 65) return "Good match";
+  return "Potential";
+}
+
+function toggleRoommateMatchMode() {
+  if (state.roommateMatchMode) exitRoommateMatchMode();
+  else enterRoommateMatchMode();
+}
+
+function enterRoommateMatchMode() {
+  const reference = currentUserRow();
+  if (!reference) {
+    if (els.roommateMatchButtonLabel) els.roommateMatchButtonLabel.textContent = "Profile not found";
+    window.setTimeout(updateRoommateMatchUI, 1500);
+    return;
+  }
+  state.roommateMatchMode = true;
+  state.roommateReferenceRow = reference;
+  state.roommateMatchMeta = new WeakMap();
+  state.page = 1;
+  state.sort = { index: null, direction: "asc" };
+  updateRoommateMatchUI();
+  applyDataPipeline();
+  document.querySelector(".results-bar")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function exitRoommateMatchMode() {
+  state.roommateMatchMode = false;
+  state.roommateReferenceRow = null;
+  state.roommateMatchMeta = new WeakMap();
+  state.page = 1;
+  updateRoommateMatchUI();
+  applyDataPipeline();
+}
+
+function updateRoommateMatchUI() {
+  const active = state.roommateMatchMode;
+  if (els.roommateMatchButton) {
+    els.roommateMatchButton.classList.toggle("active", active);
+    els.roommateMatchButton.setAttribute("aria-pressed", String(active));
+  }
+  if (els.roommateMatchButtonLabel) els.roommateMatchButtonLabel.textContent = active ? "Roommate matches" : "Find roommates";
+  if (els.mobileRoommateButton) {
+    els.mobileRoommateButton.classList.toggle("active", active);
+    els.mobileRoommateButton.setAttribute("aria-pressed", String(active));
+  }
+  if (els.roommateMatchBanner) els.roommateMatchBanner.hidden = !active;
+
+  if (active && state.roommateReferenceRow) {
+    const name = displayValue(state.roommateReferenceRow, semanticColumn("name")) || "your profile";
+    const campus = displayValue(state.roommateReferenceRow, semanticColumn("campus"));
+    const program = displayValue(state.roommateReferenceRow, semanticColumn("program"));
+    if (els.roommateMatchTitle) els.roommateMatchTitle.textContent = `Best roommate matches for ${name}`;
+    const details = [campus && `campus: ${campus}`, program && `program: ${program}`].filter(Boolean).join(" · ");
+    if (els.roommateMatchText) els.roommateMatchText.textContent = `People who want a roommate are ranked first${details ? `, then matched by ${details}` : ""}. Gender is only a light tie-breaker.`;
+  }
+}
+
 function getSlicerDefinitions() {
   return CONFIG.slicers.map(definition => {
     const column = matchColumn(definition.aliases);
@@ -969,7 +1111,20 @@ function applyDataPipeline() {
     return filterEntries.every(([index, selected]) => selected.has(displayValue(row, state.columns[Number(index)])));
   });
 
-  if (state.sort.index !== null) {
+  if (state.roommateMatchMode && state.roommateReferenceRow) {
+    const reference = state.roommateReferenceRow;
+    const ranked = [];
+    state.roommateMatchMeta = new WeakMap();
+    rows.forEach(row => {
+      if (row === reference) return;
+      const meta = calculateRoommateMatch(reference, row);
+      if (!meta.eligible) return;
+      state.roommateMatchMeta.set(row, meta);
+      ranked.push({ row, meta });
+    });
+    ranked.sort((a, b) => b.meta.score - a.meta.score || String(displayValue(a.row, semanticColumn("name"))).localeCompare(String(displayValue(b.row, semanticColumn("name")))));
+    rows = ranked.map(item => item.row);
+  } else if (state.sort.index !== null) {
     const index = state.sort.index;
     const direction = state.sort.direction === "asc" ? 1 : -1;
     rows = [...rows].sort((a, b) => compareCells(a[index], b[index]) * direction);
@@ -978,7 +1133,9 @@ function applyDataPipeline() {
   state.filteredRows = rows;
   const maxPage = Math.max(1, Math.ceil(rows.length / CONFIG.rowsPerPage));
   state.page = Math.min(state.page, maxPage);
-  els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
+  els.resultText.textContent = state.roommateMatchMode
+    ? `${formatNumber(rows.length)} ${rows.length === 1 ? "roommate match" : "roommate matches"}`
+    : `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
   renderActiveFilters();
   renderRows();
 }
@@ -1012,14 +1169,14 @@ function renderCards(rows, start) {
     const name = displayValue(row, nameCol) || `Student ${start + offset + 1}`;
     const gender = displayValue(row, genderCol);
     const program = displayValue(row, programCol) || "Program not specified";
-    const campus = displayValue(row, campusCol) || "Not specified";
-    const degree = displayValue(row, degreeCol) || "Not specified";
-    const roommate = displayValue(row, roommateCol) || "Not specified";
+    const campus = displayValue(row, campusCol) || "Campus not specified";
+    const degree = displayValue(row, degreeCol) || "Degree not specified";
+    const roommate = displayValue(row, roommateCol) || "Roommate not specified";
     const polimiMail = displayValue(row, polimiMailCol);
     const slug = studentSlug(row);
 
     const card = document.createElement("article");
-    card.className = "student-card student-card-compact";
+    card.className = "student-card student-card-compact student-card-v2";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
@@ -1034,56 +1191,94 @@ function renderCards(rows, start) {
       }
     });
 
-    const head = document.createElement("div");
-    head.className = "student-card-head";
     const avatar = document.createElement("div");
-    avatar.className = "student-avatar";
+    avatar.className = "student-avatar student-card-avatar";
     avatar.textContent = initials(name);
-    const identity = document.createElement("div");
-    identity.className = "student-identity";
+
+    const content = document.createElement("div");
+    content.className = "student-card-content";
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "student-card-title-row";
+
     const title = document.createElement("h3");
     title.className = "student-name";
     title.textContent = name;
-    const subline = document.createElement("div");
-    subline.className = "student-subline";
-    subline.textContent = degree;
-    identity.append(title, subline);
+    titleRow.appendChild(title);
 
-    const badges = document.createElement("div");
-    badges.className = "student-card-badges";
     if (gender) {
       const badge = document.createElement("span");
-      badge.className = `gender-badge ${genderClass(gender)}`;
+      badge.className = `gender-badge compact-badge ${genderClass(gender)}`;
       badge.textContent = gender;
-      badges.appendChild(badge);
+      titleRow.appendChild(badge);
     }
+
     if (mailtoUrl(polimiMail)) {
       const verified = document.createElement("span");
-      verified.className = "polimi-mail-badge";
-      verified.textContent = "✓ Polimi mail";
+      verified.className = "polimi-mail-badge compact-polimi-badge";
+      verified.textContent = "✓ Polimi";
       verified.title = "Polimi mail provided";
-      badges.appendChild(verified);
+      titleRow.appendChild(verified);
     }
-    head.append(avatar, identity, badges);
 
-    const programBlock = document.createElement("div");
-    programBlock.className = "program-block";
-    programBlock.innerHTML = `<span>Program</span><strong>${escapeHtml(program)}</strong>`;
+    if (state.roommateMatchMode) {
+      const matchMeta = state.roommateMatchMeta.get(row);
+      if (matchMeta) {
+        const matchBadge = document.createElement("span");
+        matchBadge.className = `roommate-match-badge ${matchMeta.score >= 88 ? "strong" : ""}`;
+        matchBadge.textContent = roommateMatchTier(matchMeta);
+        matchBadge.title = matchMeta.reasons.join(" · ") || "Roommate match";
+        titleRow.appendChild(matchBadge);
+        card.classList.add("roommate-match-card");
+        card.dataset.matchScore = String(matchMeta.score);
+      }
+    }
 
-    const facts = document.createElement("div");
-    facts.className = "student-facts";
-    facts.append(createFact("Campus", campus), createFact("Roommate", roommate));
+    const programLine = document.createElement("div");
+    programLine.className = "student-card-program";
+    programLine.textContent = program;
 
-    const footer = document.createElement("div");
-    footer.className = "student-card-footer";
-    const hint = document.createElement("span");
-    hint.textContent = "View full profile";
+    const meta = document.createElement("div");
+    meta.className = "student-card-meta";
+
+    const campusChip = document.createElement("span");
+    campusChip.className = "student-meta-chip campus-chip";
+    campusChip.title = `Campus: ${campus}`;
+    campusChip.textContent = campus;
+
+    const degreeChip = document.createElement("span");
+    degreeChip.className = "student-meta-chip degree-chip";
+    degreeChip.title = `Degree: ${degree}`;
+    degreeChip.textContent = degree;
+
+    const roommateChip = document.createElement("span");
+    roommateChip.className = `student-meta-chip roommate-chip ${roommateClass(roommate)}`;
+    roommateChip.title = `Roommate: ${roommate}`;
+    roommateChip.textContent = `Roommate · ${roommate}`;
+
+    meta.append(campusChip, degreeChip, roommateChip);
+    content.append(titleRow, programLine, meta);
+
+    if (state.roommateMatchMode) {
+      const matchMeta = state.roommateMatchMeta.get(row);
+      if (matchMeta?.reasons?.length) {
+        const reasons = document.createElement("div");
+        reasons.className = "roommate-match-reasons";
+        matchMeta.reasons.slice(0, 3).forEach(reason => {
+          const chip = document.createElement("span");
+          chip.textContent = `✓ ${reason}`;
+          reasons.appendChild(chip);
+        });
+        content.appendChild(reasons);
+      }
+    }
+
     const arrow = document.createElement("span");
-    arrow.className = "student-card-arrow";
-    arrow.textContent = "→";
-    footer.append(hint, arrow);
+    arrow.className = "student-card-chevron";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "›";
 
-    card.append(head, programBlock, facts, footer);
+    card.append(avatar, content, arrow);
     fragment.appendChild(card);
   });
 
@@ -1138,6 +1333,12 @@ function renderTable(rows) {
 }
 
 function sortBy(index) {
+  if (state.roommateMatchMode) {
+    state.roommateMatchMode = false;
+    state.roommateReferenceRow = null;
+    state.roommateMatchMeta = new WeakMap();
+    updateRoommateMatchUI();
+  }
   if (state.sort.index === index) state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
   else state.sort = { index, direction: "asc" };
   state.page = 1;

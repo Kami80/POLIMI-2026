@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260810-compact-cards-v2" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -137,6 +137,11 @@
           <span class="filter-symbol">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
         </button>
 
+        <button class="roommate-match-trigger" id="roommateMatchButton" type="button" aria-pressed="false">
+          <span class="roommate-match-icon" aria-hidden="true">⌂</span>
+          <span id="roommateMatchButtonLabel">Find roommates</span>
+        </button>
+
         <div class="desktop-filters" id="desktopFilters"></div>
       </div>
 
@@ -144,6 +149,15 @@
         <p id="resultText">Loading students…</p>
         <div class="active-filter-chips" id="activeFilterChips"></div>
         <button class="clear-all" id="clearFilters" type="button" hidden>Reset filters</button>
+      </div>
+
+      <div class="roommate-match-banner" id="roommateMatchBanner" hidden>
+        <div class="roommate-match-banner-icon" aria-hidden="true">✦</div>
+        <div class="roommate-match-banner-copy">
+          <strong id="roommateMatchTitle">Your roommate matches</strong>
+          <span id="roommateMatchText">Students looking for roommates are ranked by campus and program fit.</span>
+        </div>
+        <button id="roommateMatchReset" type="button">Show everyone</button>
       </div>
 
       <div id="cardView" class="student-grid" hidden></div>
@@ -204,8 +218,8 @@
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <a href="#top" class="mobile-nav-item active"><span>⌂</span><small>Home</small></a>
     <button id="mobileFilterButton" class="mobile-nav-item" type="button"><span>☷</span><small>Filters</small><i id="mobileFilterBadge" hidden>0</i></button>
+    <button id="mobileRoommateButton" class="mobile-nav-item mobile-roommate" type="button" aria-pressed="false"><span>⌂</span><small>Roommates</small></button>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" class="mobile-nav-item mobile-add"><span>＋</span><small>Add profile</small></a>
-    <button id="refreshButton" class="mobile-nav-item" type="button"><span>↻</span><small>Refresh</small></button>
   </nav>
 
   <footer class="site-footer shell">
@@ -215,6 +229,6 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="app.js?v=20260810-profile-app-v1"></script>
+  <script src="app.js?v=20260810-roommate-matching-v1"></script>
 </body>
 </html>
