@@ -1069,7 +1069,6 @@ function updateRoommateMatchUI() {
     const details = [campus && `campus: ${campus}`, program && `program: ${program}`].filter(Boolean).join(" · ");
     if (els.roommateMatchText) els.roommateMatchText.textContent = `People open to a roommate are prioritized${details ? `, with stronger matches for ${details}` : ""}. Match labels stay descriptive rather than pretending to be exact percentages.`;
   }
-  renderQuickFilters();
 }
 
 function getSlicerDefinitions() {
@@ -1831,14 +1830,13 @@ function quickFilterSpec() {
   if (roommateCol) {
     const values = [...new Set(state.rows.map(row => displayValue(row, roommateCol)).filter(Boolean))]
       .filter(value => roommateIntent(value).score >= 42);
-    if (values.length) specs.push({ label: "Roommate mode", column: roommateCol, values, icon: "⌂", mode: "roommate-match", title: "Rank potential roommates by campus and program fit" });
+    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "⌂", title: "Students open to finding a roommate" });
   }
 
   return specs;
 }
 
 function quickFilterActive(spec) {
-  if (spec.mode === "roommate-match") return state.roommateMatchMode;
   const selected = state.filters[spec.column.index] || new Set();
   return selected.size === spec.values.length && spec.values.every(value => selected.has(value));
 }
@@ -1857,10 +1855,6 @@ function renderQuickFilters() {
     button.innerHTML = `<span aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
     if (spec.title) button.title = spec.title;
     button.addEventListener("click", () => {
-      if (spec.mode === "roommate-match") {
-        toggleRoommateMatchMode();
-        return;
-      }
       if (quickFilterActive(spec)) delete state.filters[spec.column.index];
       else state.filters[spec.column.index] = new Set(spec.values);
       state.page = 1;

@@ -45,20 +45,6 @@ function groupSlug(program) {
     .replace(/^-+|-+$/g, "");
 }
 
-function showGroupsToast(message) {
-  const toast = document.getElementById("groupsToast");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.hidden = false;
-  toast.classList.remove("show");
-  requestAnimationFrame(() => toast.classList.add("show"));
-  clearTimeout(showGroupsToast.timer);
-  showGroupsToast.timer = setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => { toast.hidden = true; }, 180);
-  }, 2200);
-}
-
 async function shareGroup(item) {
   const url = `${window.location.origin}${window.location.pathname}?group=${encodeURIComponent(groupSlug(item.program))}`;
   const payload = {
@@ -70,7 +56,7 @@ async function shareGroup(item) {
     if (navigator.share) await navigator.share(payload);
     else {
       await navigator.clipboard.writeText(url);
-      showGroupsToast("Group link copied");
+      alert("Group link copied to clipboard");
     }
   } catch (_) {}
 }
