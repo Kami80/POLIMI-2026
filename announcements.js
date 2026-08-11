@@ -5,6 +5,42 @@
 */
 const POLIMI_ANNOUNCEMENTS = [
   {
+    id: "basic-safety-course-resource",
+    category: "Safety",
+    filter: "safety",
+    icon: "⚑",
+    title: "Basic Safety Course · study material",
+    summary: "Pinned 3-page PDF with Basic Safety Course questions and answers covering workplace safety, VDT use, emergencies, risk evaluation and ergonomics.",
+    pinned: true,
+    dateLabel: "Pinned resource",
+    dateShort: "PDF",
+    dateMonth: "3 PAGES",
+    dateContext: "Safety course material",
+    tone: "safety",
+    priority: 0,
+    tags: ["Pinned", "Safety course", "PDF", "Study material"],
+    highlights: [
+      { label: "Format", value: "3-page PDF" },
+      { label: "Topics", value: "VDT · first aid · risk · ergonomics" },
+      { label: "Includes", value: "Questions and answers" },
+      { label: "Use", value: "Basic Safety Course study reference" }
+    ],
+    fullText: [
+      "This pinned resource contains a three-page Basic Safety Course question-and-answer document for study and review.",
+      "Topics include the university Prevention and Protection Service, workplace safety responsibilities, first aid and evacuation, risk evaluation, VDT exposure, screen and workstation ergonomics, health supervision and emergency procedures.",
+      "Examples in the material include keeping the screen 50–70 cm from the eyes, positioning the monitor at 90° to natural light, and the responsibilities of workers, employers and safety personnel. Open the attached PDF to review the complete set of questions and answers."
+    ],
+    actions: [
+      {
+        label: "Open safety course PDF",
+        href: "basic-safety-course.pdf",
+        type: "pdf"
+      }
+    ],
+    source: "Basic Safety Course · uploaded study material",
+    signature: ["Polimi Students 2026/2027 resource"]
+  },
+  {
     id: "summer-closure-2026",
     category: "Closure",
     filter: "closures",
@@ -159,6 +195,7 @@ const announcementState = {
 };
 
 function announcementStatus(item) {
+  if (item.pinned) return { label: "Pinned", className: "pinned", rank: 0 };
   const now = Date.now();
   const start = item.start ? new Date(item.start).getTime() : null;
   const end = item.end ? new Date(item.end).getTime() : null;
@@ -225,7 +262,7 @@ function actionsMarkup(item) {
     const external = !String(action.href).startsWith("mailto:");
     return `
       <a class="announcement-modal-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-        <span>${action.type === "email" ? "✉" : "↗"}</span>
+        <span>${action.type === "email" ? "✉" : action.type === "pdf" ? "PDF" : "↗"}</span>
         <strong>${escapeHtml(action.label)}</strong>
       </a>
     `;
@@ -277,6 +314,7 @@ function announcementCardMarkup(item) {
 function updateFilterCounts() {
   const counts = {
     all: POLIMI_ANNOUNCEMENTS.length,
+    safety: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "safety").length,
     courses: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "courses").length,
     closures: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "closures").length
   };

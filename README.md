@@ -134,3 +134,9 @@ This build additionally includes:
 - contextual empty states with Clear filters / See all students
 - keyboard shortcuts: / search, Esc close, Left/Right profile navigation
 - lightweight first-use hints shown only once
+
+
+## Latest additions
+- Pinned Basic Safety Course PDF notice (`basic-safety-course.pdf`).
+- HPC and CS Telegram group.
+- Larger filter-sheet typography on desktop and mobile.

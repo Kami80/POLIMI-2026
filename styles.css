@@ -4667,3 +4667,62 @@ body.announcement-modal-open {
   .mark-all-read { min-height: 34px; font-size: 9px; }
 }
 .profile-updated-badge { min-height: 27px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--cyan-soft); color: var(--cyan); font-size: 8px; font-weight: 850; }
+
+
+/* =========================================================
+   Filter sheet readability + pinned safety resource
+   ========================================================= */
+.announcement-card-v3.announcement-safety {
+  --notice-accent: #12a879;
+  --notice-accent-2: #4b8ef5;
+  --notice-soft: #eafaf4;
+}
+[data-theme="dark"] .announcement-card-v3.announcement-safety { --notice-soft: #12372f; }
+.announcement-card-v3.announcement-safety {
+  border-color: color-mix(in srgb, var(--notice-accent) 30%, var(--line));
+  box-shadow: 0 14px 38px color-mix(in srgb, var(--notice-accent) 10%, transparent), var(--shadow-sm);
+}
+.announcement-status.pinned {
+  background: color-mix(in srgb, #12a879 12%, var(--surface));
+  color: #0c8c64;
+  border: 1px solid color-mix(in srgb, #12a879 20%, var(--line));
+}
+[data-theme="dark"] .announcement-status.pinned { color: #6de6bd; }
+
+@media (min-width: 761px) {
+  .filter-sheet .sheet-panel {
+    width: min(780px, calc(100vw - 40px));
+    max-height: min(84vh, 820px);
+    padding: 14px 22px 20px;
+  }
+  .filter-sheet .sheet-handle { margin-bottom: 20px; }
+  .filter-sheet .sheet-head span { font-size: 11px; letter-spacing: .13em; }
+  .filter-sheet .sheet-head h2 { margin-top: 7px; font-size: 31px; line-height: 1.12; }
+  .filter-sheet .sheet-head p { margin-top: 4px; font-size: 13px; line-height: 1.5; }
+  .filter-sheet .sheet-close { width: 48px; height: 48px; border-radius: 15px; font-size: 24px; }
+  .filter-sheet .mobile-filter-content { gap: 13px; padding: 22px 0 24px; }
+  .filter-sheet .mobile-filter-group { border-radius: 20px; }
+  .filter-sheet .mobile-filter-summary { min-height: 70px; padding: 0 18px; }
+  .filter-sheet .mobile-filter-summary strong { font-size: 15px; line-height: 1.3; }
+  .filter-sheet .mobile-filter-summary small { margin-top: 2px; font-size: 11px; }
+  .filter-sheet .mobile-filter-chevron { font-size: 18px; }
+  .filter-sheet .mobile-filter-options { padding: 2px 14px 14px; gap: 7px; }
+  .filter-sheet .mobile-check { min-height: 54px; padding: 0 10px; grid-template-columns: 28px minmax(0,1fr) auto; gap: 12px; border-radius: 14px; }
+  .filter-sheet .mobile-check-box { width: 26px; height: 26px; border-radius: 8px; }
+  .filter-sheet .mobile-check input:checked + .mobile-check-box::after { font-size: 14px; }
+  .filter-sheet .mobile-check-label { font-size: 13px; line-height: 1.4; }
+  .filter-sheet .mobile-check-count { min-width: 34px; height: 32px; padding-inline: 9px; border-radius: 10px; font-size: 11px; }
+  .filter-sheet .sheet-actions { gap: 12px; padding-top: 15px; }
+  .filter-sheet .sheet-actions button { min-height: 60px; border-radius: 17px; font-size: 14px; }
+}
+
+@media (max-width: 760px) {
+  .filter-sheet .sheet-head span { font-size: 9px; }
+  .filter-sheet .sheet-head h2 { font-size: 27px; }
+  .filter-sheet .sheet-head p { font-size: 10.5px; }
+  .filter-sheet .mobile-filter-summary strong { font-size: 12px; }
+  .filter-sheet .mobile-filter-summary small { font-size: 8.5px; }
+  .filter-sheet .mobile-check-label { font-size: 10.5px; }
+  .filter-sheet .mobile-check-count { font-size: 8.5px; }
+  .filter-sheet .sheet-actions button { font-size: 11px; }
+}

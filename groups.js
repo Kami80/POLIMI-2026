@@ -22,6 +22,10 @@ const TELEGRAM_GROUPS = [
   {
     program: "Chemical Engineering",
     url: "https://t.me/+E-ZbMJk_9FthYTY0"
+  },
+  {
+    program: "HPC and CS",
+    url: "https://t.me/+zavdWJEF7RZiMDM0"
   }
 ];
 function openTelegramLink(href) {
