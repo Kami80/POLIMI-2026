@@ -4670,226 +4670,60 @@ body.announcement-modal-open {
 
 
 /* =========================================================
-   UI repair · compact mobile/tablet directory toolbar
+   Filter sheet readability + pinned safety resource
    ========================================================= */
-@media (max-width: 900px) {
-  .directory-intro {
-    margin-bottom: 12px;
+.announcement-card-v3.announcement-safety {
+  --notice-accent: #12a879;
+  --notice-accent-2: #4b8ef5;
+  --notice-soft: #eafaf4;
+}
+[data-theme="dark"] .announcement-card-v3.announcement-safety { --notice-soft: #12372f; }
+.announcement-card-v3.announcement-safety {
+  border-color: color-mix(in srgb, var(--notice-accent) 30%, var(--line));
+  box-shadow: 0 14px 38px color-mix(in srgb, var(--notice-accent) 10%, transparent), var(--shadow-sm);
+}
+.announcement-status.pinned {
+  background: color-mix(in srgb, #12a879 12%, var(--surface));
+  color: #0c8c64;
+  border: 1px solid color-mix(in srgb, #12a879 20%, var(--line));
+}
+[data-theme="dark"] .announcement-status.pinned { color: #6de6bd; }
+
+@media (min-width: 761px) {
+  .filter-sheet .sheet-panel {
+    width: min(780px, calc(100vw - 40px));
+    max-height: min(84vh, 820px);
+    padding: 14px 22px 20px;
   }
-  .section-heading {
-    margin-bottom: 10px;
-    gap: 12px;
-  }
-  .section-heading h2 {
-    margin: 5px 0 4px;
-  }
-  .controls-panel {
-    position: sticky;
-    top: 8px;
-    z-index: 20;
-    padding: 0;
-    gap: 10px;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
-    display: grid;
-    grid-template-columns: minmax(0,1fr) auto;
-    align-items: stretch;
-  }
-  .search-field {
-    grid-column: 1 / -1;
-    min-height: 56px;
-    padding: 0 15px;
-    border-radius: 16px;
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
-  }
-  .search-field input {
-    font-size: 15px;
-    font-weight: 650;
-  }
-  .filter-trigger,
-  .sort-control-inline,
-  .saved-trigger {
-    min-height: 48px;
-    border-radius: 14px;
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
-  }
-  .filter-trigger {
-    display: inline-flex;
-    min-width: 54px;
-    justify-content: center;
-    padding: 0 14px;
-  }
-  .filter-trigger span:last-of-type {
-    display: none;
-  }
-  .filter-trigger .filter-symbol {
-    font-size: 18px;
-  }
-  .filter-trigger strong {
-    min-width: 20px;
-    height: 20px;
-    font-size: 9px;
-  }
-  .sort-control-inline {
-    min-width: 0;
-    width: 100%;
-    justify-content: space-between;
-    padding-inline: 14px 12px;
-  }
-  .sort-control-inline span {
-    display: none;
-  }
-  .sort-control-inline select {
-    width: 100%;
-    max-width: none;
-    font-size: 13px;
-    font-weight: 800;
-  }
-  .saved-trigger {
-    display: none;
-  }
-  .quick-filter-row {
-    margin-top: 8px;
-  }
-  .results-bar {
-    padding-top: 8px;
-  }
+  .filter-sheet .sheet-handle { margin-bottom: 20px; }
+  .filter-sheet .sheet-head span { font-size: 11px; letter-spacing: .13em; }
+  .filter-sheet .sheet-head h2 { margin-top: 7px; font-size: 31px; line-height: 1.12; }
+  .filter-sheet .sheet-head p { margin-top: 4px; font-size: 13px; line-height: 1.5; }
+  .filter-sheet .sheet-close { width: 48px; height: 48px; border-radius: 15px; font-size: 24px; }
+  .filter-sheet .mobile-filter-content { gap: 13px; padding: 22px 0 24px; }
+  .filter-sheet .mobile-filter-group { border-radius: 20px; }
+  .filter-sheet .mobile-filter-summary { min-height: 70px; padding: 0 18px; }
+  .filter-sheet .mobile-filter-summary strong { font-size: 15px; line-height: 1.3; }
+  .filter-sheet .mobile-filter-summary small { margin-top: 2px; font-size: 11px; }
+  .filter-sheet .mobile-filter-chevron { font-size: 18px; }
+  .filter-sheet .mobile-filter-options { padding: 2px 14px 14px; gap: 7px; }
+  .filter-sheet .mobile-check { min-height: 54px; padding: 0 10px; grid-template-columns: 28px minmax(0,1fr) auto; gap: 12px; border-radius: 14px; }
+  .filter-sheet .mobile-check-box { width: 26px; height: 26px; border-radius: 8px; }
+  .filter-sheet .mobile-check input:checked + .mobile-check-box::after { font-size: 14px; }
+  .filter-sheet .mobile-check-label { font-size: 13px; line-height: 1.4; }
+  .filter-sheet .mobile-check-count { min-width: 34px; height: 32px; padding-inline: 9px; border-radius: 10px; font-size: 11px; }
+  .filter-sheet .sheet-actions { gap: 12px; padding-top: 15px; }
+  .filter-sheet .sheet-actions button { min-height: 60px; border-radius: 17px; font-size: 14px; }
 }
 
 @media (max-width: 760px) {
-  .main-shell {
-    padding-top: 8px;
-  }
-  .directory-intro {
-    padding: 18px 18px 17px;
-  }
-  .directory-intro h1 {
-    font-size: clamp(28px, 9vw, 38px);
-  }
-  .directory-intro p {
-    line-height: 1.5;
-  }
-  .controls-panel {
-    top: 6px;
-    margin-top: 0;
-    grid-template-columns: 54px minmax(0, 1fr);
-  }
-  .search-field {
-    min-height: 58px;
-  }
-  .search-field input {
-    font-size: 14px;
-  }
-  .sort-control-inline {
-    min-width: 0;
-  }
-  .sort-control-inline select {
-    font-size: 12px;
-  }
-  .search-suggestions {
-    top: 64px;
-    left: 0;
-    width: 100%;
-    border-radius: 16px;
-  }
+  .filter-sheet .sheet-head span { font-size: 9px; }
+  .filter-sheet .sheet-head h2 { font-size: 27px; }
+  .filter-sheet .sheet-head p { font-size: 10.5px; }
+  .filter-sheet .mobile-filter-summary strong { font-size: 12px; }
+  .filter-sheet .mobile-filter-summary small { font-size: 8.5px; }
+  .filter-sheet .mobile-check-label { font-size: 10.5px; }
+  .filter-sheet .mobile-check-count { font-size: 8.5px; }
+  .filter-sheet .sheet-actions button { font-size: 11px; }
 }
-
-
-/* =========================================================
-   UI repair v2 · single-row mobile/tablet directory toolbar
-   ========================================================= */
-@media (max-width: 900px) {
-  .controls-panel {
-    grid-template-columns: minmax(0, 1fr) 54px minmax(128px, auto);
-    align-items: center;
-    gap: 8px;
-  }
-  .search-field {
-    grid-column: auto;
-    min-width: 0;
-  }
-  .filter-trigger {
-    min-width: 54px;
-    width: 54px;
-    padding: 0;
-  }
-  .sort-control-inline {
-    width: auto;
-    min-width: 128px;
-    max-width: 160px;
-  }
-  .sort-control-inline select {
-    width: 100%;
-    text-overflow: ellipsis;
-  }
-}
-
-@media (max-width: 760px) {
-  .controls-panel {
-    top: 6px;
-    margin-top: 0;
-    grid-template-columns: minmax(0, 1fr) 50px minmax(118px, 132px);
-    gap: 8px;
-  }
-  .search-field {
-    min-height: 56px;
-    padding: 0 13px;
-  }
-  .search-field input {
-    font-size: 13px;
-  }
-  .filter-trigger {
-    min-width: 50px;
-    width: 50px;
-    min-height: 50px;
-    border-radius: 14px;
-  }
-  .sort-control-inline {
-    min-height: 50px;
-    min-width: 118px;
-    max-width: 132px;
-    padding-inline: 12px 10px;
-    border-radius: 14px;
-  }
-  .sort-control-inline select {
-    font-size: 11px;
-  }
-  .search-suggestions {
-    top: 64px;
-    left: 0;
-    width: min(100%, 340px);
-    border-radius: 16px;
-  }
-}
-
-@media (max-width: 420px) {
-  .controls-panel {
-    grid-template-columns: minmax(0, 1fr) 46px 112px;
-    gap: 7px;
-  }
-  .search-field {
-    min-height: 54px;
-    padding: 0 12px;
-  }
-  .search-field input {
-    font-size: 12.5px;
-  }
-  .filter-trigger {
-    min-width: 46px;
-    width: 46px;
-    min-height: 46px;
-  }
-  .sort-control-inline {
-    min-width: 112px;
-    max-width: 112px;
-    min-height: 46px;
-    padding-inline: 10px 9px;
-  }
-  .sort-control-inline select {
-    font-size: 10.5px;
-  }
-}
+\n\n/* =========================================================\n   Directory top UI tightening + shareable Telegram groups\n   ========================================================= */\n.telegram-group-actions {\n  margin-top: auto;\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;\n  gap: 8px;\n  align-items: center;\n}\n.telegram-group-actions .telegram-join-btn { margin-top: 0; }\n.telegram-share-btn {\n  min-width: 92px; min-height: 48px; padding: 0 13px;\n  display: inline-flex; align-items: center; justify-content: center; gap: 7px;\n  border: 1px solid var(--line); border-radius: 14px;\n  background: var(--surface-2); color: var(--ink-soft);\n  cursor: pointer; font-size: 11px; font-weight: 850;\n  transition: transform .15s ease, border-color .15s ease, background .15s ease;\n}\n.telegram-share-btn:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--group-accent) 28%, var(--line)); background: color-mix(in srgb, var(--group-accent) 8%, var(--surface)); }\n.telegram-group-pinned .telegram-group-actions { margin-top: 0; grid-template-columns: minmax(0, 1fr) auto; }\n.telegram-group-pinned .telegram-share-btn { min-height: 54px; min-width: 102px; background: color-mix(in srgb, #229ED9 8%, var(--surface)); border-color: color-mix(in srgb, #229ED9 24%, var(--line)); color: #168ec8; }\n.group-deep-linked {\n  border-color: color-mix(in srgb, #2aabee 62%, var(--line)) !important;\n  box-shadow: 0 0 0 4px rgba(42,171,238,.12), 0 20px 54px rgba(42,171,238,.17) !important;\n}\n\n@media (min-width: 761px) {\n  /* Keep the directory introduction and search area visually connected. */\n  .directory-intro { margin-bottom: 18px; }\n  #directory .section-heading { margin-bottom: 14px; }\n  .controls-panel { margin-top: 0; }\n}\n\n@media (max-width: 760px) {\n  .main-shell { padding-top: 8px; }\n  .directory-intro { margin-bottom: 12px; }\n  #directory .section-heading { margin: 0 0 10px; }\n  #directory .section-heading p { margin-bottom: 0; }\n  .directory-heading-tools { display: none; }\n\n  /* A lightweight app toolbar instead of a large framed search block. */\n  .controls-panel {\n    position: sticky; top: 68px; z-index: 30;\n    margin: 0; padding: 0;\n    grid-template-columns: 52px minmax(0, 1fr);\n    gap: 8px;\n    border: 0; border-radius: 0;\n    background: color-mix(in srgb, var(--bg) 88%, transparent);\n    box-shadow: none;\n    backdrop-filter: blur(18px) saturate(145%);\n    -webkit-backdrop-filter: blur(18px) saturate(145%);\n  }\n  .search-field {\n    grid-column: 1 / -1;\n    min-height: 54px;\n    padding: 0 14px;\n    border-radius: 17px;\n    background: var(--surface);\n    box-shadow: var(--shadow-sm);\n  }\n  .search-field input { font-size: 14px; font-weight: 650; }\n  .search-icon { font-size: 20px; }\n  .filter-trigger {\n    grid-column: 1; grid-row: 2;\n    width: 52px; min-width: 52px; min-height: 48px;\n    border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-sm);\n  }\n  .sort-control-inline {\n    grid-column: 2; grid-row: 2;\n    width: 100%; min-height: 48px;\n    padding: 0 12px;\n    border-radius: 14px;\n    background: var(--surface);\n    box-shadow: var(--shadow-sm);\n  }\n  .sort-control-inline > span { display: inline; font-size: 9px; color: var(--muted); }\n  .sort-control-inline select { width: 100%; max-width: none; font-size: 11px; text-align: right; }\n  .roommate-match-trigger, .saved-trigger { display: none; }\n  .search-suggestions { top: 61px; left: 0; width: 100%; }\n\n  .telegram-group-actions { grid-template-columns: minmax(0,1fr) 86px; }\n  .telegram-share-btn { min-width: 86px; min-height: 46px; padding-inline: 10px; font-size: 10px; }\n  .telegram-group-pinned .telegram-group-actions { grid-template-columns: minmax(0,1fr) 86px; }\n  .telegram-group-pinned .telegram-share-btn { min-width: 86px; min-height: 50px; }\n}\n

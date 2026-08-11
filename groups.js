@@ -22,6 +22,10 @@ const TELEGRAM_GROUPS = [
   {
     program: "Chemical Engineering",
     url: "https://t.me/+E-ZbMJk_9FthYTY0"
+  },
+  {
+    program: "HPC and CS",
+    url: "https://t.me/+zavdWJEF7RZiMDM0"
   }
 ];
 function openTelegramLink(href) {
@@ -47,6 +51,65 @@ function normalize(value) {
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
+}
+
+function groupSlug(value) {
+  return normalize(value)
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "group";
+}
+
+function groupShareUrl(item) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.searchParams.set("group", groupSlug(item.program));
+  url.hash = "";
+  return url.toString();
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch (_) {
+    return false;
+  }
+}
+
+async function shareGroup(item, button) {
+  const url = groupShareUrl(item);
+  const data = {
+    title: `${item.program} · Polimi Students`,
+    text: `Join the ${item.program} Telegram group for Polimi students.`,
+    url
+  };
+  if (navigator.share) {
+    try {
+      await navigator.share(data);
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
+  const copied = await copyText(url);
+  const old = button.innerHTML;
+  button.innerHTML = copied ? '<span>Link copied</span><span aria-hidden="true">✓</span>' : '<span>Copy failed</span><span aria-hidden="true">!</span>';
+  setTimeout(() => { button.innerHTML = old; }, 1600);
 }
 
 function initials(program) {
@@ -104,6 +167,9 @@ function renderGroups() {
 
     body.append(label, title, description);
 
+    const actions = document.createElement("div");
+    actions.className = "telegram-group-actions";
+
     const button = document.createElement("a");
     button.className = "telegram-join-btn";
     button.href = item.url;
@@ -116,11 +182,32 @@ function renderGroups() {
     button.innerHTML = '<span>Open Telegram group</span><span aria-hidden="true">↗</span>';
     button.setAttribute("aria-label", `Open ${item.program} Telegram group`);
 
-    card.append(top, body, button);
+    const share = document.createElement("button");
+    share.type = "button";
+    share.className = "telegram-share-btn";
+    share.innerHTML = '<span>Share</span><span aria-hidden="true">⌁</span>';
+    share.setAttribute("aria-label", `Share ${item.program} group`);
+    share.addEventListener("click", () => shareGroup(item, share));
+
+    actions.append(button, share);
+    card.dataset.groupSlug = groupSlug(item.program);
+    card.append(top, body, actions);
     fragment.appendChild(card);
   });
 
   grid.appendChild(fragment);
+
+  const requestedGroup = new URLSearchParams(window.location.search).get("group");
+  if (requestedGroup) {
+    const target = grid.querySelector(`[data-group-slug="${CSS.escape(requestedGroup)}"]`);
+    if (target) {
+      requestAnimationFrame(() => {
+        target.classList.add("group-deep-linked");
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }
+
   count.textContent = `${groups.length} ${groups.length === 1 ? "group" : "groups"}`;
   empty.hidden = groups.length !== 0;
   grid.hidden = groups.length === 0;

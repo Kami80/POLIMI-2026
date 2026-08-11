@@ -5,6 +5,55 @@
 */
 const POLIMI_ANNOUNCEMENTS = [
   {
+    id: "basic-safety-course-resource",
+    category: "Safety",
+    filter: "safety",
+    icon: "⚑",
+    title: "Basic Safety Course · Formazione generale",
+    summary: "Mandatory 4-hour general safety training for students and university workers. A valid certificate may be required to access some Polimi activities and services.",
+    pinned: true,
+    dateLabel: "Mandatory safety training",
+    dateShort: "4H",
+    dateMonth: "SAFETY",
+    dateContext: "Online Services → Safety Course",
+    tone: "safety",
+    priority: 0,
+    tags: ["Pinned", "Mandatory", "Safety course", "4 hours", "Online"],
+    highlights: [
+      { label: "Duration", value: "4 hours" },
+      { label: "Path", value: "Online Services → Safety Course" },
+      { label: "Format", value: "Online" },
+      { label: "Certification", value: "Valid certificate may be required" }
+    ],
+    fullText: [
+      "Corso Base sulla Sicurezza – ‘Formazione generale’. If your status is shown as ‘non sostenuto’, the course has not yet been completed.",
+      "Important: the absence of a valid safety-training certificate may prevent access to some university activities or services.",
+      "Who it is for: teaching staff, contract lecturers, research fellows, students and PhD candidates, technical-administrative staff and collaborators.",
+      "The course has an equivalent duration of 4 hours and corresponds to the mandatory general safety training required by law for all workers. It introduces the basic concepts of prevention and workplace safety.",
+      "It also includes specific training content relevant to many activities carried out at Politecnico di Milano, including the use of video display terminal equipment (VDT) and emergency-management procedures.",
+      "To find it in Polimi services, open Online Services and select Safety Course. You can then access the course in Italian or English using the official links below."
+    ],
+    actions: [
+      {
+        label: "Open course in Italian",
+        href: "https://formazionesicurezza.polimi.it/auth/shibboleth/index.php?target=https://formazionesicurezza.polimi.it/course/view.php?id=4",
+        type: "link"
+      },
+      {
+        label: "Open course in English",
+        href: "https://formazionesicurezza.polimi.it/auth/shibboleth/index.php?target=https://formazionesicurezza.polimi.it/course/view.php?id=5",
+        type: "link"
+      },
+      {
+        label: "Study notes PDF",
+        href: "basic-safety-course.pdf",
+        type: "pdf"
+      }
+    ],
+    source: "Politecnico di Milano · Online Services → Safety Course",
+    signature: ["Basic Safety Course · Formazione generale"]
+  },
+  {
     id: "summer-closure-2026",
     category: "Closure",
     filter: "closures",
@@ -159,6 +208,7 @@ const announcementState = {
 };
 
 function announcementStatus(item) {
+  if (item.pinned) return { label: "Pinned", className: "pinned", rank: 0 };
   const now = Date.now();
   const start = item.start ? new Date(item.start).getTime() : null;
   const end = item.end ? new Date(item.end).getTime() : null;
@@ -225,7 +275,7 @@ function actionsMarkup(item) {
     const external = !String(action.href).startsWith("mailto:");
     return `
       <a class="announcement-modal-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-        <span>${action.type === "email" ? "✉" : "↗"}</span>
+        <span>${action.type === "email" ? "✉" : action.type === "pdf" ? "PDF" : "↗"}</span>
         <strong>${escapeHtml(action.label)}</strong>
       </a>
     `;
@@ -277,6 +327,7 @@ function announcementCardMarkup(item) {
 function updateFilterCounts() {
   const counts = {
     all: POLIMI_ANNOUNCEMENTS.length,
+    safety: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "safety").length,
     courses: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "courses").length,
     closures: POLIMI_ANNOUNCEMENTS.filter(x => x.filter === "closures").length
   };
