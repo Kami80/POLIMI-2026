@@ -137,6 +137,6 @@ This build additionally includes:
 
 
 ## Latest additions
-- Pinned Basic Safety Course PDF notice (`basic-safety-course.pdf`).
+- Pinned mandatory Basic Safety Course notice with Online Services → Safety Course path, official Italian/English course links, and optional study-notes PDF (`basic-safety-course.pdf`).
 - HPC and CS Telegram group.
 - Larger filter-sheet typography on desktop and mobile.

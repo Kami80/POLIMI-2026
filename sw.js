@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-safety-v1";
+const CACHE_NAME = "polimi-students-safety-v2";
 const APP_SHELL = [
   "./",
   "./index.html",

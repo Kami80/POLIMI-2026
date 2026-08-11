@@ -9,36 +9,49 @@ const POLIMI_ANNOUNCEMENTS = [
     category: "Safety",
     filter: "safety",
     icon: "⚑",
-    title: "Basic Safety Course · study material",
-    summary: "Pinned 3-page PDF with Basic Safety Course questions and answers covering workplace safety, VDT use, emergencies, risk evaluation and ergonomics.",
+    title: "Basic Safety Course · Formazione generale",
+    summary: "Mandatory 4-hour general safety training for students and university workers. A valid certificate may be required to access some Polimi activities and services.",
     pinned: true,
-    dateLabel: "Pinned resource",
-    dateShort: "PDF",
-    dateMonth: "3 PAGES",
-    dateContext: "Safety course material",
+    dateLabel: "Mandatory safety training",
+    dateShort: "4H",
+    dateMonth: "SAFETY",
+    dateContext: "Online Services → Safety Course",
     tone: "safety",
     priority: 0,
-    tags: ["Pinned", "Safety course", "PDF", "Study material"],
+    tags: ["Pinned", "Mandatory", "Safety course", "4 hours", "Online"],
     highlights: [
-      { label: "Format", value: "3-page PDF" },
-      { label: "Topics", value: "VDT · first aid · risk · ergonomics" },
-      { label: "Includes", value: "Questions and answers" },
-      { label: "Use", value: "Basic Safety Course study reference" }
+      { label: "Duration", value: "4 hours" },
+      { label: "Path", value: "Online Services → Safety Course" },
+      { label: "Format", value: "Online" },
+      { label: "Certification", value: "Valid certificate may be required" }
     ],
     fullText: [
-      "This pinned resource contains a three-page Basic Safety Course question-and-answer document for study and review.",
-      "Topics include the university Prevention and Protection Service, workplace safety responsibilities, first aid and evacuation, risk evaluation, VDT exposure, screen and workstation ergonomics, health supervision and emergency procedures.",
-      "Examples in the material include keeping the screen 50–70 cm from the eyes, positioning the monitor at 90° to natural light, and the responsibilities of workers, employers and safety personnel. Open the attached PDF to review the complete set of questions and answers."
+      "Corso Base sulla Sicurezza – ‘Formazione generale’. If your status is shown as ‘non sostenuto’, the course has not yet been completed.",
+      "Important: the absence of a valid safety-training certificate may prevent access to some university activities or services.",
+      "Who it is for: teaching staff, contract lecturers, research fellows, students and PhD candidates, technical-administrative staff and collaborators.",
+      "The course has an equivalent duration of 4 hours and corresponds to the mandatory general safety training required by law for all workers. It introduces the basic concepts of prevention and workplace safety.",
+      "It also includes specific training content relevant to many activities carried out at Politecnico di Milano, including the use of video display terminal equipment (VDT) and emergency-management procedures.",
+      "To find it in Polimi services, open Online Services and select Safety Course. You can then access the course in Italian or English using the official links below."
     ],
     actions: [
       {
-        label: "Open safety course PDF",
+        label: "Open course in Italian",
+        href: "https://formazionesicurezza.polimi.it/auth/shibboleth/index.php?target=https://formazionesicurezza.polimi.it/course/view.php?id=4",
+        type: "link"
+      },
+      {
+        label: "Open course in English",
+        href: "https://formazionesicurezza.polimi.it/auth/shibboleth/index.php?target=https://formazionesicurezza.polimi.it/course/view.php?id=5",
+        type: "link"
+      },
+      {
+        label: "Study notes PDF",
         href: "basic-safety-course.pdf",
         type: "pdf"
       }
     ],
-    source: "Basic Safety Course · uploaded study material",
-    signature: ["Polimi Students 2026/2027 resource"]
+    source: "Politecnico di Milano · Online Services → Safety Course",
+    signature: ["Basic Safety Course · Formazione generale"]
   },
   {
     id: "summer-closure-2026",
