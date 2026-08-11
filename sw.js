@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-ui-share-v1";
+const CACHE_NAME = "polimi-students-mobile-polish-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const APP_SHELL = [
   "./announcements-ux.js",
   "./basic-safety-course.pdf",
   "./styles.css",
+  "./ui-polish.css",
   "./app.js",
   "./ux-enhancements.js",
   "./manifest.webmanifest",

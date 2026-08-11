@@ -2028,7 +2028,7 @@ function updateSavedUI() {
 }
 
 function updateMobileNavState() {
-  els.mobileStudentsButton?.classList.toggle("active", !state.savedOnly && !state.roommateMatchMode);
+  els.mobileStudentsButton?.classList.toggle("active", !state.savedOnly);
   els.mobileSavedButton?.classList.toggle("active", state.savedOnly);
   els.mobileRoommateButton?.classList.toggle("active", state.roommateMatchMode);
 }
@@ -2066,8 +2066,8 @@ function updatePersonalizedHeader() {
   const first = name.split(/\s+/).filter(Boolean)[0] || "Student";
   const program = displayValue(row, semanticColumn("program"));
   const campus = displayValue(row, semanticColumn("campus"));
-  if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Find your people, ${first}.`;
-  if (els.directoryIntroText) els.directoryIntroText.textContent = [program && `Your program: ${program}`, campus && `Your campus: ${campus}`, "Tap any student to open the full profile."].filter(Boolean).join(" · ");
+  if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Welcome back, ${first}.`;
+  if (els.directoryIntroText) els.directoryIntroText.textContent = [program, campus, "Discover classmates and new connections."].filter(Boolean).join(" · ");
   if (els.myProfileAvatar) els.myProfileAvatar.textContent = initials(name);
 }
 

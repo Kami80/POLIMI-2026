@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260812-ui-share-v1" />
+  <link rel="stylesheet" href="ui-polish.css?v=20260812-mobile-v4" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -24,48 +25,67 @@
   <section class="access-gate" id="accessGate" aria-labelledby="accessTitle">
     <div class="access-shell">
       <div class="access-card">
-        <div class="access-brand">
+        <header class="access-brand">
           <span class="access-brand-mark" aria-hidden="true"><img src="icons/icon-192.png" alt="" /></span>
           <div>
             <strong>Polimi Students</strong>
-            <small>Community · 2026/2027</small>
+            <small>Community &middot; 2026/2027</small>
           </div>
+        </header>
+
+        <div class="access-intro">
+          <span class="access-kicker"><i></i> POLIMI STUDENTS &middot; 2026/27</span>
+          <h1 id="accessTitle">Meet your Polimi community.</h1>
+          <p class="access-lead">Find classmates, connect across campuses, and meet potential roommates in one student directory.</p>
         </div>
 
-        <span class="access-kicker"><i></i> STUDENT COMMUNITY · 2026/27</span>
-        <h1 id="accessTitle">Add your profile. Then meet everyone.</h1>
-        <p class="access-lead">The directory is shared with students who have added their own information first. It takes less than a minute.</p>
+        <div class="access-join-actions">
+          <a class="access-primary-form" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+            <span class="access-primary-icon" aria-hidden="true">&#43;</span>
+            <span class="access-primary-copy"><strong>Join the directory</strong><small>Add your profile in under a minute</small></span>
+            <span class="access-primary-arrow" aria-hidden="true">&nearr;</span>
+          </a>
+          <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University updates</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span aria-hidden="true">&rarr;</span></a>
+        </div>
 
-        <a class="access-primary-form" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-          <span class="access-primary-icon" aria-hidden="true">＋</span>
-          <span class="access-primary-copy"><strong>Add my profile</strong><small>Open the Polimi Students form</small></span>
-          <span class="access-primary-arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University announcements</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span aria-hidden="true">→</span></a>
-
-        <div class="access-divider"><span>Already submitted?</span></div>
-        <p class="access-return-copy">Enter the same email you used in the form to open the directory.</p>
-
-        <form class="access-form" id="accessForm" novalidate>
-          <label for="accessEmail">Email used in the form</label>
-          <div class="access-input">
-            <span aria-hidden="true">@</span>
-            <input id="accessEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+        <section class="access-return-panel" aria-labelledby="accessReturnTitle">
+          <div class="access-return-heading">
+            <strong id="accessReturnTitle">Already joined?</strong>
+            <span>Use the same email you submitted.</span>
           </div>
-          <button id="accessSubmit" type="submit" disabled>
-            <span id="accessSubmitLabel">Loading directory…</span><span aria-hidden="true">→</span>
-          </button>
-        </form>
+          <form class="access-form" id="accessForm" novalidate>
+            <label for="accessEmail">Email used in the form</label>
+            <div class="access-form-row">
+              <div class="access-input">
+                <span aria-hidden="true">@</span>
+                <input id="accessEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+              </div>
+              <button id="accessSubmit" type="submit" disabled>
+                <span id="accessSubmitLabel">Loading directory&hellip;</span><span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+          </form>
+          <p class="access-status loading" id="accessStatus" role="status" aria-live="polite">Checking the latest form responses&hellip;</p>
+          <div class="access-not-found" id="accessNotFound" hidden></div>
+        </section>
 
-        <p class="access-status loading" id="accessStatus" role="status" aria-live="polite">Checking the latest form responses…</p>
-        <div class="access-not-found" id="accessNotFound" hidden></div>
-        <p class="access-privacy"><span aria-hidden="true">✓</span> Only submitted students can view the directory. Your access email is used only for matching and is never displayed.</p>
+        <p class="access-privacy"><span aria-hidden="true">&#10003;</span> Your email is used only to confirm membership and is never shown in the directory.</p>
       </div>
 
       <aside class="access-visual" aria-hidden="true">
-        <span class="access-visual-label">POLIMI · 2026/27</span>
-        <h2>One shared directory for your new Polimi community.</h2>
-        <div class="access-visual-pills"><span>Find classmates</span><span>Connect directly</span><span>Find roommates</span></div>
+        <div class="access-visual-top">
+          <span class="access-visual-label">YOUR 2026/27 COMMUNITY</span>
+          <span class="access-visual-state"><i></i> Student-led</span>
+        </div>
+        <div class="access-visual-content">
+          <h2>Start university with familiar faces.</h2>
+          <p class="access-visual-copy">A simple place to discover who is studying alongside you before the semester gets busy.</p>
+          <div class="access-feature-list">
+            <div><span>01</span><strong>Find classmates</strong><small>Browse by program and degree.</small></div>
+            <div><span>02</span><strong>Meet your campus</strong><small>Connect with students nearby.</small></div>
+            <div><span>03</span><strong>Plan ahead</strong><small>Save profiles and find roommates.</small></div>
+          </div>
+        </div>
         <div class="access-orbit orbit-one"></div>
         <div class="access-orbit orbit-two"></div>
       </aside>
@@ -105,9 +125,9 @@
   <main id="top" class="shell main-shell">
     <section class="directory-intro" aria-labelledby="directoryIntroTitle">
       <div class="directory-intro-copy">
-        <span class="directory-intro-kicker">POLIMI STUDENTS · 2026/27</span>
-        <h1 id="directoryIntroTitle">Find your people.</h1>
-        <p id="directoryIntroText">Browse classmates, open profiles, connect directly, or switch to roommate matching.</p>
+        <span class="directory-intro-kicker">YOUR COMMUNITY &middot; 2026/27</span>
+        <h1 id="directoryIntroTitle">Welcome back.</h1>
+        <p id="directoryIntroText">Discover classmates, campus connections, and potential roommates.</p>
       </div>
       <div class="directory-intro-actions">
         <a class="directory-update-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
@@ -134,36 +154,42 @@
       <div class="controls-panel">
         <label class="search-field" for="searchInput">
           <span class="search-icon" aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" placeholder="Search name, program, campus…" autocomplete="off" />
+          <input id="searchInput" type="search" placeholder="Search students&hellip;" aria-label="Search students by name, program, or campus" autocomplete="off" />
           <span class="search-shortcut" aria-hidden="true">/</span>
           <button id="searchClear" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
         </label>
         <div class="search-suggestions" id="searchSuggestions" hidden role="listbox" aria-label="Search suggestions"></div>
 
-        <button class="filter-trigger" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
-          <span class="filter-symbol">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
-        </button>
+        <div class="directory-control-actions">
+          <button class="filter-trigger" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
+            <span class="filter-symbol" aria-hidden="true">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
+          </button>
 
-        <label class="sort-control sort-control-inline" for="sortSelect">
-          <span>Sort</span>
-          <select id="sortSelect" aria-label="Sort students">
-            <option value="recommended">Recommended</option>
-            <option value="recent">Recently joined</option>
-            <option value="name">Name A–Z</option>
-            <option value="same-program">Same program first</option>
-            <option value="same-campus">Same campus first</option>
-            <option value="best" hidden>Best matches</option>
-          </select>
-        </label>
+          <label class="sort-control sort-control-inline" for="sortSelect">
+            <span>Sort by</span>
+            <select id="sortSelect" aria-label="Sort students">
+              <option value="recommended">Recommended</option>
+              <option value="recent">Recently joined</option>
+              <option value="name">Name A–Z</option>
+              <option value="same-program">Same program first</option>
+              <option value="same-campus">Same campus first</option>
+              <option value="best" hidden>Best matches</option>
+            </select>
+          </label>
 
-        <button class="roommate-match-trigger" id="roommateMatchButton" type="button" aria-pressed="false">
-          <span class="roommate-match-icon" aria-hidden="true">⌂</span>
-          <span id="roommateMatchButtonLabel">Find roommates</span>
-        </button>
+          <button class="roommate-match-trigger" id="roommateMatchButton" type="button" aria-pressed="false">
+            <span class="roommate-match-icon" aria-hidden="true">⌂</span>
+            <span id="roommateMatchButtonLabel">Find roommates</span>
+          </button>
 
-        <button class="saved-trigger" id="savedTrigger" type="button" aria-pressed="false">
-          <span aria-hidden="true">♡</span><span>Saved</span><strong id="savedCount">0</strong>
-        </button>
+          <button class="mobile-roommate-shortcut" id="mobileRoommateButton" type="button" aria-pressed="false">
+            <span aria-hidden="true">⌂</span><span>Roommates</span>
+          </button>
+
+          <button class="saved-trigger" id="savedTrigger" type="button" aria-pressed="false">
+            <span aria-hidden="true">♡</span><span>Saved</span><strong id="savedCount">0</strong>
+          </button>
+        </div>
 
         <div class="desktop-filters" id="desktopFilters"></div>
       </div>
@@ -282,11 +308,11 @@
   </aside>
 
   <nav class="mobile-nav" aria-label="Mobile navigation">
-    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span>⌂</span><small>Students</small></button>
-    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span>♡</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
-    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span>✈</span><small>Groups</small></a>
-    <button id="mobileRoommateButton" class="mobile-nav-item mobile-roommate" type="button" aria-pressed="false"><span>⌁</span><small>Roommates</small></button>
-    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span>◎</span><small>Me</small></button>
+    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon" aria-hidden="true">&#8962;</span><small>Students</small></button>
+    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">&#9825;</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
+    <a href="announcements.html" class="mobile-nav-item mobile-notices-link"><span class="mobile-nav-icon mobile-notice-icon" aria-hidden="true">!<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></a>
+    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span class="mobile-nav-icon" aria-hidden="true">&#10148;</span><small>Groups</small></a>
+    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span class="mobile-nav-icon" aria-hidden="true">&#9673;</span><small>Me</small></button>
   </nav>
 
 
@@ -311,7 +337,7 @@
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script src="announcements.js?v=20260812-ui-share-v1"></script>
-  <script src="app.js?v=20260812-ui-share-v1"></script>
+  <script src="app.js?v=20260812-mobile-v3"></script>
   <script src="ux-enhancements.js?v=20260811-safety-v1"></script>
 </body>
 </html>

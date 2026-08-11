@@ -1,0 +1,980 @@
+/* Final interface layer: welcome, directory controls, and mobile navigation. */
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 58%, transparent);
+  outline-offset: 3px;
+}
+
+/* Welcome and access screen */
+.access-gate {
+  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+}
+
+.access-shell {
+  width: min(1080px, 100%);
+  min-height: 640px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
+  border-radius: 32px;
+  box-shadow: 0 34px 100px rgba(17, 45, 93, .16);
+}
+
+.access-card {
+  padding: clamp(38px, 4.5vw, 54px);
+  justify-content: flex-start;
+}
+
+.access-brand {
+  margin-bottom: 42px;
+}
+
+.access-brand-mark {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  border-radius: 15px;
+}
+
+.access-brand strong {
+  font-size: 14px;
+}
+
+.access-brand small {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+.access-intro {
+  max-width: 590px;
+}
+
+.access-kicker {
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.access-card h1 {
+  max-width: 610px;
+  margin: 14px 0 13px;
+  font-size: clamp(42px, 4.7vw, 58px);
+  line-height: .98;
+  letter-spacing: -.065em;
+}
+
+.access-lead {
+  max-width: 540px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.access-join-actions {
+  margin-top: 26px;
+  display: grid;
+  gap: 9px;
+}
+
+.access-primary-form {
+  min-height: 72px;
+  margin: 0;
+  padding: 11px 14px;
+  grid-template-columns: 44px minmax(0, 1fr) 28px;
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+.access-primary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.access-primary-copy strong {
+  font-size: 13px;
+}
+
+.access-primary-copy small {
+  font-size: 9px;
+}
+
+.access-announcements-link {
+  min-height: 46px;
+  margin: 0;
+  grid-template-columns: 30px minmax(0, 1fr) auto 20px;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.access-announcements-link > span:first-child {
+  width: 28px;
+  height: 28px;
+}
+
+.access-announcements-link > span:last-child {
+  grid-column: 4;
+}
+
+.access-return-panel {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: color-mix(in srgb, var(--surface-2) 82%, var(--surface));
+}
+
+.access-return-heading {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.access-return-heading strong {
+  font-size: 11px;
+  letter-spacing: -.015em;
+}
+
+.access-return-heading span {
+  color: var(--muted);
+  font-size: 8.5px;
+  font-weight: 650;
+}
+
+.access-form {
+  margin: 0;
+  gap: 7px;
+}
+
+.access-form > label {
+  font-size: 8px;
+  letter-spacing: .03em;
+}
+
+.access-form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.access-input {
+  min-height: 52px;
+  padding-inline: 12px;
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.access-input input {
+  font-size: 11px;
+}
+
+.access-form button {
+  width: 142px;
+  min-height: 52px;
+  margin: 0;
+  border-radius: 14px;
+  font-size: 9px;
+}
+
+.access-status {
+  min-height: 0;
+  margin: 10px 2px 0;
+  font-size: 8px;
+}
+
+.access-not-found {
+  margin-top: 10px;
+}
+
+.access-privacy {
+  margin: 15px 2px 0;
+  padding: 0;
+  border: 0;
+  font-size: 8px;
+}
+
+.access-visual {
+  padding: 42px;
+  justify-content: space-between;
+  background:
+    radial-gradient(circle at 86% 8%, rgba(127, 203, 255, .24), transparent 30%),
+    linear-gradient(150deg, #071b3c 0%, #0b57d0 56%, #6243d7 100%);
+}
+
+.access-visual-top,
+.access-visual-content {
+  position: relative;
+  z-index: 2;
+}
+
+.access-visual-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.access-visual-state {
+  min-height: 28px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, .17);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .78);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.access-visual-state i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #70e1b5;
+  box-shadow: 0 0 0 4px rgba(112, 225, 181, .12);
+}
+
+.access-visual-content h2 {
+  margin: 0 0 13px;
+  font-size: clamp(34px, 3.6vw, 48px);
+  line-height: 1;
+}
+
+.access-visual-copy {
+  max-width: 400px;
+  margin: 0;
+  color: rgba(255, 255, 255, .68);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.access-feature-list {
+  margin-top: 28px;
+  display: grid;
+  gap: 8px;
+}
+
+.access-feature-list > div {
+  min-height: 65px;
+  padding: 11px 13px;
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 11px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 16px;
+  background: rgba(5, 25, 62, .20);
+  backdrop-filter: blur(12px);
+}
+
+.access-feature-list > div > span {
+  grid-row: 1 / 3;
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .11);
+  color: #b7ddff;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.access-feature-list strong {
+  align-self: end;
+  font-size: 10px;
+}
+
+.access-feature-list small {
+  align-self: start;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, .58);
+  font-size: 8px;
+}
+
+/* Personalized directory header */
+.main-shell {
+  padding-top: 16px;
+}
+
+.directory-intro {
+  min-height: 128px;
+  margin: 0 0 18px;
+  padding: 22px 27px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 4%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 34%),
+    linear-gradient(140deg, var(--surface), color-mix(in srgb, var(--primary-soft) 32%, var(--surface)));
+}
+
+.directory-intro h1 {
+  margin: 7px 0 5px;
+  font-size: clamp(31px, 4vw, 45px);
+}
+
+.directory-intro p {
+  font-size: 11px;
+}
+
+#directory .section-heading {
+  margin: 0 0 14px;
+}
+
+/* Directory search and actions */
+.controls-panel {
+  position: relative;
+  margin: 0;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) auto;
+  align-items: stretch;
+  gap: 10px;
+  border-radius: 21px;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-field {
+  min-height: 58px;
+  padding: 0 15px;
+  gap: 12px;
+  border-radius: 16px;
+}
+
+.search-icon {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  position: relative;
+  color: var(--primary);
+  font-size: 0;
+  transform: none;
+}
+
+.search-icon::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.search-icon::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 2px;
+  width: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+  transform-origin: right center;
+}
+
+.search-field input {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.directory-control-actions {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.directory-control-actions .filter-trigger,
+.directory-control-actions .sort-control,
+.directory-control-actions .roommate-match-trigger,
+.directory-control-actions .saved-trigger {
+  min-height: 58px;
+  box-shadow: none;
+}
+
+.directory-control-actions .filter-trigger {
+  display: inline-flex;
+  padding-inline: 14px;
+  background: var(--surface-2);
+}
+
+.filter-symbol {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: var(--primary);
+  font-size: 0;
+  background:
+    radial-gradient(circle at 5px 4px, currentColor 0 2px, transparent 2.4px),
+    radial-gradient(circle at 13px 9px, currentColor 0 2px, transparent 2.4px),
+    radial-gradient(circle at 7px 14px, currentColor 0 2px, transparent 2.4px),
+    linear-gradient(currentColor, currentColor) center 4px / 18px 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center 9px / 18px 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center 14px / 18px 1.5px no-repeat;
+}
+
+.directory-control-actions .sort-control {
+  min-width: 145px;
+  padding-inline: 12px;
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+
+.directory-control-actions .sort-control select {
+  max-width: 120px;
+}
+
+.directory-control-actions .roommate-match-trigger,
+.directory-control-actions .saved-trigger {
+  border-radius: 16px;
+}
+
+.mobile-roommate-shortcut {
+  display: none;
+}
+
+.search-suggestions {
+  top: 78px;
+  left: 10px;
+  width: min(620px, calc(100% - 20px));
+}
+
+.quick-filter-row {
+  margin-top: 9px;
+}
+
+.results-bar {
+  min-height: 52px;
+  padding: 10px 2px 8px;
+}
+
+@media (min-width: 761px) and (max-width: 1080px) {
+  .controls-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .directory-control-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .directory-control-actions > * {
+    width: 100%;
+  }
+
+  .directory-control-actions .sort-control,
+  .directory-control-actions .sort-control select {
+    max-width: none;
+  }
+
+  .search-suggestions {
+    top: 78px;
+    width: calc(100% - 20px);
+  }
+}
+
+/* Phone layout */
+@media (max-width: 760px) {
+  body.directory-unlocked {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+
+  body:not(.directory-unlocked) {
+    padding-bottom: 0;
+  }
+
+  .access-gate {
+    min-height: 100svh;
+    padding: 0;
+    place-items: start center;
+  }
+
+  .access-shell {
+    width: 100%;
+    min-height: 100svh;
+    display: block;
+    border: 0;
+    border-radius: 0;
+    background: var(--bg);
+    box-shadow: none;
+  }
+
+  .access-card {
+    min-height: 100svh;
+    padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+
+  .access-brand {
+    margin-bottom: 42px;
+  }
+
+  .access-brand-mark {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .access-brand strong {
+    font-size: 13px;
+  }
+
+  .access-brand small {
+    display: block;
+    font-size: 8px;
+  }
+
+  .access-kicker {
+    font-size: 8px;
+  }
+
+  .access-card h1 {
+    margin: 13px 0 12px;
+    font-size: clamp(39px, 11vw, 46px);
+    line-height: .98;
+  }
+
+  .access-lead {
+    max-width: 345px;
+    font-size: 12px;
+    line-height: 1.62;
+  }
+
+  .access-join-actions {
+    margin-top: 24px;
+  }
+
+  .access-primary-form {
+    min-height: 66px;
+    padding: 10px 12px;
+    grid-template-columns: 40px minmax(0, 1fr) 24px;
+    border-radius: 17px;
+  }
+
+  .access-primary-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  .access-primary-copy strong {
+    font-size: 11px;
+  }
+
+  .access-primary-copy small {
+    font-size: 8px;
+  }
+
+  .access-announcements-link {
+    min-height: 44px;
+    font-size: 10px;
+  }
+
+  .access-return-panel {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .access-return-heading {
+    margin-bottom: 11px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .access-return-heading strong {
+    font-size: 11px;
+  }
+
+  .access-return-heading span {
+    font-size: 8.5px;
+  }
+
+  .access-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .access-input {
+    min-height: 50px;
+  }
+
+  .access-input input {
+    font-size: 12px;
+  }
+
+  .access-form button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 9px;
+  }
+
+  .access-status {
+    font-size: 8px;
+  }
+
+  .access-privacy {
+    margin: 14px 2px 0;
+    font-size: 8.5px;
+    line-height: 1.55;
+  }
+
+  .access-visual {
+    display: none;
+  }
+
+  .main-shell {
+    padding-top: 8px;
+  }
+
+  .directory-intro {
+    min-height: 0;
+    margin: 0 0 16px;
+    padding: 16px 18px;
+    display: block;
+    border-radius: 21px;
+    box-shadow: none;
+  }
+
+  .directory-intro-kicker {
+    font-size: 7.5px;
+  }
+
+  .directory-intro h1 {
+    margin: 6px 0 5px;
+    font-size: clamp(27px, 8.2vw, 33px);
+    line-height: 1.03;
+  }
+
+  .directory-intro p {
+    max-width: 100%;
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+
+  .directory-intro-actions {
+    display: none;
+  }
+
+  #directory .section-heading {
+    margin: 0 0 13px;
+    padding-inline: 2px;
+    align-items: flex-end;
+  }
+
+  #directory .section-heading h2 {
+    margin: 5px 0 4px;
+    font-size: 27px;
+  }
+
+  #directory .section-heading p {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .directory-heading-tools {
+    display: none;
+  }
+
+  .controls-panel {
+    position: sticky;
+    top: 64px;
+    z-index: 30;
+    margin: 0;
+    padding: 8px 0 10px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    border: 0;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    box-shadow: none;
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+  }
+
+  .search-field {
+    grid-column: 1;
+    min-height: 56px;
+    padding: 0 15px;
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+
+  .search-field:focus-within {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 11%, transparent), 0 10px 28px color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+
+  .search-field input {
+    font-size: 15px;
+  }
+
+  .search-shortcut {
+    display: none;
+  }
+
+  .directory-control-actions {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr) 106px;
+    gap: 7px;
+  }
+
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control,
+  .mobile-roommate-shortcut {
+    min-width: 0;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: none;
+  }
+
+  .directory-control-actions .filter-trigger {
+    width: auto;
+    padding: 0 10px;
+    gap: 7px;
+  }
+
+  .directory-control-actions .filter-trigger > span:nth-child(2) {
+    display: inline;
+    font-size: 9px;
+  }
+
+  .directory-control-actions .filter-trigger strong {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    display: grid;
+    font-size: 7px;
+  }
+
+  .filter-symbol {
+    width: 16px;
+    height: 16px;
+    flex-basis: 16px;
+    background-size: auto, auto, auto, 16px 1.5px, 16px 1.5px, 16px 1.5px;
+  }
+
+  .directory-control-actions .sort-control {
+    width: 100%;
+    min-width: 0;
+    padding: 5px 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 1px;
+  }
+
+  .directory-control-actions .sort-control > span {
+    display: block;
+    color: var(--muted-2);
+    font-size: 7px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+
+  .directory-control-actions .sort-control select {
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  .directory-control-actions .roommate-match-trigger,
+  .directory-control-actions .saved-trigger {
+    display: none;
+  }
+
+  .mobile-roommate-shortcut {
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 8.5px;
+    font-weight: 850;
+  }
+
+  .mobile-roommate-shortcut > span:first-child {
+    color: var(--violet);
+    font-size: 14px;
+  }
+
+  .mobile-roommate-shortcut.active {
+    border-color: color-mix(in srgb, var(--violet) 42%, var(--line));
+    background: var(--violet-soft);
+    color: var(--violet);
+  }
+
+  .search-suggestions {
+    top: 71px;
+    left: 0;
+    width: 100%;
+  }
+
+  .quick-filter-row {
+    margin: 7px 0 0;
+    padding: 2px 0 1px;
+  }
+
+  .quick-filter-chip {
+    min-height: 34px;
+    font-size: 8px;
+  }
+
+  .results-bar {
+    min-height: 0;
+    margin-top: 6px;
+    padding: 8px 2px 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .results-bar p {
+    margin: 0;
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 9px;
+  }
+
+  .results-bar .clear-all {
+    margin: 0;
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 28px;
+    padding: 0 9px;
+    font-size: 8px;
+  }
+
+  .active-filter-chips {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    order: initial;
+    padding: 0;
+  }
+
+  .active-chip {
+    min-height: 27px;
+    font-size: 7.5px;
+  }
+
+  .mobile-nav {
+    left: 10px;
+    right: 10px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    min-height: 70px;
+    height: auto;
+    padding: 6px 7px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    border-radius: 23px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 16px 44px rgba(8, 20, 42, .22);
+  }
+
+  .mobile-nav-item {
+    min-height: 56px;
+    padding: 4px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 16px;
+  }
+
+  .mobile-nav-item .mobile-nav-icon {
+    width: 30px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: currentColor;
+    font-size: 17px;
+    font-weight: 850;
+    line-height: 1;
+    transition: background .16s ease, color .16s ease, transform .16s ease;
+  }
+
+  .mobile-nav-item small {
+    font-size: 8px;
+    letter-spacing: .01em;
+  }
+
+  .mobile-nav-item.active {
+    background: transparent;
+    color: var(--primary);
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 28%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .mobile-nav-item > i {
+    top: 4px;
+    right: calc(50% - 22px);
+    border: 2px solid var(--surface);
+  }
+
+  .mobile-nav .mobile-notice-icon i {
+    top: -6px;
+    right: -7px;
+    border-color: var(--surface);
+  }
+}
+
+@media (max-width: 370px) {
+  .access-card {
+    padding-inline: 16px;
+  }
+
+  .access-brand {
+    margin-bottom: 34px;
+  }
+
+  .access-card h1 {
+    font-size: 37px;
+  }
+
+  .directory-control-actions {
+    grid-template-columns: 78px minmax(0, 1fr) 96px;
+  }
+
+  .mobile-roommate-shortcut {
+    padding-inline: 6px;
+    font-size: 7.5px;
+  }
+
+  .mobile-nav {
+    left: 7px;
+    right: 7px;
+    padding-inline: 5px;
+  }
+
+  .mobile-nav-item small {
+    font-size: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-item .mobile-nav-icon {
+    transition: none;
+  }
+}
