@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-safety-v2";
+const CACHE_NAME = "polimi-students-prod-20260812-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,11 +7,11 @@ const APP_SHELL = [
   "./announcements.html",
   "./announcements.js",
   "./announcements-ux.js",
-  "./basic-safety-course.pdf",
   "./styles.css",
   "./app.js",
   "./ux-enhancements.js",
   "./manifest.webmanifest",
+  "./basic-safety-course.pdf",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",

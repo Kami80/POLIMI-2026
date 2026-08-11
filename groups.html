@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260811-announcements-v1" />
+  <link rel="stylesheet" href="styles.css?v=20260812-prod-v1" />
   <title>Telegram Groups · Polimi Students 2026/2027</title>
 </head>
 <body class="groups-page">
@@ -56,10 +56,10 @@
           <input id="groupSearch" type="search" placeholder="Search program…" autocomplete="off" />
           <button id="groupSearchClear" type="button" aria-label="Clear search" hidden>×</button>
         </label>
-        <p class="groups-count" id="groupsCount">4 groups</p>
+        <p class="groups-count" id="groupsCount">5 communities</p>
       </div>
 
-      <div class="telegram-group-grid" id="telegramGroupGrid"></div>
+      <div class="telegram-group-grid telegram-group-grid-redesigned" id="telegramGroupGrid"></div>
 
       <div class="groups-empty" id="groupsEmpty" hidden>
         <span aria-hidden="true">⌕</span>
@@ -80,6 +80,8 @@
     </section>
   </main>
 
+  <div class="groups-toast" id="groupsToast" role="status" aria-live="polite" hidden></div>
+
   <nav class="groups-mobile-nav" aria-label="Mobile navigation">
     <a href="index.html"><span>⌂</span><small>Students</small></a>
     <a href="groups.html" class="active" aria-current="page"><span>✈</span><small>Groups</small></a>
@@ -91,6 +93,6 @@
     <span>Created by Kamyab</span>
   </footer>
 
-  <script src="groups.js?v=20260811-groups-v2"></script>
+  <script src="groups.js?v=20260812-prod-v1"></script>
 </body>
 </html>

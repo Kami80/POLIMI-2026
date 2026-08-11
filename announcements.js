@@ -275,7 +275,7 @@ function actionsMarkup(item) {
     const external = !String(action.href).startsWith("mailto:");
     return `
       <a class="announcement-modal-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-        <span>${action.type === "email" ? "✉" : action.type === "pdf" ? "PDF" : "↗"}</span>
+        <span>${action.type === "email" ? "✉" : "↗"}</span>
         <strong>${escapeHtml(action.label)}</strong>
       </a>
     `;
