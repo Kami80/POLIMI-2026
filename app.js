@@ -76,9 +76,7 @@ function cacheElements() {
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
     "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
     "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileMyProfileButton",
-    "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast",
-    "youAvatar", "youName", "youMeta", "youProgramBadge", "youCampusBadge", "youRoommateBadge", "youSavedCount",
-    "youViewProfile", "youOpenSaved", "youThemeToggle", "youSection"
+    "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast"
   ].forEach(id => els[id] = document.getElementById(id));
 }
 
@@ -231,14 +229,8 @@ function setupEvents() {
     if (!els.profileMenu?.hidden && !event.target.closest(".profile-menu-wrap")) closeProfileMenu();
   });
 
-  els.myProfileButton?.addEventListener("click", openYouSection);
-  els.mobileMyProfileButton?.addEventListener("click", openYouSection);
-  els.youViewProfile?.addEventListener("click", openMyProfile);
-  els.youOpenSaved?.addEventListener("click", () => {
-    if (!state.savedOnly) toggleSavedMode();
-    document.getElementById("directory")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-  els.youThemeToggle?.addEventListener("click", () => els.themeToggle?.click());
+  els.myProfileButton?.addEventListener("click", openMyProfile);
+  els.mobileMyProfileButton?.addEventListener("click", openMyProfile);
   els.savedTrigger?.addEventListener("click", toggleSavedMode);
   els.mobileSavedButton?.addEventListener("click", toggleSavedMode);
   els.savedReset?.addEventListener("click", exitSavedMode);
@@ -768,11 +760,6 @@ function renderStudentProfile(row) {
     creatorBadge.textContent = "✦ Creator";
     creatorBadge.title = "Creator of Polimi Students 2026/2027";
     badges.appendChild(creatorBadge);
-  } else if (isRecentStudent(row)) {
-    const recentBadge = document.createElement("span");
-    recentBadge.className = "profile-recent-badge";
-    recentBadge.textContent = "Updated recently";
-    badges.appendChild(recentBadge);
   }
   if (mailtoUrl(polimiMail)) {
     const mailBadge = document.createElement("span");
@@ -1358,7 +1345,6 @@ function renderCards(rows, start) {
 
     const card = document.createElement("article");
     card.className = `student-card student-card-v2 student-card-simple ${cardAccentClass(program || name)} card-gender-${genderClass(gender)}`;
-    card.style.setProperty("--card-index", String(offset % 24));
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
@@ -2038,7 +2024,6 @@ function updateSavedUI() {
     els.mobileSavedBadge.hidden = count === 0;
   }
   if (els.savedBanner) els.savedBanner.hidden = !state.savedOnly;
-  if (els.youSavedCount) els.youSavedCount.textContent = String(count);
   updateMobileNavState();
 }
 
@@ -2074,27 +2059,6 @@ function openMyProfile() {
   openStudentProfile(row);
 }
 
-
-function openYouSection() {
-  els.youSection?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function updateYouSection() {
-  const row = currentUserRow();
-  if (!row) return;
-  const name = displayValue(row, semanticColumn("name")) || "Student";
-  const program = displayValue(row, semanticColumn("program")) || "Program not specified";
-  const campus = displayValue(row, semanticColumn("campus")) || "Campus not specified";
-  const roommate = displayValue(row, semanticColumn("roommate")) || "Roommate not specified";
-  if (els.youAvatar) els.youAvatar.textContent = initials(name);
-  if (els.youName) els.youName.textContent = name;
-  if (els.youMeta) els.youMeta.textContent = `${program} · ${campus}`;
-  if (els.youProgramBadge) els.youProgramBadge.textContent = program;
-  if (els.youCampusBadge) els.youCampusBadge.textContent = campus;
-  if (els.youRoommateBadge) els.youRoommateBadge.textContent = roommate;
-  if (els.youSavedCount) els.youSavedCount.textContent = String(state.savedSlugs.size);
-}
-
 function updatePersonalizedHeader() {
   const row = currentUserRow();
   if (!row) return;
@@ -2103,9 +2067,8 @@ function updatePersonalizedHeader() {
   const program = displayValue(row, semanticColumn("program"));
   const campus = displayValue(row, semanticColumn("campus"));
   if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Find your people, ${first}.`;
-  if (els.directoryIntroText) els.directoryIntroText.textContent = [program && `Your program: ${program}`, campus && `Your campus: ${campus}`, "Open profiles, meet classmates, and discover potential roommates."].filter(Boolean).join(" · ");
+  if (els.directoryIntroText) els.directoryIntroText.textContent = [program && `Your program: ${program}`, campus && `Your campus: ${campus}`, "Tap any student to open the full profile."].filter(Boolean).join(" · ");
   if (els.myProfileAvatar) els.myProfileAvatar.textContent = initials(name);
-  updateYouSection();
 }
 
 function toggleProfileMenu() {

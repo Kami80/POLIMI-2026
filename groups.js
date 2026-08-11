@@ -22,11 +22,6 @@ const TELEGRAM_GROUPS = [
   {
     program: "Chemical Engineering",
     url: "https://t.me/+E-ZbMJk_9FthYTY0"
-  },
-  {
-    program: "HPC and CS",
-    url: "https://t.me/+zavdWJEF7RZiMDM0",
-    description: "A focused community for HPC and Computer Science students at Polimi."
   }
 ];
 function openTelegramLink(href) {
@@ -37,41 +32,6 @@ function openTelegramLink(href) {
   }
 }
 
-function groupSlug(program) {
-  return String(program || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-async function shareGroup(item) {
-  const url = `${window.location.origin}${window.location.pathname}?group=${encodeURIComponent(groupSlug(item.program))}`;
-  const payload = {
-    title: `${item.program} · Polimi Students`,
-    text: `Join the ${item.program} Telegram community on Polimi Students.`,
-    url
-  };
-  try {
-    if (navigator.share) await navigator.share(payload);
-    else {
-      await navigator.clipboard.writeText(url);
-      alert("Group link copied to clipboard");
-    }
-  } catch (_) {}
-}
-
-function maybeHighlightGroup() {
-  const slug = new URL(window.location.href).searchParams.get("group");
-  if (!slug) return;
-  const target = document.querySelector(`[data-group-slug="${CSS.escape(slug)}"]`);
-  if (!target) return;
-  requestAnimationFrame(() => {
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
-    target.classList.add("is-spotlight");
-    setTimeout(() => target.classList.remove("is-spotlight"), 2200);
-  });
-}
 
 const grid = document.getElementById("telegramGroupGrid");
 const search = document.getElementById("groupSearch");
@@ -114,8 +74,6 @@ function renderGroups() {
   groups.forEach((item, index) => {
     const card = document.createElement("article");
     card.className = `telegram-group-card telegram-group-accent-${index % 5}${item.pinned ? " telegram-group-pinned" : ""}`;
-    card.dataset.groupSlug = groupSlug(item.program);
-    card.style.setProperty("--group-index", String(index));
 
     const top = document.createElement("div");
     top.className = "telegram-group-top";
@@ -146,9 +104,6 @@ function renderGroups() {
 
     body.append(label, title, description);
 
-    const buttonRow = document.createElement("div");
-    buttonRow.className = "telegram-group-actions";
-
     const button = document.createElement("a");
     button.className = "telegram-join-btn";
     button.href = item.url;
@@ -158,22 +113,15 @@ function renderGroups() {
       event.preventDefault();
       openTelegramLink(item.url);
     });
-    button.innerHTML = '<span>Join community</span><span aria-hidden="true">↗</span>';
+    button.innerHTML = '<span>Open Telegram group</span><span aria-hidden="true">↗</span>';
     button.setAttribute("aria-label", `Open ${item.program} Telegram group`);
 
-    const share = document.createElement("button");
-    share.className = "telegram-share-btn";
-    share.type = "button";
-    share.innerHTML = '<span>Share</span><span aria-hidden="true">↗</span>';
-    share.addEventListener("click", () => shareGroup(item));
-
-    buttonRow.append(button, share);
-    card.append(top, body, buttonRow);
+    card.append(top, body, button);
     fragment.appendChild(card);
   });
 
   grid.appendChild(fragment);
-  count.textContent = `${groups.length} ${groups.length === 1 ? "community" : "communities"}`;
+  count.textContent = `${groups.length} ${groups.length === 1 ? "group" : "groups"}`;
   empty.hidden = groups.length !== 0;
   grid.hidden = groups.length === 0;
   clear.hidden = !search.value;
@@ -197,9 +145,7 @@ search.addEventListener("input", renderGroups);
 clear.addEventListener("click", () => {
   search.value = "";
   renderGroups();
-maybeHighlightGroup();
   search.focus();
 });
 
 renderGroups();
-maybeHighlightGroup();
