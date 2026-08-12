@@ -78,7 +78,7 @@ function cacheElements() {
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
     "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
-    "studentAppView", "noticesAppView", "groupsAppView", "topNoticesButton", "topGroupsButton",
+    "studentAppView", "noticesAppView", "groupsAppView", "meAppView", "mePage", "mePageName", "mePageSubtitle", "mePageBadges", "mePageBody", "mePageShare", "mePageSwitchEmail", "mePageAccountEmail", "topNoticesButton", "topGroupsButton",
     "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileNoticesButton", "mobileGroupsButton", "mobileMyProfileButton",
     "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast"
   ].forEach(id => els[id] = document.getElementById(id));
@@ -94,7 +94,7 @@ function appViewFromUrl() {
 }
 
 function appPanelForView(view) {
-  if (view === "notices" || view === "groups") return view;
+  if (view === "notices" || view === "groups" || view === "me") return view;
   return "students";
 }
 
@@ -140,7 +140,7 @@ function showAppView(requestedView, options = {}) {
   const commit = () => {
     state.appView = view;
     const activePanel = appPanelForView(view);
-    [els.studentAppView, els.noticesAppView, els.groupsAppView].filter(Boolean).forEach(panel => {
+    [els.studentAppView, els.noticesAppView, els.groupsAppView, els.meAppView].filter(Boolean).forEach(panel => {
       panel.hidden = panel.dataset.appViewPanel !== activePanel;
     });
     document.body.dataset.appView = view;
@@ -162,10 +162,10 @@ function showAppView(requestedView, options = {}) {
       }
     }
 
-    if (view !== "me" && els.profileSheet?.classList.contains("open")) {
+    if (els.profileSheet?.classList.contains("open")) {
       closeStudentProfile({ syncUrl: false });
     }
-    if (view === "notices" || view === "groups") closeFilterSheet();
+    if (view === "notices" || view === "groups" || view === "me") closeFilterSheet();
 
     updateSavedUI();
     updateRoommateMatchUI();
@@ -174,6 +174,7 @@ function showAppView(requestedView, options = {}) {
 
     if (view === "groups") window.PolimiGroups?.render?.();
     if (view === "notices" && typeof window.renderAnnouncements === "function") window.renderAnnouncements();
+    if (view === "me") renderMyProfilePage();
   };
 
   let transition = null;
@@ -181,7 +182,7 @@ function showAppView(requestedView, options = {}) {
   else {
     commit();
     if (animate) {
-      const activePanel = [els.studentAppView, els.noticesAppView, els.groupsAppView].find(panel => panel && !panel.hidden);
+      const activePanel = [els.studentAppView, els.noticesAppView, els.groupsAppView, els.meAppView].find(panel => panel && !panel.hidden);
       if (activePanel) {
         const className = `app-view-fallback-${direction}`;
         activePanel.classList.remove("app-view-fallback-forward", "app-view-fallback-back");
@@ -195,7 +196,6 @@ function showAppView(requestedView, options = {}) {
   transition?.finished?.catch?.(() => {});
 
   syncAppViewUrl(view, historyMode);
-  if (view === "me") requestAnimationFrame(() => openMyProfile({ syncUrl: false }));
   if (scroll) requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
@@ -331,6 +331,8 @@ function setupEvents() {
   });
 
   els.changeEmailButton?.addEventListener("click", lockDirectory);
+  els.mePageSwitchEmail?.addEventListener("click", lockDirectory);
+  els.mePageShare?.addEventListener("click", shareMyProfilePage);
 
   els.searchInput.addEventListener("input", debounce(event => {
     state.query = event.target.value.trim().toLowerCase();
@@ -413,7 +415,7 @@ function setupEvents() {
     showAppView(view, { historyMode: "none", scroll: false });
     const slug = url.searchParams.get("student");
     if (slug) openStudentProfileBySlug(slug, { syncUrl: false });
-    else if (view !== "me") closeStudentProfile({ syncUrl: false });
+    else closeStudentProfile({ syncUrl: false });
   });
 
   document.addEventListener("keydown", event => {
@@ -536,6 +538,7 @@ function refreshAuthorizedDirectory() {
   updateRoommateMatchUI();
   updateSavedUI();
   applyDataPipeline();
+  if (state.appView === "me") renderMyProfilePage();
 }
 
 function unlockDirectory(email) {
@@ -844,6 +847,10 @@ function openStudentProfileBySlug(slug, options = {}) {
 function openStudentProfile(row, options = {}) {
   if (!row || !els.profileSheet) return;
   const { syncUrl = true } = options;
+  if (syncUrl && row === currentUserRow()) {
+    showAppView("me");
+    return;
+  }
   const slug = studentSlug(row);
   state.activeProfileSlug = slug;
   closeProfileMenu();
@@ -868,10 +875,6 @@ function closeStudentProfile(options = {}) {
   if (!els.profileSheet) return;
   els.profileSheet.classList.remove("open");
   els.profileSheet.setAttribute("aria-hidden", "true");
-  if (state.appView === "me") {
-    state.appView = "students";
-    document.body.dataset.appView = "students";
-  }
   state.activeProfileSlug = "";
   closeProfileMenu();
   updateAppNavigationState();
@@ -1104,21 +1107,20 @@ function createProfileContactButton(type, value) {
   return a;
 }
 
-async function shareActiveProfile() {
-  const slug = state.activeProfileSlug;
-  const row = state.profileBySlug.get(slug);
-  if (!slug || !row) return;
+async function shareProfileRow(row) {
+  if (!row) return "unavailable";
+  const slug = studentSlug(row);
   const name = displayValue(row, semanticColumn("name")) || "Polimi student";
   const url = profileUrl(slug);
   try {
     if (navigator.share) {
       await navigator.share({ title: `${name} · Polimi Students`, text: `View ${name}'s Polimi Students profile.`, url });
-      return;
+      return "shared";
     }
     await navigator.clipboard.writeText(url);
-    flashShareLabel("Copied");
+    return "copied";
   } catch (error) {
-    if (error?.name === "AbortError") return;
+    if (error?.name === "AbortError") return "aborted";
     try {
       const input = document.createElement("textarea");
       input.value = url;
@@ -1128,11 +1130,24 @@ async function shareActiveProfile() {
       input.select();
       document.execCommand("copy");
       input.remove();
-      flashShareLabel("Copied");
+      return "copied";
     } catch (_) {
-      flashShareLabel("Copy link");
+      return "unavailable";
     }
   }
+}
+
+async function shareActiveProfile() {
+  const result = await shareProfileRow(state.profileBySlug.get(state.activeProfileSlug));
+  if (result === "copied") flashShareLabel("Copied");
+  else if (result === "unavailable") flashShareLabel("Copy link");
+}
+
+async function shareMyProfilePage() {
+  const result = await shareProfileRow(currentUserRow());
+  if (result === "shared") showToast("Profile shared");
+  else if (result === "copied") showToast("Profile link copied");
+  else if (result === "unavailable") showToast("Profile link is unavailable");
 }
 
 function flashShareLabel(text) {
@@ -2445,10 +2460,184 @@ function updateEmptyStateCopy() {
   }
 }
 
-function openMyProfile(options = {}) {
+function createMyProfileField(label, value, iconText, featured = false) {
+  const item = document.createElement("article");
+  item.className = `me-profile-field${featured ? " featured" : ""}`;
+  const icon = document.createElement("span");
+  icon.className = "me-profile-field-icon material-symbols-rounded";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = iconText;
+  const copy = document.createElement("div");
+  const key = document.createElement("span");
+  key.textContent = label;
+  const content = document.createElement("strong");
+  content.textContent = value || "Not specified";
+  copy.append(key, content);
+  item.append(icon, copy);
+  return item;
+}
+
+function createMyProfileContactLink(type, value) {
+  const isTelegram = type === "telegram";
+  const href = isTelegram ? telegramUrl(value) : mailtoUrl(value);
+  if (!href) return null;
+
+  const link = document.createElement("a");
+  link.className = `me-profile-contact ${isTelegram ? "telegram" : "mail"}`;
+  link.href = href;
+  if (isTelegram) activateTelegramLink(link, href);
+
+  const icon = document.createElement("span");
+  icon.className = "me-profile-contact-icon";
+  icon.append(isTelegram ? telegramIcon() : mailIcon());
+  const copy = document.createElement("span");
+  const label = document.createElement("small");
+  label.textContent = isTelegram ? "Telegram" : "Polimi mail";
+  const detail = document.createElement("strong");
+  detail.textContent = isTelegram ? telegramLabel(value) : String(value).trim();
+  copy.append(label, detail);
+  const arrow = document.createElement("span");
+  arrow.className = "material-symbols-rounded";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = isTelegram ? "open_in_new" : "arrow_forward";
+  link.append(icon, copy, arrow);
+  return link;
+}
+
+function appendMyProfileBadge(container, label, className, iconText = "") {
+  const badge = document.createElement("span");
+  badge.className = `me-page-badge ${className}`;
+  if (iconText) {
+    const icon = document.createElement("span");
+    icon.className = "material-symbols-rounded";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = iconText;
+    badge.appendChild(icon);
+  }
+  badge.appendChild(document.createTextNode(label));
+  container.appendChild(badge);
+}
+
+function renderMyProfilePage() {
+  if (!els.mePageBody) return;
   const row = currentUserRow();
-  if (!row) { showToast("Your profile could not be matched yet"); return; }
-  openStudentProfile(row, options);
+  const accountEmail = state.authorizedEmail || rememberedVerifiedEmail();
+  if (els.mePageAccountEmail) els.mePageAccountEmail.textContent = accountEmail || "Verified student";
+  if (els.mePageShare) els.mePageShare.disabled = !row;
+  els.mePageBody.replaceChildren();
+  els.mePageBadges?.replaceChildren();
+  els.mePage?.classList.remove("me-gender-female", "me-gender-male", "me-gender-other");
+
+  if (!row) {
+    if (els.mePageName) els.mePageName.textContent = "My profile";
+    if (els.mePageSubtitle) els.mePageSubtitle.textContent = "We could not match this email to a current directory profile.";
+    const empty = document.createElement("section");
+    empty.className = "me-profile-empty";
+    const title = document.createElement("h2");
+    title.textContent = "Your profile needs an update";
+    const text = document.createElement("p");
+    text.textContent = "Submit the directory form again with the same verified email, then refresh this page.";
+    empty.append(title, text);
+    els.mePageBody.appendChild(empty);
+    return;
+  }
+
+  const nameCol = semanticColumn("name");
+  const genderCol = semanticColumn("gender");
+  const programCol = semanticColumn("program");
+  const campusCol = semanticColumn("campus");
+  const degreeCol = semanticColumn("degree");
+  const roommateCol = semanticColumn("roommate");
+  const noteCol = semanticColumn("note");
+  const telegramCol = semanticColumn("telegram");
+  const polimiMailCol = semanticColumn("polimiMail");
+  const telegramVisibilityCol = semanticColumn("telegramVisibility");
+  const polimiMailVisibilityCol = semanticColumn("polimiMailVisibility");
+  const coreIndexes = new Set([nameCol, genderCol, programCol, campusCol, degreeCol, roommateCol, noteCol, telegramCol, polimiMailCol]
+    .filter(Boolean).map(column => column.index));
+
+  const name = displayValue(row, nameCol) || "Polimi student";
+  const gender = displayValue(row, genderCol);
+  const genderTone = genderClass(gender);
+  const program = displayValue(row, programCol) || "Program not specified";
+  const campus = displayValue(row, campusCol) || "Not specified";
+  const degree = displayValue(row, degreeCol) || "Not specified";
+  const roommate = displayValue(row, roommateCol) || "Not specified";
+  const note = displayValue(row, noteCol);
+  const telegram = contactVisibilityAllows(displayValue(row, telegramVisibilityCol)) ? displayValue(row, telegramCol) : "";
+  const polimiMail = contactVisibilityAllows(displayValue(row, polimiMailVisibilityCol)) ? displayValue(row, polimiMailCol) : "";
+
+  els.mePage?.classList.add(`me-gender-${genderTone}`);
+  if (els.mePageName) els.mePageName.textContent = name;
+  if (els.mePageSubtitle) els.mePageSubtitle.textContent = [program, campus].filter(Boolean).join(" · ");
+  if (els.mePageBadges) {
+    appendMyProfileBadge(els.mePageBadges, "Directory member", "member", "verified_user");
+    if (gender) appendMyProfileBadge(els.mePageBadges, gender, genderTone, "person");
+    if (isCreatorRow(row)) appendMyProfileBadge(els.mePageBadges, "Community creator", "creator", "verified");
+  }
+
+  const overview = document.createElement("section");
+  overview.className = "me-profile-grid";
+  overview.append(
+    createMyProfileField("Program", program, "school", true),
+    createMyProfileField("Campus", campus, "location_on"),
+    createMyProfileField("Degree", degree, "workspace_premium"),
+    createMyProfileField("Roommate", roommate, "bed")
+  );
+  els.mePageBody.appendChild(overview);
+
+  if (note) {
+    const about = document.createElement("section");
+    about.className = "me-profile-section me-profile-about";
+    const heading = document.createElement("h2");
+    heading.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span><span>About me</span>';
+    const text = document.createElement("p");
+    text.dir = "auto";
+    appendProfileNote(text, note);
+    about.append(heading, text);
+    els.mePageBody.appendChild(about);
+  }
+
+  const contacts = [
+    createMyProfileContactLink("telegram", telegram),
+    createMyProfileContactLink("mail", polimiMail),
+  ].filter(Boolean);
+  if (contacts.length) {
+    const contactSection = document.createElement("section");
+    contactSection.className = "me-profile-section";
+    const heading = document.createElement("h2");
+    heading.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">contact_page</span><span>Contact details</span>';
+    const grid = document.createElement("div");
+    grid.className = "me-profile-contact-grid";
+    contacts.forEach(link => grid.appendChild(link));
+    contactSection.append(heading, grid);
+    els.mePageBody.appendChild(contactSection);
+  }
+
+  const extras = visibleColumns().filter(column => !coreIndexes.has(column.index) && displayValue(row, column));
+  if (extras.length) {
+    const extraSection = document.createElement("section");
+    extraSection.className = "me-profile-section";
+    const heading = document.createElement("h2");
+    heading.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">list_alt</span><span>More details</span>';
+    const grid = document.createElement("div");
+    grid.className = "me-profile-extra-grid";
+    extras.forEach(column => {
+      const item = document.createElement("article");
+      const label = document.createElement("span");
+      label.textContent = shortHeader(column.label);
+      const value = document.createElement("strong");
+      renderColumnContent(value, column, displayValue(row, column));
+      item.append(label, value);
+      grid.appendChild(item);
+    });
+    extraSection.append(heading, grid);
+    els.mePageBody.appendChild(extraSection);
+  }
+}
+
+function openMyProfile(options = {}) {
+  showAppView("me", { historyMode: options.syncUrl === false ? "none" : "push" });
 }
 
 function updatePersonalizedHeader() {
@@ -2460,7 +2649,7 @@ function updatePersonalizedHeader() {
   const campus = displayValue(row, semanticColumn("campus"));
   if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Welcome back, ${first}.`;
   if (els.directoryIntroText) els.directoryIntroText.textContent = [program, campus, "Discover classmates and new connections."].filter(Boolean).join(" · ");
-  if (els.myProfileAvatar) els.myProfileAvatar.textContent = initials(name);
+  if (els.myProfileAvatar) els.myProfileAvatar.textContent = "person";
 }
 
 function toggleProfileMenu() {

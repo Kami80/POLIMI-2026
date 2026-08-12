@@ -461,13 +461,33 @@ body {
   min-height: 27px;
   margin-top: auto;
   padding: 0 9px;
-  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 6px;
   border: 1px solid color-mix(in srgb, var(--card-tone) 17%, var(--line));
   border-radius: 999px;
   background: color-mix(in srgb, var(--card-tone) 8%, var(--surface));
   color: color-mix(in srgb, var(--card-tone) 84%, var(--ink));
   box-shadow: none;
   font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.student-context-badge > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-context-badge > .material-symbols-rounded {
+  flex: 0 0 auto;
+  margin: 0;
+  line-height: 1;
 }
 
 .student-card-chevron,
@@ -889,6 +909,384 @@ body {
   height: 14px !important;
 }
 
+/* Full-page signed-in profile. */
+.top-profile-avatar.material-symbols-rounded {
+  font-size: 19px;
+  font-variation-settings: "FILL" 0, "wght" 520, "GRAD" 0, "opsz" 24;
+}
+
+.me-main {
+  padding-top: clamp(26px, 4vw, 48px);
+  padding-bottom: 120px;
+}
+
+.me-page {
+  --me-gender-tint: #9a7951;
+  width: min(980px, 100%);
+  margin-inline: auto;
+}
+
+.me-page.me-gender-female { --me-gender-tint: #b86f76; }
+.me-page.me-gender-male { --me-gender-tint: #5d7772; }
+.me-page.me-gender-other { --me-gender-tint: #9a7951; }
+
+.me-page-hero {
+  padding: clamp(24px, 4vw, 40px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  overflow: hidden;
+  border: 1px solid var(--neo-stroke);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--me-gender-tint) 6%, var(--surface)), transparent 43%),
+    color-mix(in srgb, var(--neo-glass-strong) 92%, transparent);
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+}
+
+.me-page-identity {
+  min-width: 0;
+}
+
+.me-page-kicker {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+.me-page-hero h1 {
+  margin: 10px 0 8px;
+  color: var(--ink);
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.03;
+  letter-spacing: -.055em;
+}
+
+.me-page-hero p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.me-page-badges {
+  min-height: 26px;
+  margin-top: 17px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.me-page-badges:empty {
+  display: none;
+}
+
+.me-page-badge {
+  min-height: 27px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid color-mix(in srgb, var(--me-gender-tint) 16%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--me-gender-tint) 6%, var(--surface));
+  color: color-mix(in srgb, var(--me-gender-tint) 64%, var(--ink));
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.me-page-badge > .material-symbols-rounded {
+  font-size: 15px;
+}
+
+.me-page-badge.member {
+  border-color: color-mix(in srgb, var(--green) 18%, var(--line));
+  background: color-mix(in srgb, var(--green) 7%, var(--surface));
+  color: var(--green);
+}
+
+.me-page-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 9px;
+}
+
+.me-page-action {
+  min-height: 44px;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.me-page-action > .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.me-page-action:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.me-page-action.secondary {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.me-page-action.primary {
+  border-color: color-mix(in srgb, var(--primary) 44%, transparent);
+  background: linear-gradient(135deg, #a9402c, #c65e43);
+  color: #fffaf4;
+  box-shadow: 0 10px 24px rgba(115, 54, 38, .18), inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+.me-page-body {
+  margin-top: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.me-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.me-profile-field,
+.me-profile-section,
+.me-page-account,
+.me-profile-empty {
+  border: 1px solid var(--neo-stroke);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--me-gender-tint) 2%, var(--surface)), color-mix(in srgb, var(--surface-2) 78%, transparent));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.me-profile-field {
+  min-height: 112px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-radius: 20px;
+}
+
+.me-profile-field.featured {
+  grid-column: 1 / -1;
+}
+
+.me-profile-field-icon {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--me-gender-tint) 14%, var(--line));
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--me-gender-tint) 5%, var(--surface));
+  color: color-mix(in srgb, var(--me-gender-tint) 68%, var(--ink));
+  font-size: 20px;
+}
+
+.me-profile-field > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.me-profile-field > div > span,
+.me-profile-extra-grid article > span,
+.me-page-account > div > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.me-profile-field > div > strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.me-profile-field.featured > div > strong {
+  font-size: 18px;
+}
+
+.me-profile-section {
+  padding: 22px;
+  border-radius: 22px;
+}
+
+.me-profile-section > h2 {
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.me-profile-section > h2 > .material-symbols-rounded {
+  color: var(--primary);
+  font-size: 19px;
+}
+
+.me-profile-about > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.me-profile-contact-grid,
+.me-profile-extra-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.me-profile-contact {
+  min-width: 0;
+  min-height: 68px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 68%, transparent);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.me-profile-contact-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--green) 8%, var(--surface));
+  color: var(--green);
+}
+
+.me-profile-contact-icon .contact-icon-svg,
+.me-profile-contact-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.me-profile-contact > span:nth-child(2) {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.me-profile-contact small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.me-profile-contact strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.me-profile-contact > .material-symbols-rounded {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.me-profile-extra-grid article {
+  min-width: 0;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 68%, transparent);
+}
+
+.me-profile-extra-grid article > strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.me-page-account {
+  margin-top: 16px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 18px;
+}
+
+.me-page-account > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.me-page-account strong {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.me-page-account button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.me-profile-empty {
+  padding: clamp(28px, 6vw, 68px);
+  border-radius: 24px;
+  text-align: center;
+}
+
+.me-profile-empty h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 24px;
+}
+
+.me-profile-empty p {
+  margin: 0 auto;
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 /* One-document navigation */
 .app-view {
   view-transition-name: app-view;
@@ -1204,6 +1602,8 @@ body {
   .student-context-badge {
     min-height: 25px;
     padding-inline: 8px;
+    align-items: center;
+    justify-content: center;
     font-size: 10px !important;
   }
 
@@ -1213,8 +1613,90 @@ body {
   }
 
   .groups-main,
-  .announcements-main {
+  .announcements-main,
+  .me-main {
     padding-bottom: 104px;
+  }
+
+  .me-main {
+    padding-top: 18px;
+  }
+
+  .me-page-hero {
+    padding: 22px 18px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 24px;
+  }
+
+  .me-page-kicker {
+    font-size: 10px;
+  }
+
+  .me-page-hero h1 {
+    margin-top: 8px;
+    font-size: clamp(31px, 10vw, 42px);
+  }
+
+  .me-page-hero p {
+    font-size: 13px;
+  }
+
+  .me-page-actions {
+    width: 100%;
+  }
+
+  .me-page-action {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .me-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .me-profile-field {
+    min-height: 102px;
+    padding: 14px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 18px;
+  }
+
+  .me-profile-field.featured {
+    min-height: 96px;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .me-profile-field-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    border-radius: 11px;
+    font-size: 18px;
+  }
+
+  .me-profile-field > div > strong,
+  .me-profile-field.featured > div > strong {
+    font-size: 13px;
+  }
+
+  .me-profile-section {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .me-profile-contact-grid,
+  .me-profile-extra-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .me-page-account {
+    padding: 14px;
   }
 
   .groups-hero,
