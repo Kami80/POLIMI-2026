@@ -1,0 +1,830 @@
+/* Compact interaction and motion layer. Loaded after the neo-glass theme. */
+
+/* Optical centering for icon-only controls and icon tiles. */
+.telegram-group-mark,
+.announcement-card-icon,
+.profile-detail-icon,
+.profile-toolbar-btn,
+.announcement-modal-icon-btn,
+.sheet-close,
+.student-card-chevron,
+.groups-contribute-icon,
+.announcements-note-icon,
+.app-mobile-nav .mobile-nav-icon {
+  box-sizing: border-box;
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  text-align: center;
+}
+
+.telegram-group-mark,
+.announcement-card-icon,
+.profile-detail-icon,
+.profile-toolbar-btn > .material-symbols-rounded,
+.announcement-modal-icon-btn > .material-symbols-rounded,
+.sheet-close > .material-symbols-rounded,
+.student-card-chevron,
+.groups-contribute-icon,
+.announcements-note-icon,
+.app-mobile-nav .mobile-nav-icon {
+  font-variation-settings: "FILL" 0, "wght" 520, "GRAD" 0, "opsz" 24;
+}
+
+.telegram-group-mark,
+.announcement-card-icon {
+  text-indent: 0;
+}
+
+.announcement-modal-date-tile {
+  display: grid !important;
+  grid-template-rows: auto auto;
+  place-content: center !important;
+  justify-items: center;
+  text-align: center;
+}
+
+.announcement-modal-date-tile strong,
+.announcement-modal-date-tile small {
+  width: 100%;
+  margin: 0;
+  line-height: 1.05 !important;
+  text-align: center;
+}
+
+/* Opening feedback before a card expands into a sheet. */
+.student-card.is-opening,
+.announcement-card-v3.is-opening {
+  transform: translateY(-2px) scale(.975) !important;
+  filter: saturate(1.08);
+  box-shadow: var(--neo-pressed) !important;
+  transition-duration: 105ms !important;
+}
+
+.profile-sheet .profile-backdrop,
+.announcement-modal {
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.profile-sheet .profile-panel,
+.announcement-modal .announcement-modal-panel {
+  transform: translateY(28px) scale(.985);
+  transform-origin: center bottom;
+  opacity: 0;
+  transition: transform 360ms cubic-bezier(.16, 1, .3, 1), opacity 220ms ease;
+}
+
+.profile-sheet.open .profile-panel,
+.announcement-modal.is-visible .announcement-modal-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.profile-sheet.open .profile-body > *,
+.announcement-modal.is-visible .announcement-modal-hero > *,
+.announcement-modal.is-visible .announcement-modal-body > * {
+  animation: sheet-content-in 360ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.profile-sheet.open .profile-body > *:nth-child(2),
+.announcement-modal.is-visible .announcement-modal-hero > *:nth-child(2),
+.announcement-modal.is-visible .announcement-modal-body > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+
+.profile-sheet.open .profile-body > *:nth-child(n + 3),
+.announcement-modal.is-visible .announcement-modal-hero > *:nth-child(n + 3),
+.announcement-modal.is-visible .announcement-modal-body > *:nth-child(n + 3) {
+  animation-delay: 70ms;
+}
+
+/* Scroll reveal and subtle floating motion. */
+.motion-card.motion-pending {
+  opacity: 0;
+  transform: translateY(16px) scale(.985);
+}
+
+.motion-card.is-in-view {
+  animation: card-float-in 440ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--motion-index, 0) * 24ms);
+  translate: 0 var(--scroll-float, 0px);
+}
+
+.student-card.motion-card {
+  transition: translate 140ms linear, transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+/* Directional page motion for navigation links and swipe gestures. */
+main.page-motion-surface {
+  translate: var(--page-swipe-x, 0px) 0;
+  transition: translate 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+body.page-enter-forward main,
+body.page-enter-forward .access-shell {
+  animation: page-enter-forward 330ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+body.page-enter-back main,
+body.page-enter-back .access-shell {
+  animation: page-enter-back 330ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+body.page-exit-forward main,
+body.page-exit-forward .access-shell {
+  animation: page-exit-forward 180ms cubic-bezier(.4, 0, 1, 1) both;
+}
+
+body.page-exit-back main,
+body.page-exit-back .access-shell {
+  animation: page-exit-back 180ms cubic-bezier(.4, 0, 1, 1) both;
+}
+
+body.page-shift-forward main {
+  animation: page-shift-forward 310ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+body.page-shift-back main {
+  animation: page-shift-back 310ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.app-mobile-nav .mobile-nav-item.nav-tapped .mobile-nav-icon,
+.app-mobile-nav .mobile-nav-item.nav-target .mobile-nav-icon {
+  animation: nav-icon-pop 320ms cubic-bezier(.16, 1, .3, 1);
+}
+
+@media (max-width: 760px) {
+  body {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .app-bar-inner {
+    height: 62px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 13px;
+  }
+
+  .icon-btn,
+  .top-profile-btn,
+  .install-app-btn {
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 14px;
+  }
+
+  /* Student discovery controls */
+  .controls-panel {
+    padding: 7px;
+    border-radius: 21px;
+  }
+
+  .search-field {
+    min-height: 48px;
+    padding-inline: 13px 9px;
+    border-radius: 15px;
+  }
+
+  .search-field input {
+    font-size: 14px;
+  }
+
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control {
+    min-height: 44px;
+    border-radius: 14px;
+  }
+
+  .directory-control-actions .filter-trigger {
+    padding-inline: 11px;
+  }
+
+  .directory-control-actions .sort-control {
+    padding-inline: 12px;
+  }
+
+  .quick-filter-row {
+    margin: 12px 0 18px;
+    gap: 7px;
+  }
+
+  .quick-filter-label {
+    margin-bottom: 1px;
+  }
+
+  .quick-filter-chip {
+    min-height: 40px;
+    padding-inline: 9px;
+    gap: 6px;
+    border-radius: 14px;
+    font-size: 12px !important;
+    box-shadow: -3px -3px 8px color-mix(in srgb, var(--neo-highlight) 64%, transparent), 4px 5px 10px color-mix(in srgb, var(--neo-shadow-color) 54%, transparent);
+  }
+
+  .quick-filter-chip > .material-symbols-rounded {
+    font-size: 17px !important;
+    line-height: 1;
+  }
+
+  .results-bar:not(.has-active) {
+    min-height: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+  }
+
+  #cardView.student-grid {
+    margin-top: 14px;
+    gap: 10px;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 150px !important;
+    padding: 13px !important;
+    grid-template-columns: minmax(0, 1fr) 30px !important;
+    grid-template-rows: 1fr !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    border-radius: 20px;
+    box-shadow: -5px -5px 13px color-mix(in srgb, var(--neo-highlight) 66%, transparent), 7px 8px 17px color-mix(in srgb, var(--neo-shadow-color) 62%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .student-card-simple-content {
+    min-width: 0;
+    min-height: 0;
+    padding: 0 !important;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    gap: 7px;
+  }
+
+  .student-card-simple .student-card-title-row {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15.5px !important;
+    line-height: 1.22 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .student-card-program-simple {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .student-context-badge {
+    max-width: 100%;
+    min-height: 27px;
+    margin-top: auto;
+    padding-inline: 7px;
+    gap: 4px;
+    justify-self: start;
+    border-radius: 10px;
+    font-size: 11px !important;
+    white-space: nowrap;
+  }
+
+  .student-context-badge > span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .student-context-badge > .material-symbols-rounded {
+    flex: 0 0 auto;
+    font-size: 15px !important;
+    line-height: 1;
+  }
+
+  .student-card-simple .student-card-simple-chevron {
+    width: 30px !important;
+    height: 30px !important;
+    align-self: end;
+    justify-self: end;
+    border-radius: 10px;
+    font-size: 18px !important;
+  }
+
+  /* Compact filter sheet without the opaque rectangular header. */
+  .filter-sheet .sheet-panel {
+    max-height: min(88svh, 760px);
+    padding: 8px 14px calc(12px + env(safe-area-inset-bottom));
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    border-radius: 26px 26px 0 0;
+  }
+
+  .filter-sheet .sheet-handle {
+    margin: 1px auto 10px;
+  }
+
+  .filter-sheet .sheet-head {
+    position: relative !important;
+    top: auto !important;
+    padding: 1px 2px 10px !important;
+    align-items: center;
+    background: transparent !important;
+  }
+
+  .filter-sheet .sheet-head h2 {
+    margin-top: 4px;
+    font-size: 24px;
+  }
+
+  .filter-sheet .sheet-head p {
+    margin-top: 2px;
+    font-size: 12px;
+  }
+
+  .filter-sheet .sheet-close {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    border-radius: 13px;
+    font-size: 20px;
+  }
+
+  .filter-sheet .mobile-filter-content {
+    gap: 8px;
+    padding: 7px 2px 10px;
+  }
+
+  .filter-sheet .mobile-filter-group {
+    border-radius: 16px;
+    box-shadow: -3px -3px 9px color-mix(in srgb, var(--neo-highlight) 60%, transparent), 4px 5px 11px color-mix(in srgb, var(--neo-shadow-color) 52%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .filter-sheet .mobile-filter-summary {
+    min-height: 54px;
+    padding: 0 13px;
+  }
+
+  .filter-sheet .mobile-filter-summary strong {
+    font-size: 13px;
+  }
+
+  .filter-sheet .mobile-filter-summary small,
+  .filter-sheet .mobile-check-count {
+    font-size: 11px;
+  }
+
+  .filter-sheet .mobile-filter-options {
+    gap: 2px;
+    padding: 0 7px 8px;
+  }
+
+  .filter-sheet .mobile-filter-programs[open] .mobile-filter-options {
+    max-height: min(34svh, 330px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .mobile-filter-search {
+    min-height: 40px;
+    margin: 0 8px 7px;
+    padding: 0 10px;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--neo-stroke);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+    box-shadow: var(--neo-inset);
+  }
+
+  .mobile-filter-search > .material-symbols-rounded {
+    color: var(--primary);
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .mobile-filter-search input {
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+  }
+
+  .mobile-filter-search-empty {
+    padding: 4px 14px 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .filter-sheet .mobile-check {
+    min-height: 42px;
+    padding: 0 7px;
+    grid-template-columns: 23px minmax(0, 1fr) auto;
+    gap: 8px;
+    border-radius: 11px;
+  }
+
+  .filter-sheet .mobile-check-box {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+  }
+
+  .filter-sheet .mobile-check-label {
+    font-size: 12px;
+  }
+
+  .filter-sheet .mobile-check-count {
+    min-width: 28px;
+    height: 26px;
+    padding-inline: 7px;
+  }
+
+  .filter-sheet .sheet-actions {
+    gap: 8px;
+    padding-top: 9px;
+    background: transparent;
+  }
+
+  .filter-sheet .sheet-actions button {
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+
+  /* Minimal icon-only floating navigation. */
+  .app-mobile-nav,
+  .app-mobile-nav.groups-mobile-nav,
+  .app-mobile-nav.announcements-mobile-nav {
+    width: min(286px, calc(100% - 28px));
+    min-height: 62px;
+    height: 62px;
+    left: 50%;
+    right: auto !important;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    padding: 5px 6px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    border-radius: 25px;
+    transform: translateX(-50%);
+    box-shadow: 0 18px 42px color-mix(in srgb, var(--neo-shadow-deep) 62%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .app-mobile-nav .mobile-nav-item {
+    width: 48px;
+    min-width: 0;
+    min-height: 50px;
+    height: 50px;
+    padding: 0;
+    justify-self: center;
+    border-radius: 17px;
+  }
+
+  .app-mobile-nav .mobile-nav-item small {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .app-mobile-nav .mobile-nav-item .mobile-nav-icon {
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 22px !important;
+    transition: transform 220ms cubic-bezier(.16, 1, .3, 1), color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  }
+
+  .app-mobile-nav .mobile-nav-item.active {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .app-mobile-nav .mobile-nav-item.active .mobile-nav-icon {
+    color: #fff;
+    transform: translateY(-1px) scale(1.04);
+    box-shadow: 0 9px 19px color-mix(in srgb, var(--primary) 34%, transparent), inset 0 1px 0 rgba(255, 255, 255, .32);
+  }
+
+  .app-mobile-nav .mobile-nav-item > i,
+  .app-mobile-nav .mobile-notice-icon > i {
+    top: -3px;
+    right: -4px;
+    min-width: 17px;
+    height: 17px;
+    font-size: 10px;
+  }
+
+  /* Groups */
+  .groups-search {
+    min-height: 50px;
+    border-radius: 16px;
+  }
+
+  .telegram-group-grid {
+    gap: 12px;
+  }
+
+  .telegram-group-card,
+  .telegram-group-card.telegram-group-pinned {
+    min-height: 0 !important;
+    padding: 16px !important;
+    border-radius: 21px;
+  }
+
+  .telegram-group-top {
+    align-items: center;
+  }
+
+  .telegram-group-avatar,
+  .telegram-group-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .telegram-group-mark {
+    font-size: 22px !important;
+  }
+
+  .telegram-group-body {
+    margin-top: 14px;
+  }
+
+  .telegram-group-body h2,
+  .telegram-group-pinned .telegram-group-body h2 {
+    font-size: 20px;
+  }
+
+  .telegram-group-body p {
+    margin-top: 7px;
+    font-size: 13px !important;
+    line-height: 1.55;
+  }
+
+  .telegram-group-actions {
+    margin-top: 14px;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 8px;
+  }
+
+  .telegram-join-btn,
+  .telegram-share-btn {
+    min-height: 44px;
+    height: 44px;
+    border-radius: 14px;
+    font-size: 13px !important;
+  }
+
+  .telegram-share-btn {
+    width: 44px;
+    padding: 0;
+  }
+
+  .telegram-share-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  /* Announcements */
+  .announcements-discovery {
+    padding: 6px;
+    gap: 6px;
+    border-radius: 18px;
+  }
+
+  .announcements-search-wrap {
+    min-height: 48px;
+    border-radius: 14px;
+  }
+
+  .announcement-filter {
+    min-height: 38px;
+    padding-inline: 10px;
+    border-radius: 12px;
+  }
+
+  .announcement-card-v3,
+  .announcement-card-button {
+    min-height: 242px !important;
+  }
+
+  .announcement-card-button {
+    padding: 15px;
+  }
+
+  .announcement-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    font-size: 20px !important;
+  }
+
+  .announcement-card-date-row {
+    margin-top: 12px;
+  }
+
+  .announcement-card-title {
+    font-size: 19px;
+    line-height: 1.25;
+  }
+
+  .announcement-card-summary {
+    font-size: 13px !important;
+    line-height: 1.52;
+  }
+
+  /* Profile and notice sheets */
+  .profile-toolbar,
+  .announcement-modal-toolbar {
+    min-height: 58px;
+    padding: 7px 10px;
+  }
+
+  .profile-toolbar {
+    grid-template-columns: 40px minmax(70px, 1fr) auto;
+    gap: 6px;
+  }
+
+  .profile-toolbar-actions {
+    gap: 5px;
+  }
+
+  .profile-toolbar-btn,
+  .profile-share,
+  .announcement-modal-icon-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    border-radius: 13px;
+  }
+
+  .profile-toolbar-label,
+  .announcement-modal-toolbar-label {
+    font-size: 10px !important;
+  }
+
+  .profile-detail {
+    min-height: 58px;
+    padding: 8px 10px;
+    gap: 10px;
+    border-radius: 15px;
+  }
+
+  .profile-detail-icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    border-radius: 10px;
+    font-size: 18px !important;
+  }
+
+  .profile-contact-btn {
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+
+  .announcement-modal-hero {
+    padding-inline: 18px;
+  }
+
+  .announcement-modal-hero-top {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+  }
+
+  .announcement-modal-date-tile {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    flex-basis: 56px;
+    border-radius: 15px;
+  }
+
+  .announcement-modal-date-tile strong {
+    font-size: 15px;
+  }
+
+  .announcement-modal-date-tile small {
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 146px !important;
+    padding: 11px !important;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    font-size: 14.5px !important;
+  }
+
+  .student-card-program-simple {
+    font-size: 11.5px !important;
+  }
+}
+
+@keyframes sheet-content-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes card-float-in {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes page-enter-forward {
+  from { opacity: .45; transform: translateX(26px) scale(.992); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes page-enter-back {
+  from { opacity: .45; transform: translateX(-26px) scale(.992); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes page-exit-forward {
+  to { opacity: .35; transform: translateX(-22px) scale(.992); }
+}
+
+@keyframes page-exit-back {
+  to { opacity: .35; transform: translateX(22px) scale(.992); }
+}
+
+@keyframes page-shift-forward {
+  0% { opacity: 1; transform: translateX(0); }
+  45% { opacity: .45; transform: translateX(-15px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes page-shift-back {
+  0% { opacity: 1; transform: translateX(0); }
+  45% { opacity: .45; transform: translateX(15px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes nav-icon-pop {
+  0% { transform: scale(1); }
+  45% { transform: translateY(-2px) scale(1.13); }
+  100% { transform: translateY(-1px) scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-sheet .profile-panel,
+  .announcement-modal .announcement-modal-panel,
+  .motion-card,
+  .motion-card.is-in-view,
+  .page-motion-surface,
+  body[class*="page-enter-"] main,
+  body[class*="page-exit-"] main,
+  body[class*="page-shift-"] main {
+    animation: none !important;
+    transform: none !important;
+    translate: none !important;
+    transition: none !important;
+  }
+
+  .motion-card.motion-pending {
+    opacity: 1;
+  }
+}

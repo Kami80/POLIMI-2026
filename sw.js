@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-neo-glass-v7";
+const CACHE_NAME = "polimi-students-compact-motion-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,8 +11,10 @@ const APP_SHELL = [
   "./styles.css",
   "./ui-polish.css",
   "./neo-glass.css",
+  "./compact-motion.css",
   "./app.js",
   "./ux-enhancements.js",
+  "./navigation-motion.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

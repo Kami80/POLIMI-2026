@@ -544,7 +544,13 @@ function bindAnnouncementControls() {
   document.getElementById("announcementGrid")?.addEventListener("click", event => {
     const button = event.target.closest(".announcement-card-button");
     const card = button?.closest("[data-announcement-id]");
-    if (card) openAnnouncement(card.dataset.announcementId);
+    if (!card || card.classList.contains("is-opening")) return;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    card.classList.add("is-opening");
+    window.setTimeout(() => {
+      openAnnouncement(card.dataset.announcementId);
+      card.classList.remove("is-opening");
+    }, reducedMotion ? 0 : 105);
   });
 
   const modal = document.getElementById("announcementModal");

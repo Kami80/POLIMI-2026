@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="styles.css?v=20260812-ui-share-v2" />
   <link rel="stylesheet" href="ui-polish.css?v=20260812-mobile-v7" />
   <link rel="stylesheet" href="neo-glass.css?v=20260812-v6" />
+  <link rel="stylesheet" href="compact-motion.css?v=20260812-v2" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -210,7 +211,7 @@
         <div class="roommate-match-banner-icon material-symbols-rounded" aria-hidden="true">bed</div>
         <div class="roommate-match-banner-copy">
           <strong id="roommateMatchTitle">Your roommate matches</strong>
-          <span id="roommateMatchText">Students looking for roommates are ranked by campus and program fit.</span>
+          <span id="roommateMatchText">Same-gender students appear first, then same-program and same-campus matches.</span>
         </div>
         <button id="roommateMatchReset" type="button">Show everyone</button>
       </div>
@@ -307,11 +308,11 @@
   </aside>
 
   <nav class="mobile-nav app-mobile-nav" aria-label="Mobile navigation">
-    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">groups</span><small>Students</small></button>
-    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">favorite</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
-    <a href="announcements.html" class="mobile-nav-item mobile-notices-link"><span class="mobile-nav-icon material-symbols-rounded mobile-notice-icon" aria-hidden="true">notifications<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></a>
-    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">forum</span><small>Groups</small></a>
-    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">person</span><small>Me</small></button>
+    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button" aria-label="Students"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">groups</span><small>Students</small></button>
+    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-label="Saved students" aria-pressed="false"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">favorite</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
+    <a href="announcements.html" class="mobile-nav-item mobile-notices-link" aria-label="Notices"><span class="mobile-nav-icon material-symbols-rounded mobile-notice-icon" aria-hidden="true">notifications<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></a>
+    <a href="groups.html" class="mobile-nav-item mobile-groups-link" aria-label="Telegram groups"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">forum</span><small>Groups</small></a>
+    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button" aria-label="My profile"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">person</span><small>Me</small></button>
   </nav>
 
 
@@ -335,8 +336,9 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="announcements.js?v=20260812-neo-v2"></script>
-  <script src="app.js?v=20260812-mobile-v7"></script>
+  <script src="announcements.js?v=20260812-compact-v1"></script>
+  <script src="app.js?v=20260812-compact-v3"></script>
   <script src="ux-enhancements.js?v=20260812-mobile-v7"></script>
+  <script src="navigation-motion.js?v=20260812-v2"></script>
 </body>
 </html>

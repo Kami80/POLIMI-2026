@@ -1033,6 +1033,17 @@ function valuesOverlap(a, b) {
   return aa.some(x => bb.some(y => x === y || (x.length > 4 && y.includes(x)) || (y.length > 4 && x.includes(y))));
 }
 
+function selectedValuesOverlap(a, b) {
+  const choices = value => String(value || "")
+    .split(/[,;/|]+/)
+    .map(normalize)
+    .filter(Boolean);
+  const aa = choices(a);
+  const bb = choices(b);
+  if (!aa.length || !bb.length) return false;
+  return aa.some(value => bb.includes(value));
+}
+
 function calculateRoommateMatch(referenceRow, candidateRow) {
   const roommateCol = semanticColumn("roommate");
   const campusCol = semanticColumn("campus");
@@ -1047,16 +1058,14 @@ function calculateRoommateMatch(referenceRow, candidateRow) {
   const reasons = [];
   if (intent.score >= 42) reasons.push(intent.score >= 55 ? "Wants a roommate" : "Open to a roommate");
 
-  const sameCampus = valuesOverlap(displayValue(referenceRow, campusCol), displayValue(candidateRow, campusCol));
-  const sameProgram = valuesOverlap(displayValue(referenceRow, programCol), displayValue(candidateRow, programCol));
-  const sameGender = valuesOverlap(displayValue(referenceRow, genderCol), displayValue(candidateRow, genderCol));
-  const sameDegree = valuesOverlap(displayValue(referenceRow, degreeCol), displayValue(candidateRow, degreeCol));
+  const sameCampus = selectedValuesOverlap(displayValue(referenceRow, campusCol), displayValue(candidateRow, campusCol));
+  const sameProgram = selectedValuesOverlap(displayValue(referenceRow, programCol), displayValue(candidateRow, programCol));
+  const sameGender = selectedValuesOverlap(displayValue(referenceRow, genderCol), displayValue(candidateRow, genderCol));
+  const sameDegree = selectedValuesOverlap(displayValue(referenceRow, degreeCol), displayValue(candidateRow, degreeCol));
 
-  if (sameCampus) { score += 30; reasons.push("Same campus"); }
-  if (sameProgram) { score += 25; reasons.push("Same program"); }
-  // Gender is intentionally only a light tie-breaker because the form currently
-  // stores gender, not an explicit roommate-gender preference.
-  if (sameGender) { score += 8; reasons.push("Same gender"); }
+  if (sameGender) { score += 12; reasons.push("Same gender"); }
+  if (sameProgram) { score += 30; reasons.push("Same program"); }
+  if (sameCampus) { score += 25; reasons.push("Same campus"); }
   if (sameDegree) { score += 5; reasons.push("Same degree level"); }
 
   return { eligible: true, score, reasons, sameCampus, sameProgram, sameGender, sameDegree };
@@ -1065,8 +1074,8 @@ function calculateRoommateMatch(referenceRow, candidateRow) {
 function roommateMatchTier(meta) {
   if (!meta) return "Potential match";
   if (meta.sameCampus && meta.sameProgram) return "Strong match";
-  if (meta.sameCampus) return "Same campus";
   if (meta.sameProgram) return "Same program";
+  if (meta.sameCampus) return "Same campus";
   if (meta.score >= 55) return "Looking for roommate";
   return "Potential match";
 }
@@ -1127,7 +1136,7 @@ function updateRoommateMatchUI() {
     const program = displayValue(state.roommateReferenceRow, semanticColumn("program"));
     if (els.roommateMatchTitle) els.roommateMatchTitle.textContent = `Potential roommates for ${name}`;
     const details = [campus && `campus: ${campus}`, program && `program: ${program}`].filter(Boolean).join(" · ");
-    if (els.roommateMatchText) els.roommateMatchText.textContent = `People open to a roommate are prioritized${details ? `, with stronger matches for ${details}` : ""}. Match labels stay descriptive rather than pretending to be exact percentages.`;
+    if (els.roommateMatchText) els.roommateMatchText.textContent = `Same-gender students are shown first, followed by same-program and same-campus matches${details ? ` for ${details}` : ""}.`;
   }
 }
 
@@ -1219,7 +1228,9 @@ function renderMobileFilters() {
     const title = document.createElement("strong");
     title.textContent = definition.label;
     const meta = document.createElement("small");
-    meta.textContent = selected.size ? `${selected.size} selected` : "All";
+    meta.textContent = selected.size
+      ? `${selected.size} selected`
+      : definition.key === "program" ? `All ${values.length} programs` : "All";
     summaryCopy.append(title, meta);
     const chevron = document.createElement("span");
     chevron.className = "mobile-filter-chevron material-symbols-rounded";
@@ -1238,7 +1249,9 @@ function renderMobileFilters() {
       input.addEventListener("change", () => {
         toggleDraftFilterValue(column.index, value, input.checked);
         const now = state.draftFilters[column.index] || new Set();
-        meta.textContent = now.size ? `${now.size} selected` : "All";
+        meta.textContent = now.size
+          ? `${now.size} selected`
+          : definition.key === "program" ? `All ${values.length} programs` : "All";
       });
       const box = document.createElement("span");
       box.className = "mobile-check-box";
@@ -1252,7 +1265,34 @@ function renderMobileFilters() {
       options.appendChild(label);
     });
 
-    group.append(summary, options);
+    if (definition.key === "program") {
+      group.classList.add("mobile-filter-programs");
+      const finder = document.createElement("label");
+      finder.className = "mobile-filter-search";
+      finder.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">search</span>';
+      const finderInput = document.createElement("input");
+      finderInput.type = "search";
+      finderInput.placeholder = `Search ${values.length} programs`;
+      finderInput.setAttribute("aria-label", "Search program filters");
+      const emptyMessage = document.createElement("span");
+      emptyMessage.className = "mobile-filter-search-empty";
+      emptyMessage.textContent = "No program matches that search.";
+      emptyMessage.hidden = true;
+      finderInput.addEventListener("input", () => {
+        const query = normalize(finderInput.value);
+        let visible = 0;
+        options.querySelectorAll(".mobile-check").forEach(option => {
+          const matches = !query || normalize(option.querySelector(".mobile-check-label")?.textContent).includes(query);
+          option.hidden = !matches;
+          if (matches) visible += 1;
+        });
+        emptyMessage.hidden = visible !== 0;
+      });
+      finder.appendChild(finderInput);
+      group.append(summary, finder, options, emptyMessage);
+    } else {
+      group.append(summary, options);
+    }
     els.mobileFilters.appendChild(group);
   });
 }
@@ -1363,7 +1403,14 @@ function applyDataPipeline() {
       state.roommateMatchMeta.set(row, meta);
       ranked.push({ row, meta });
     });
-    ranked.sort((a, b) => b.meta.score - a.meta.score || String(displayValue(a.row, semanticColumn("name"))).localeCompare(String(displayValue(b.row, semanticColumn("name")))));
+    const roommatePriority = item => (
+      (item.meta.sameGender ? 1_000_000 : 0)
+      + (item.meta.sameProgram ? 10_000 : 0)
+      + (item.meta.sameCampus ? 100 : 0)
+      + item.meta.score
+    );
+    ranked.sort((a, b) => roommatePriority(b) - roommatePriority(a)
+      || String(displayValue(a.row, semanticColumn("name"))).localeCompare(String(displayValue(b.row, semanticColumn("name")))));
     rows = ranked.map(item => item.row);
   } else if (state.sort.index !== null) {
     const index = state.sort.index;
@@ -1487,7 +1534,15 @@ function renderCards(rows, start) {
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
     card.dataset.studentSlug = slug;
 
-    const open = () => openStudentProfile(row);
+    const open = () => {
+      if (card.classList.contains("is-opening")) return;
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      card.classList.add("is-opening");
+      window.setTimeout(() => {
+        openStudentProfile(row);
+        card.classList.remove("is-opening");
+      }, reducedMotion ? 0 : 105);
+    };
     card.addEventListener("click", open);
     card.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
@@ -1966,13 +2021,21 @@ function quickFilterSpec() {
   if (roommateCol) {
     const values = [...new Set(state.rows.map(row => displayValue(row, roommateCol)).filter(Boolean))]
       .filter(value => roommateIntent(value).score >= 42);
-    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "bed", title: "Students open to finding a roommate" });
+    if (values.length) specs.push({
+      label: "Roommates",
+      column: roommateCol,
+      values,
+      mode: "roommate",
+      icon: "bed",
+      title: "Rank roommate matches by gender, program, then campus"
+    });
   }
 
   return specs;
 }
 
 function quickFilterActive(spec) {
+  if (spec.mode === "roommate") return state.roommateMatchMode;
   const selected = state.filters[spec.column.index] || new Set();
   return selected.size === spec.values.length && spec.values.every(value => selected.has(value));
 }
@@ -1991,6 +2054,12 @@ function renderQuickFilters() {
     button.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
     if (spec.title) button.title = spec.title;
     button.addEventListener("click", () => {
+      if (spec.mode === "roommate") {
+        delete state.filters[spec.column.index];
+        toggleRoommateMatchMode();
+        renderQuickFilters();
+        return;
+      }
       if (quickFilterActive(spec)) delete state.filters[spec.column.index];
       else state.filters[spec.column.index] = new Set(spec.values);
       state.page = 1;
