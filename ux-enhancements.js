@@ -180,7 +180,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = `active-chip active-chip-removable ${className}`.trim();
-      button.innerHTML = `<span>${escapeHtml(label)}</span><b class="material-symbols-rounded" aria-hidden="true">close</b>`;
+      button.innerHTML = `<span>${escapeHtml(label)}</span><b aria-hidden="true">×</b>`;
       button.setAttribute("aria-label", `Remove filter ${label}`);
       button.addEventListener("click", onRemove);
       els.activeFilterChips.appendChild(button);
@@ -218,7 +218,6 @@
     const hasAny = activeFilterCount() > 0 || Boolean(state.query) || state.roommateMatchMode || state.savedOnly;
     els.clearFilters.hidden = !hasAny;
     if (!els.clearFilters.hidden) els.clearFilters.textContent = "Clear all";
-    els.resultsBar?.classList.toggle("has-active", hasAny);
     updateFilterBadges();
   };
 
@@ -372,6 +371,19 @@
 
   renderCards = function(rows, start) {
     baseRenderCards(rows, start);
+    rows.forEach(row => {
+      if (isCreatorRow(row) || !isRecentlyUpdated(row)) return;
+      const card = els.cardView?.querySelector(`[data-student-slug="${CSS.escape(studentSlug(row))}"]`);
+      const titleRow = card?.querySelector(".student-card-title-row");
+      if (!titleRow) return;
+      titleRow.querySelector(".card-new-badge")?.remove();
+      if (!titleRow.querySelector(".card-updated-badge")) {
+        const badge = document.createElement("span");
+        badge.className = "card-updated-badge";
+        badge.textContent = "Updated";
+        titleRow.appendChild(badge);
+      }
+    });
   };
 
   /* ---------- Telegram recommendation ---------- */
@@ -386,7 +398,7 @@
     a.className = `telegram-recommendation-card${pinned ? " pinned" : ""}`;
     a.href = group.url;
     a.rel = "external noopener noreferrer";
-    a.innerHTML = `<span class="telegram-recommendation-icon material-symbols-rounded" aria-hidden="true">send</span><span><small>${escapeHtml(label)}</small><strong>${escapeHtml(group.program)}</strong></span><b class="material-symbols-rounded" aria-hidden="true">arrow_forward</b>`;
+    a.innerHTML = `<span class="telegram-recommendation-icon" aria-hidden="true">✈</span><span><small>${escapeHtml(label)}</small><strong>${escapeHtml(group.program)}</strong></span><b aria-hidden="true">→</b>`;
     a.addEventListener("click", event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
@@ -405,7 +417,7 @@
     host.innerHTML = "";
     const heading = document.createElement("div");
     heading.className = "telegram-recommendation-heading";
-    heading.innerHTML = `<span>YOUR TELEGRAM GROUPS</span><a href="groups.html">See all groups <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>`;
+    heading.innerHTML = `<span>YOUR TELEGRAM GROUPS</span><a href="groups.html">See all groups →</a>`;
     const cards = document.createElement("div");
     cards.className = "telegram-recommendation-cards";
     if (programGroup) cards.appendChild(telegramLinkCard(programGroup, "Your program group"));
@@ -463,7 +475,7 @@
       const button = document.createElement("button");
       button.type = "button"; button.className = "search-suggestion"; button.dataset.suggestionIndex = String(index);
       button.setAttribute("role", "option");
-      button.innerHTML = `<span><small>${escapeHtml(item.type)}</small><strong>${escapeHtml(item.value)}</strong></span><b class="material-symbols-rounded" aria-hidden="true">keyboard_return</b>`;
+      button.innerHTML = `<span><small>${escapeHtml(item.type)}</small><strong>${escapeHtml(item.value)}</strong></span><b aria-hidden="true">↵</b>`;
       button.addEventListener("mousedown", event => event.preventDefault());
       button.addEventListener("click", () => applySuggestion(item));
       box.appendChild(button);
