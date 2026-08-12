@@ -89,7 +89,7 @@
         return;
       }
 
-      if (!reducedMotion && to !== from) {
+      if (!reducedMotion && to !== from && !window.PolimiAppNavigation) {
         window.setTimeout(() => setBodyMotion("page-shift", direction, 340), 0);
       }
     }, true);
@@ -97,9 +97,8 @@
 
   function bindSwipeNavigation() {
     if (!nav || reducedMotion) return;
-    const surface = document.querySelector("main");
-    if (!surface) return;
-    surface.classList.add("page-motion-surface");
+    const activeSurface = () => document.querySelector("[data-app-view-panel]:not([hidden])") || document.querySelector("main");
+    document.querySelectorAll("[data-app-view-panel], main").forEach(surface => surface.classList.add("page-motion-surface"));
     const items = [...nav.querySelectorAll(".mobile-nav-item")];
     let gesture = null;
     let suppressClickUntil = 0;
@@ -111,7 +110,9 @@
     document.addEventListener("touchstart", event => {
       if (!compactViewport() || event.touches.length !== 1 || blockedTarget(event.target)) return;
       const touch = event.touches[0];
-      gesture = { x: touch.clientX, y: touch.clientY, dx: 0, horizontal: false, from: activeIndex(items) };
+      const surface = activeSurface();
+      if (!surface) return;
+      gesture = { x: touch.clientX, y: touch.clientY, dx: 0, horizontal: false, from: activeIndex(items), surface };
       surface.style.transition = "none";
     }, { passive: true });
 
@@ -125,7 +126,7 @@
       event.preventDefault();
       gesture.dx = dx;
       const eased = Math.max(-38, Math.min(38, dx * .34));
-      surface.style.setProperty("--page-swipe-x", `${eased}px`);
+      gesture.surface.style.setProperty("--page-swipe-x", `${eased}px`);
     }, { passive: false });
 
     document.addEventListener("touchend", () => {
@@ -133,8 +134,8 @@
       const completed = gesture.horizontal && Math.abs(gesture.dx) >= 68;
       const direction = gesture.dx < 0 ? "forward" : "back";
       const targetIndex = gesture.from + (direction === "forward" ? 1 : -1);
-      surface.style.transition = "";
-      surface.style.setProperty("--page-swipe-x", "0px");
+      gesture.surface.style.transition = "";
+      gesture.surface.style.setProperty("--page-swipe-x", "0px");
 
       if (completed && targetIndex >= 0 && targetIndex < items.length) {
         suppressClickUntil = Date.now() + 420;
@@ -143,7 +144,7 @@
         if (target.matches("a[href]")) {
           navigateAnchor(target, direction);
         } else {
-          setBodyMotion("page-shift", direction, 340);
+          if (!window.PolimiAppNavigation) setBodyMotion("page-shift", direction, 340);
           target.click();
         }
       }
@@ -152,8 +153,11 @@
 
     document.addEventListener("touchcancel", () => {
       gesture = null;
-      surface.style.transition = "";
-      surface.style.setProperty("--page-swipe-x", "0px");
+      const surface = gesture?.surface;
+      if (surface) {
+        surface.style.transition = "";
+        surface.style.setProperty("--page-swipe-x", "0px");
+      }
     }, { passive: true });
 
     document.addEventListener("click", event => {

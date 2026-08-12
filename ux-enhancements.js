@@ -405,10 +405,10 @@
     host.innerHTML = "";
     const heading = document.createElement("div");
     heading.className = "telegram-recommendation-heading";
-    heading.innerHTML = `<span>YOUR TELEGRAM GROUPS</span><a href="groups.html">See all groups <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>`;
+    heading.innerHTML = `<span>YOUR COMMUNITIES</span><a href="groups.html">See all communities <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>`;
     const cards = document.createElement("div");
     cards.className = "telegram-recommendation-cards";
-    if (programGroup) cards.appendChild(telegramLinkCard(programGroup, "Your program group"));
+    if (programGroup) cards.appendChild(telegramLinkCard(programGroup, "Your program community"));
     cards.appendChild(telegramLinkCard(FREE_FORUM, "Main community", true));
     host.append(heading, cards);
     host.hidden = false;

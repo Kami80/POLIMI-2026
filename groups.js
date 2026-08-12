@@ -1,31 +1,45 @@
 /*
-  Add future Telegram groups here.
+  Add future Telegram communities here.
   Example:
   { program: "Mechanical Engineering", url: "https://t.me/example" }
 */
+(() => {
 const TELEGRAM_GROUPS = [
   {
     program: "Polimi Free Forum",
     url: "https://t.me/+hVdotxBWIWUwMDU0",
     pinned: true,
     audience: "Everyone",
+    image: "community-photos/persian-polimi-community-floating.webp",
     description: "The main community group for all Polimi students — meet people across programs, ask general questions, and stay connected."
   },
   {
+    program: "Esfahan to Italy",
+    url: "https://t.me/+UNwP4GGpBQ1iZGY0",
+    audience: "Students from Esfahan and Iran",
+    category: "REGIONAL COMMUNITY",
+    image: "community-photos/esfahan-to-italy-floating.webp",
+    description: "Connect with students and newcomers from Esfahan who are studying in or moving to Italy."
+  },
+  {
     program: "Biomedical Engineering",
-    url: "https://t.me/+AFwhBgOX24M5Mjg8"
+    url: "https://t.me/+AFwhBgOX24M5Mjg8",
+    image: "community-photos/biomedical-engineering-floating.webp"
   },
   {
     program: "Electrical Engineering",
-    url: "https://t.me/ElecEngPolimi"
+    url: "https://t.me/ElecEngPolimi",
+    image: "community-photos/electrical-engineering-floating.webp"
   },
   {
     program: "Chemical Engineering",
-    url: "https://t.me/+E-ZbMJk_9FthYTY0"
+    url: "https://t.me/+E-ZbMJk_9FthYTY0",
+    image: "community-photos/chemical-engineering-floating.webp"
   },
   {
     program: "HPC and CS",
-    url: "https://t.me/+zavdWJEF7RZiMDM0"
+    url: "https://t.me/+zavdWJEF7RZiMDM0",
+    image: "community-photos/hpc-computer-science-floating.webp"
   }
 ];
 function openTelegramLink(href) {
@@ -63,6 +77,7 @@ function groupSlug(value) {
 function groupShareUrl(item) {
   const url = new URL(window.location.href);
   url.search = "";
+  if (document.getElementById("groupsAppView")) url.searchParams.set("view", "groups");
   url.searchParams.set("group", groupSlug(item.program));
   url.hash = "";
   return url.toString();
@@ -95,7 +110,7 @@ async function shareGroup(item, button) {
   const url = groupShareUrl(item);
   const data = {
     title: `${item.program} · Polimi Students`,
-    text: `Join the ${item.program} Telegram group for Polimi students.`,
+    text: `Join the ${item.program} community on Telegram.`,
     url
   };
   if (navigator.share) {
@@ -125,9 +140,10 @@ function initials(program) {
 }
 
 function renderGroups() {
-  const q = normalize(search.value);
+  if (!grid) return;
+  const q = normalize(search?.value || "");
   const groups = TELEGRAM_GROUPS
-    .filter(item => !q || normalize(`${item.program} ${item.audience || ""} ${item.description || ""}`).includes(q))
+    .filter(item => !q || normalize(`${item.program} ${item.audience || ""} ${item.category || ""} ${item.description || ""}`).includes(q))
     .sort((a, b) => {
       if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
       return a.program.localeCompare(b.program);
@@ -140,6 +156,26 @@ function renderGroups() {
     const card = document.createElement("article");
     card.className = `telegram-group-card telegram-group-accent-${index % 5}${item.pinned ? " telegram-group-pinned" : ""}`;
 
+    if (item.image) {
+      card.classList.add("has-community-photo");
+      const media = document.createElement("div");
+      media.className = "telegram-group-photo";
+      media.setAttribute("aria-hidden", "true");
+
+      const photo = document.createElement("img");
+      photo.src = item.image;
+      photo.alt = "";
+      photo.decoding = "async";
+      photo.loading = item.pinned ? "eager" : "lazy";
+      if (item.pinned) photo.fetchPriority = "high";
+      photo.addEventListener("error", () => {
+        media.remove();
+        card.classList.remove("has-community-photo");
+      }, { once: true });
+      media.appendChild(photo);
+      card.appendChild(media);
+    }
+
     const top = document.createElement("div");
     top.className = "telegram-group-top";
 
@@ -149,8 +185,9 @@ function renderGroups() {
     avatar.setAttribute("aria-hidden", "true");
 
     const telegramMark = document.createElement("span");
-    telegramMark.className = "telegram-group-mark material-symbols-rounded";
-    telegramMark.textContent = "send";
+    telegramMark.className = "telegram-group-mark telegram-icon-svg";
+    telegramMark.setAttribute("aria-hidden", "true");
+    telegramMark.innerHTML = '<svg viewBox="0 0 24 24" focusable="false" fill="currentColor"><path d="M21.2 3.12 3.93 9.78c-.78.3-.77 1.4.02 1.68l4.36 1.52 1.7 5.48c.25.8 1.3.96 1.78.27l2.42-3.5 4.77 3.5c.6.44 1.46.1 1.6-.63L22.4 4.2c.15-.79-.45-1.36-1.2-1.08ZM9.26 12.1l8.45-5.42-6.72 7.24-.6 2.63-1.13-4.45Z"/></svg>';
 
     top.append(avatar, telegramMark);
 
@@ -160,7 +197,7 @@ function renderGroups() {
     const label = document.createElement("span");
     label.className = "telegram-group-label";
     if (item.pinned) label.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">push_pin</span> PINNED · MAIN COMMUNITY';
-    else label.textContent = "PROGRAM GROUP";
+    else label.textContent = item.category || "PROGRAM COMMUNITY";
 
     const title = document.createElement("h2");
     title.textContent = item.program;
@@ -182,14 +219,14 @@ function renderGroups() {
       event.preventDefault();
       openTelegramLink(item.url);
     });
-    button.innerHTML = '<span>Open Telegram group</span><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>';
-    button.setAttribute("aria-label", `Open ${item.program} Telegram group`);
+    button.innerHTML = '<span>Open in Telegram</span><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>';
+    button.setAttribute("aria-label", `Open ${item.program} community in Telegram`);
 
     const share = document.createElement("button");
     share.type = "button";
     share.className = "telegram-share-btn";
     share.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">share</span><span class="telegram-share-label">Share</span>';
-    share.setAttribute("aria-label", `Share ${item.program} group`);
+    share.setAttribute("aria-label", `Share ${item.program} community`);
     share.addEventListener("click", () => shareGroup(item, share));
 
     actions.append(button, share);
@@ -211,15 +248,15 @@ function renderGroups() {
     }
   }
 
-  count.textContent = `${groups.length} ${groups.length === 1 ? "group" : "groups"}`;
-  empty.hidden = groups.length !== 0;
+  if (count) count.textContent = `${groups.length} ${groups.length === 1 ? "community" : "communities"}`;
+  if (empty) empty.hidden = groups.length !== 0;
   grid.hidden = groups.length === 0;
-  clear.hidden = !search.value;
+  if (clear) clear.hidden = !search?.value;
 }
 
 function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
+  if (themeIcon) themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
   localStorage.setItem("polimi-theme", theme);
 }
 
@@ -227,15 +264,17 @@ const savedTheme = localStorage.getItem("polimi-theme") || localStorage.getItem(
 const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 setTheme(savedTheme || (prefersDark ? "dark" : "light"));
 
-themeToggle.addEventListener("click", () => {
+themeToggle?.addEventListener("click", () => {
   setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
 });
 
-search.addEventListener("input", renderGroups);
-clear.addEventListener("click", () => {
+search?.addEventListener("input", renderGroups);
+clear?.addEventListener("click", () => {
   search.value = "";
   renderGroups();
   search.focus();
 });
 
+window.PolimiGroups = { render: renderGroups };
 renderGroups();
+})();

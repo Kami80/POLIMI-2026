@@ -6,8 +6,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eaf0f8",
-  "theme_color": "#1769e8",
+  "background_color": "#F2ECE2",
+  "theme_color": "#B84A32",
   "orientation": "any",
   "icons": [
     {
@@ -33,7 +33,7 @@
     {
       "name": "Announcements",
       "short_name": "Notices",
-      "url": "announcements.html",
+      "url": "index.html?view=notices",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -42,9 +42,9 @@
       ]
     },
     {
-      "name": "Telegram Groups",
-      "short_name": "Groups",
-      "url": "groups.html",
+      "name": "Communities",
+      "short_name": "Community",
+      "url": "index.html?view=groups",
       "icons": [
         {
           "src": "icons/icon-192.png",

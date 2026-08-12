@@ -1,9 +1,16 @@
-const CACHE_NAME = "polimi-students-compact-motion-v2";
+const CACHE_NAME = "polimi-students-warm-milan-v13";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./groups.html",
   "./groups.js",
+  "./community-photos/persian-polimi-community-floating.webp",
+  "./community-photos/esfahan-to-italy-floating.webp",
+  "./community-photos/biomedical-engineering-floating.webp",
+  "./community-photos/electrical-engineering-floating.webp",
+  "./community-photos/chemical-engineering-floating.webp",
+  "./community-photos/hpc-computer-science-floating.webp",
+  "./community-photos/persian-polimi-community.png",
   "./announcements.html",
   "./announcements.js",
   "./announcements-ux.js",
@@ -12,6 +19,7 @@ const APP_SHELL = [
   "./ui-polish.css",
   "./neo-glass.css",
   "./compact-motion.css",
+  "./warm-milan.css",
   "./app.js",
   "./ux-enhancements.js",
   "./navigation-motion.js",

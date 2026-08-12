@@ -503,7 +503,12 @@ function showAnnouncementShareFeedback(id, copied) {
 async function shareAnnouncement(id) {
   const item = POLIMI_ANNOUNCEMENTS.find(x => x.id === id);
   if (!item) return;
-  const url = `${location.origin}${location.pathname}#${encodeURIComponent(id)}`;
+  const shareUrl = new URL(location.href);
+  shareUrl.searchParams.delete("student");
+  shareUrl.searchParams.delete("qa");
+  if (document.getElementById("noticesAppView")) shareUrl.searchParams.set("view", "notices");
+  shareUrl.hash = encodeURIComponent(id);
+  const url = shareUrl.toString();
   const data = { title: item.title, text: item.summary, url };
   const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches;
 

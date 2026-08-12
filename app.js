@@ -1,5 +1,5 @@
 const CONFIG = {
-  sheetId: "1-OQdEoogFykiQuKBvreFRFFujNtr7kuQBTma6aINgOE",
+  sheetId: "1_ap0ixPjvndp31qc-039_4o7451dpCfsELfnYh1SKQY",
   sheetGid: "0",
   rowsPerPage: 24,
   defaultView: "cards",
@@ -59,6 +59,7 @@ const state = {
   cachedDataLoaded: false,
   deferredInstallPrompt: null,
   isOfflineCache: false,
+  appView: "students",
 };
 
 const els = {};
@@ -75,10 +76,128 @@ function cacheElements() {
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
     "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
-    "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileMyProfileButton",
+    "studentAppView", "noticesAppView", "groupsAppView", "topNoticesButton", "topGroupsButton",
+    "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileNoticesButton", "mobileGroupsButton", "mobileMyProfileButton",
     "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast"
   ].forEach(id => els[id] = document.getElementById(id));
 }
+
+const APP_VIEW_NAMES = new Set(["students", "saved", "notices", "groups", "me"]);
+const APP_VIEW_ORDER = ["students", "saved", "notices", "groups", "me"];
+let appViewAnimationTimer = 0;
+
+function appViewFromUrl() {
+  const requested = new URL(window.location.href).searchParams.get("view") || "students";
+  return APP_VIEW_NAMES.has(requested) ? requested : "students";
+}
+
+function appPanelForView(view) {
+  if (view === "notices" || view === "groups") return view;
+  return "students";
+}
+
+function appViewUrl(view) {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("student");
+  if (view === "students") url.searchParams.delete("view");
+  else url.searchParams.set("view", view);
+  url.hash = "";
+  return url;
+}
+
+function syncAppViewUrl(view, mode = "push") {
+  if (mode === "none") return;
+  const url = appViewUrl(view);
+  if (url.toString() === window.location.href) return;
+  const method = mode === "replace" ? "replaceState" : "pushState";
+  history[method]({ view }, "", url.toString());
+}
+
+function updateAppNavigationState() {
+  const activeRow = state.activeProfileSlug ? state.profileBySlug.get(state.activeProfileSlug) : null;
+  const activeView = activeRow && activeRow === currentUserRow() ? "me" : state.appView;
+  document.querySelectorAll("[data-app-view]").forEach(control => {
+    const active = control.dataset.appView === activeView;
+    control.classList.toggle("active", active);
+    if (active) control.setAttribute("aria-current", "page");
+    else control.removeAttribute("aria-current");
+  });
+}
+
+function showAppView(requestedView, options = {}) {
+  if (!state.authorized) return;
+  const view = APP_VIEW_NAMES.has(requestedView) ? requestedView : "students";
+  const {
+    historyMode = "push",
+    animate = true,
+    scroll = true,
+  } = options;
+  const previousView = state.appView;
+  const direction = APP_VIEW_ORDER.indexOf(view) < APP_VIEW_ORDER.indexOf(previousView) ? "back" : "forward";
+
+  const commit = () => {
+    state.appView = view;
+    const activePanel = appPanelForView(view);
+    [els.studentAppView, els.noticesAppView, els.groupsAppView].filter(Boolean).forEach(panel => {
+      panel.hidden = panel.dataset.appViewPanel !== activePanel;
+    });
+    document.body.dataset.appView = view;
+
+    let directoryChanged = false;
+    if (view === "saved") {
+      directoryChanged = !state.savedOnly || state.roommateMatchMode;
+      state.savedOnly = true;
+      state.roommateMatchMode = false;
+      state.roommateReferenceRow = null;
+      state.roommateMatchMeta = new WeakMap();
+    } else if (view === "students" || view === "me") {
+      directoryChanged = state.savedOnly || (view === "students" && state.roommateMatchMode);
+      state.savedOnly = false;
+      if (view === "students") {
+        state.roommateMatchMode = false;
+        state.roommateReferenceRow = null;
+        state.roommateMatchMeta = new WeakMap();
+      }
+    }
+
+    if (view !== "me" && els.profileSheet?.classList.contains("open")) {
+      closeStudentProfile({ syncUrl: false });
+    }
+    if (view === "notices" || view === "groups") closeFilterSheet();
+
+    updateSavedUI();
+    updateRoommateMatchUI();
+    if (directoryChanged && state.sheetReady) applyDataPipeline();
+    updateAppNavigationState();
+
+    if (view === "groups") window.PolimiGroups?.render?.();
+    if (view === "notices" && typeof window.renderAnnouncements === "function") window.renderAnnouncements();
+  };
+
+  let transition = null;
+  if (animate && typeof document.startViewTransition === "function") transition = document.startViewTransition(commit);
+  else {
+    commit();
+    if (animate) {
+      const activePanel = [els.studentAppView, els.noticesAppView, els.groupsAppView].find(panel => panel && !panel.hidden);
+      if (activePanel) {
+        const className = `app-view-fallback-${direction}`;
+        activePanel.classList.remove("app-view-fallback-forward", "app-view-fallback-back");
+        void activePanel.offsetWidth;
+        activePanel.classList.add(className);
+        window.clearTimeout(appViewAnimationTimer);
+        appViewAnimationTimer = window.setTimeout(() => activePanel.classList.remove(className), 460);
+      }
+    }
+  }
+  transition?.finished?.catch?.(() => {});
+
+  syncAppViewUrl(view, historyMode);
+  if (view === "me") requestAnimationFrame(() => openMyProfile({ syncUrl: false }));
+  if (scroll) requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+}
+
+window.PolimiAppNavigation = { go: showAppView };
 
 function normalize(value) {
   return String(value ?? "")
@@ -236,23 +355,11 @@ function setupEvents() {
     if (!els.profileMenu?.hidden && !event.target.closest(".profile-menu-wrap")) closeProfileMenu();
   });
 
-  els.myProfileButton?.addEventListener("click", openMyProfile);
-  els.mobileMyProfileButton?.addEventListener("click", openMyProfile);
-  els.savedTrigger?.addEventListener("click", toggleSavedMode);
-  els.mobileSavedButton?.addEventListener("click", toggleSavedMode);
-  els.savedReset?.addEventListener("click", exitSavedMode);
-  els.mobileStudentsButton?.addEventListener("click", () => {
-    const changed = state.savedOnly || state.roommateMatchMode;
-    state.savedOnly = false;
-    state.roommateMatchMode = false;
-    state.roommateReferenceRow = null;
-    state.roommateMatchMeta = new WeakMap();
-    state.page = 1;
-    updateSavedUI();
-    updateRoommateMatchUI();
-    if (changed) applyDataPipeline();
-    document.getElementById("directory")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.querySelectorAll("[data-app-view]").forEach(control => {
+    control.addEventListener("click", () => showAppView(control.dataset.appView));
   });
+  els.savedTrigger?.addEventListener("click", toggleSavedMode);
+  els.savedReset?.addEventListener("click", exitSavedMode);
 
   els.sortSelect?.addEventListener("change", event => {
     state.sortMode = event.target.value || "recent";
@@ -268,9 +375,12 @@ function setupEvents() {
 
   window.addEventListener("popstate", () => {
     if (!state.authorized) return;
-    const slug = new URL(window.location.href).searchParams.get("student");
+    const url = new URL(window.location.href);
+    const view = APP_VIEW_NAMES.has(url.searchParams.get("view")) ? url.searchParams.get("view") : "students";
+    showAppView(view, { historyMode: "none", scroll: false });
+    const slug = url.searchParams.get("student");
     if (slug) openStudentProfileBySlug(slug, { syncUrl: false });
-    else closeStudentProfile({ syncUrl: false });
+    else if (view !== "me") closeStudentProfile({ syncUrl: false });
   });
 
   document.addEventListener("keydown", event => {
@@ -381,12 +491,7 @@ function redirectToForm() {
 }
 
 function consumeRequestedDirectoryView() {
-  const url = new URL(window.location.href);
-  const view = url.searchParams.get("view");
-  if (!new Set(["saved", "me"]).has(view)) return "";
-  url.searchParams.delete("view");
-  history.replaceState(history.state, "", url.toString());
-  return view;
+  return appViewFromUrl();
 }
 
 function unlockDirectory(email) {
@@ -416,16 +521,16 @@ function unlockDirectory(email) {
   updateSavedUI();
   updatePersonalizedHeader();
   applyDataPipeline();
+  showAppView(requestedView, { historyMode: "replace", animate: false, scroll: false });
   setStatus(state.isOfflineCache ? "" : "online", state.isOfflineCache ? "Cached" : "Live");
   setAccessBusy(false, "Check & enter");
 
   const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
   els.updatedText.textContent = `Updated ${now}`;
-  if (requestedView === "me") openMyProfile();
   requestAnimationFrame(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
     if (requestedView !== "me") openProfileFromUrl();
-    maybeShowWelcomeTour();
+    if (requestedView === "students") maybeShowWelcomeTour();
   });
 }
 
@@ -673,6 +778,7 @@ function studentSlug(row) {
 
 function profileUrl(slug) {
   const url = new URL(window.location.href);
+  url.searchParams.delete("view");
   url.searchParams.set("student", slug);
   url.hash = "";
   return url.toString();
@@ -701,14 +807,7 @@ function openStudentProfile(row, options = {}) {
   updateProfileMenuForRow(row);
   els.profileSheet.classList.add("open");
   els.profileSheet.setAttribute("aria-hidden", "false");
-  if (row === currentUserRow()) {
-    els.mobileStudentsButton?.classList.remove("active");
-    els.mobileStudentsButton?.removeAttribute("aria-current");
-    els.mobileSavedButton?.classList.remove("active");
-    els.mobileSavedButton?.removeAttribute("aria-current");
-    els.mobileMyProfileButton?.classList.add("active");
-    els.mobileMyProfileButton?.setAttribute("aria-current", "page");
-  }
+  updateAppNavigationState();
   syncBodyLock();
   els.profilePanel?.querySelector(".profile-scroll")?.scrollTo({ top: 0, behavior: "auto" });
 
@@ -724,19 +823,17 @@ function closeStudentProfile(options = {}) {
   if (!els.profileSheet) return;
   els.profileSheet.classList.remove("open");
   els.profileSheet.setAttribute("aria-hidden", "true");
-  els.mobileMyProfileButton?.classList.remove("active");
-  els.mobileMyProfileButton?.removeAttribute("aria-current");
+  if (state.appView === "me") {
+    state.appView = "students";
+    document.body.dataset.appView = "students";
+  }
   state.activeProfileSlug = "";
   closeProfileMenu();
-  updateMobileNavState();
+  updateAppNavigationState();
   syncBodyLock();
 
   if (syncUrl) {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("student")) {
-      url.searchParams.delete("student");
-      history.replaceState({}, "", url.toString());
-    }
+    history.replaceState({ view: state.appView }, "", appViewUrl(state.appView).toString());
   }
 }
 
@@ -796,7 +893,10 @@ function renderStudentProfile(row) {
   if (mailtoUrl(polimiMail)) {
     const mailBadge = document.createElement("span");
     mailBadge.className = "polimi-mail-badge profile-polimi-badge";
-    mailBadge.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">mark_email_read</span><span>Polimi mail</span>';
+    mailBadge.append(mailIcon());
+    const mailBadgeLabel = document.createElement("span");
+    mailBadgeLabel.textContent = "Polimi mail";
+    mailBadge.append(mailBadgeLabel);
     mailBadge.title = "Polimi mail provided";
     badges.appendChild(mailBadge);
   }
@@ -1528,7 +1628,7 @@ function renderCards(rows, start) {
     const slug = studentSlug(row);
 
     const card = document.createElement("article");
-    card.className = `student-card student-card-v2 student-card-simple ${cardAccentClass(program || name)} card-gender-${genderClass(gender)}`;
+    card.className = `student-card student-card-v2 student-card-simple student-card-warm ${cardAccentClass(program || name)} card-gender-${genderClass(gender)}`;
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${name}'s student profile`);
@@ -1554,6 +1654,15 @@ function renderCards(rows, start) {
     const content = document.createElement("div");
     content.className = "student-card-content student-card-simple-content";
 
+    const identityRow = document.createElement("div");
+    identityRow.className = "student-card-identity";
+    const monogram = document.createElement("span");
+    monogram.className = "student-card-monogram";
+    monogram.textContent = initials(name);
+    monogram.setAttribute("aria-hidden", "true");
+    const identityCopy = document.createElement("div");
+    identityCopy.className = "student-card-identity-copy";
+
     const titleRow = document.createElement("div");
     titleRow.className = "student-card-title-row";
 
@@ -1565,6 +1674,8 @@ function renderCards(rows, start) {
     const programLine = document.createElement("div");
     programLine.className = "student-card-program student-card-program-simple";
     appendSearchHighlightedText(programLine, program);
+    identityCopy.append(titleRow, programLine);
+    identityRow.append(monogram, identityCopy);
 
     const contextData = cardContextForRow(row);
     const context = document.createElement("span");
@@ -1577,14 +1688,8 @@ function renderCards(rows, start) {
     appendSearchHighlightedText(contextLabel, contextData.label);
     context.append(contextIcon, contextLabel);
 
-    content.append(titleRow, programLine, context);
-
-    const arrow = document.createElement("span");
-    arrow.className = "student-card-chevron student-card-simple-chevron material-symbols-rounded";
-    arrow.setAttribute("aria-hidden", "true");
-    arrow.textContent = "chevron_right";
-
-    card.append(content, arrow);
+    content.append(identityRow, context);
+    card.append(content);
     fragment.appendChild(card);
   });
 
@@ -1760,9 +1865,9 @@ function mailtoUrl(value) {
 
 function mailIcon() {
   const span = document.createElement("span");
-  span.className = "mail-icon material-symbols-rounded";
+  span.className = "mail-icon contact-icon-svg";
   span.setAttribute("aria-hidden", "true");
-  span.textContent = "mail";
+  span.innerHTML = '<svg viewBox="0 0 24 24" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.25 5.75h15.5c.69 0 1.25.56 1.25 1.25v10c0 .69-.56 1.25-1.25 1.25H4.25C3.56 18.25 3 17.69 3 17V7c0-.69.56-1.25 1.25-1.25Z"/><path d="m4.25 7 7.1 5.33a1.08 1.08 0 0 0 1.3 0L19.75 7"/></svg>';
   return span;
 }
 
@@ -1837,9 +1942,9 @@ function telegramLabel(value) {
 
 function telegramIcon() {
   const span = document.createElement("span");
-  span.className = "telegram-icon material-symbols-rounded";
+  span.className = "telegram-icon contact-icon-svg";
   span.setAttribute("aria-hidden", "true");
-  span.textContent = "send";
+  span.innerHTML = '<svg viewBox="0 0 24 24" focusable="false" fill="currentColor"><path d="M21.2 3.12 3.93 9.78c-.78.3-.77 1.4.02 1.68l4.36 1.52 1.7 5.48c.25.8 1.3.96 1.78.27l2.42-3.5 4.77 3.5c.6.44 1.46.1 1.6-.63L22.4 4.2c.15-.79-.45-1.36-1.2-1.08ZM9.26 12.1l8.45-5.42-6.72 7.24-.6 2.63-1.13-4.45Z"/></svg>';
   return span;
 }
 
@@ -2089,7 +2194,7 @@ function isRecentStudent(row) {
 }
 
 
-const SHEET_CACHE_KEY = "polimi-sheet-cache-v2";
+const SHEET_CACHE_KEY = `polimi-sheet-cache-v3:${CONFIG.sheetId}:${CONFIG.sheetGid}`;
 const SAVED_KEY = "polimi-saved-students-v1";
 const ONBOARDING_KEY = "polimi-onboarding-seen-v1";
 
@@ -2213,25 +2318,14 @@ function updateProfileSaveButton() {
 }
 
 function toggleSavedMode() {
-  state.savedOnly = !state.savedOnly;
-  if (state.savedOnly && state.roommateMatchMode) {
-    state.roommateMatchMode = false;
-    state.roommateReferenceRow = null;
-    state.roommateMatchMeta = new WeakMap();
-    updateRoommateMatchUI();
-  }
   state.page = 1;
-  updateSavedUI();
-  applyDataPipeline();
-  document.getElementById("directory")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  showAppView(state.savedOnly ? "students" : "saved");
 }
 
 function exitSavedMode() {
   if (!state.savedOnly) return;
-  state.savedOnly = false;
   state.page = 1;
-  updateSavedUI();
-  applyDataPipeline();
+  showAppView("students");
 }
 
 function updateSavedUI() {
@@ -2254,14 +2348,8 @@ function updateSavedUI() {
 }
 
 function updateMobileNavState() {
-  const studentsActive = !state.savedOnly;
-  els.mobileStudentsButton?.classList.toggle("active", studentsActive);
-  els.mobileSavedButton?.classList.toggle("active", state.savedOnly);
   els.mobileRoommateButton?.classList.toggle("active", state.roommateMatchMode);
-  if (studentsActive) els.mobileStudentsButton?.setAttribute("aria-current", "page");
-  else els.mobileStudentsButton?.removeAttribute("aria-current");
-  if (state.savedOnly) els.mobileSavedButton?.setAttribute("aria-current", "page");
-  else els.mobileSavedButton?.removeAttribute("aria-current");
+  updateAppNavigationState();
 }
 
 function updateEmptyStateCopy() {
@@ -2284,10 +2372,10 @@ function updateEmptyStateCopy() {
   }
 }
 
-function openMyProfile() {
+function openMyProfile(options = {}) {
   const row = currentUserRow();
   if (!row) { showToast("Your profile could not be matched yet"); return; }
-  openStudentProfile(row);
+  openStudentProfile(row, options);
 }
 
 function updatePersonalizedHeader() {
