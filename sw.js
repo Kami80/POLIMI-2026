@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-warm-milan-v19";
+const CACHE_NAME = "polimi-students-warm-milan-v21";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,7 +14,6 @@ const APP_SHELL = [
   "./announcements.html",
   "./announcements.js",
   "./announcements-ux.js",
-  "./basic-safety-course.pdf",
   "./styles.css",
   "./ui-polish.css",
   "./neo-glass.css",
@@ -32,7 +31,15 @@ const APP_SHELL = [
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => Promise.allSettled(APP_SHELL.map(path => cache.add(path))))
+      .then(results => {
+        const startPage = results[0];
+        if (startPage?.status === "rejected") throw startPage.reason;
+      })
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", event => {
@@ -50,9 +57,9 @@ self.addEventListener("fetch", event => {
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request).then(response => {
-        if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())));
         return response;
-      }).catch(() => caches.match(request).then(cached => cached || caches.match("./index.html")))
+      }).catch(() => caches.match(request).then(cached => cached || caches.match("./") || caches.match("./index.html")))
     );
     return;
   }
@@ -60,7 +67,7 @@ self.addEventListener("fetch", event => {
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(request).then(cached => cached || fetch(request).then(response => {
-        if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())));
         return response;
       }))
     );

@@ -60,16 +60,24 @@ const state = {
   savedSlugs: new Set(),
   cachedDataLoaded: false,
   deferredInstallPrompt: null,
+  installPromptDismissed: false,
+  appInstalled: false,
+  pwaRegistrationError: "",
   isOfflineCache: false,
   appView: "students",
 };
 
 const els = {};
 
+// Capture Chromium's one-time install event as early as possible. Waiting for
+// the rest of the directory to initialize can otherwise miss the prompt.
+window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+window.addEventListener("appinstalled", handleAppInstalled);
+
 function cacheElements() {
   [
     "accessGate", "protectedApp", "accessForm", "accessEmail", "accessSubmit", "accessSubmitLabel", "accessStatus", "accessNotFound", "changeEmailButton",
-    "connectionStatus", "themeToggle", "themeIcon", "myProfileButton", "myProfileAvatar", "installAppButton",
+    "connectionStatus", "themeToggle", "themeIcon", "myProfileButton", "myProfileAvatar", "installAppButton", "accessInstallButton", "accessInstallLabel",
     "directoryIntroTitle", "directoryIntroText", "sortSelect", "savedTrigger", "savedCount", "savedBanner", "savedReset",
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
     "activeFilterChips", "clearFilters", "resultText", "resultsBar", "directoryHeadingCount", "cardView", "tableView", "tableHead", "tableBody",
@@ -404,7 +412,7 @@ function setupEvents() {
     applyDataPipeline();
   });
 
-  els.installAppButton?.addEventListener("click", installApp);
+  [els.installAppButton, els.accessInstallButton].filter(Boolean).forEach(button => button.addEventListener("click", installApp));
   els.welcomeTourDone?.addEventListener("click", dismissWelcomeTour);
   els.welcomeTourBackdrop?.addEventListener("click", dismissWelcomeTour);
 
@@ -2764,44 +2772,159 @@ function dismissWelcomeTour() {
   document.body.classList.remove("tour-open");
 }
 
-function showToast(message) {
+function showToast(message, duration = 1800) {
   if (!els.appToast) return;
   els.appToast.textContent = message;
   els.appToast.hidden = false;
   els.appToast.classList.add("show");
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => { els.appToast.classList.remove("show"); setTimeout(() => { els.appToast.hidden = true; }, 180); }, 1800);
+  showToast.timer = setTimeout(() => { els.appToast.classList.remove("show"); setTimeout(() => { els.appToast.hidden = true; }, 180); }, duration);
+}
+
+function installButtons() {
+  return [els.installAppButton, els.accessInstallButton].filter(Boolean);
+}
+
+function isStandaloneMode() {
+  return window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function installPlatform() {
+  const userAgent = navigator.userAgent || "";
+  const isiPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  if (/iphone|ipad|ipod/i.test(userAgent) || isiPadOS) return "ios";
+  if (/android/i.test(userAgent)) return "android";
+  if (/safari/i.test(userAgent) && !/(?:chrome|chromium|crios|edg|opr|android)/i.test(userAgent)) return "safari";
+  if (/(?:chrome|chromium|crios|edg|opr|samsungbrowser)/i.test(userAgent)) return "chromium";
+  return "unsupported";
+}
+
+function hasInstallableOrigin() {
+  if (window.location.protocol === "https:") return true;
+  if (window.location.protocol !== "http:") return false;
+  const host = window.location.hostname.toLowerCase();
+  return host === "localhost" || host === "127.0.0.1" || host === "::1" || host.endsWith(".localhost");
+}
+
+function syncInstallButtons() {
+  const standalone = isStandaloneMode();
+  const platform = installPlatform();
+  const manualInstall = platform === "ios" || platform === "android" || platform === "safari";
+  const needsOriginHelp = !hasInstallableOrigin();
+  const visible = !standalone && !state.appInstalled && Boolean(
+    state.deferredInstallPrompt ||
+    state.installPromptDismissed ||
+    state.pwaRegistrationError ||
+    manualInstall ||
+    needsOriginHelp
+  );
+
+  let label = "Install app";
+  if (needsOriginHelp || state.pwaRegistrationError) label = "Installation help";
+  else if (!state.deferredInstallPrompt && platform === "ios") label = "Add to Home Screen";
+  else if (!state.deferredInstallPrompt && platform === "safari") label = "Add to Dock";
+
+  installButtons().forEach(button => {
+    button.hidden = !visible;
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  });
+  if (els.accessInstallLabel) els.accessInstallLabel.textContent = label;
+}
+
+function handleBeforeInstallPrompt(event) {
+  event.preventDefault();
+  state.deferredInstallPrompt = event;
+  state.installPromptDismissed = false;
+  state.appInstalled = false;
+  syncInstallButtons();
+}
+
+function handleAppInstalled() {
+  state.deferredInstallPrompt = null;
+  state.installPromptDismissed = false;
+  state.appInstalled = true;
+  syncInstallButtons();
+  showToast("Polimi Students installed");
+}
+
+async function registerAppServiceWorker() {
+  if (!hasInstallableOrigin()) {
+    state.pwaRegistrationError = window.location.protocol === "file:" ? "file-preview" : "insecure-origin";
+    syncInstallButtons();
+    return;
+  }
+  if (!("serviceWorker" in navigator)) {
+    state.pwaRegistrationError = "unsupported-browser";
+    syncInstallButtons();
+    return;
+  }
+
+  try {
+    await navigator.serviceWorker.register("./sw.js", { scope: "./" });
+    await navigator.serviceWorker.ready;
+    state.pwaRegistrationError = "";
+  } catch (error) {
+    state.pwaRegistrationError = "registration-failed";
+    console.warn("Polimi Students could not initialize offline installation.", error);
+  }
+  syncInstallButtons();
 }
 
 function setupPWA() {
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
-  }
-  window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault();
-    state.deferredInstallPrompt = event;
-    if (els.installAppButton) els.installAppButton.hidden = false;
-  });
-  window.addEventListener("appinstalled", () => {
-    state.deferredInstallPrompt = null;
-    if (els.installAppButton) els.installAppButton.hidden = true;
-    showToast("Polimi Students installed");
-  });
-  const standalone = window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  if (!standalone && isiOS && els.installAppButton) els.installAppButton.hidden = false;
+  syncInstallButtons();
+  registerAppServiceWorker();
+  window.matchMedia?.("(display-mode: standalone)")?.addEventListener?.("change", syncInstallButtons);
 }
 
 async function installApp() {
-  if (state.deferredInstallPrompt) {
-    state.deferredInstallPrompt.prompt();
-    try { await state.deferredInstallPrompt.userChoice; } catch (_) {}
-    state.deferredInstallPrompt = null;
-    if (els.installAppButton) els.installAppButton.hidden = true;
+  if (isStandaloneMode() || state.appInstalled) {
+    syncInstallButtons();
+    showToast("Polimi Students is already installed");
     return;
   }
-  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  showToast(isiOS ? "In Safari: Share → Add to Home Screen" : "Use your browser menu → Install app");
+
+  if (!hasInstallableOrigin()) {
+    showToast("Installation cannot work from a file preview. Open the app over HTTPS or localhost first.", 5200);
+    return;
+  }
+
+  if (state.deferredInstallPrompt) {
+    const promptEvent = state.deferredInstallPrompt;
+    state.deferredInstallPrompt = null;
+    try {
+      const promptResult = await promptEvent.prompt();
+      const choice = promptResult?.outcome ? promptResult : await promptEvent.userChoice;
+      if (choice?.outcome === "accepted") {
+        state.appInstalled = true;
+        state.installPromptDismissed = false;
+        showToast("Finishing installation...");
+      } else {
+        state.installPromptDismissed = true;
+        showToast("Installation was cancelled. You can still install it from your browser menu.", 4200);
+      }
+    } catch (error) {
+      state.installPromptDismissed = true;
+      showToast("The browser could not open the install prompt. Try its Install app menu instead.", 4600);
+    }
+    syncInstallButtons();
+    return;
+  }
+
+  const platform = installPlatform();
+  if (state.pwaRegistrationError === "registration-failed") {
+    showToast("Installation setup did not finish. Reload the page once, then try again.", 4600);
+  } else if (state.pwaRegistrationError === "unsupported-browser" || platform === "unsupported") {
+    showToast("This browser does not offer app installation. Try Chrome, Edge, Safari, or an Android browser.", 5200);
+  } else if (platform === "ios") {
+    showToast("Tap Share in your browser, then choose Add to Home Screen.", 5200);
+  } else if (platform === "safari") {
+    showToast("In Safari, open File and choose Add to Dock.", 4600);
+  } else if (platform === "android") {
+    showToast("Open the browser menu and choose Install app or Add to Home screen.", 5200);
+  } else {
+    showToast("Open the browser menu and choose Install Polimi Students.", 4600);
+  }
 }
 
 function setupDragToClose(panel, handle, closeFn) {
