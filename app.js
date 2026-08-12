@@ -32,6 +32,8 @@ const CONFIG = {
   }
 };
 
+const VERIFIED_EMAIL_KEY = "polimi-verified-email";
+
 const state = {
   columns: [],
   rows: [],
@@ -235,6 +237,37 @@ function normalizeEmail(value) {
 
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
+}
+
+function rememberedVerifiedEmail() {
+  try {
+    const email = normalizeEmail(localStorage.getItem(VERIFIED_EMAIL_KEY) || "");
+    if (!email) return "";
+    if (isValidEmail(email)) return email;
+    localStorage.removeItem(VERIFIED_EMAIL_KEY);
+  } catch (_) {}
+  return "";
+}
+
+function rememberVerifiedEmail(email) {
+  try { localStorage.setItem(VERIFIED_EMAIL_KEY, normalizeEmail(email)); } catch (_) {}
+}
+
+function forgetVerifiedEmail() {
+  try { localStorage.removeItem(VERIFIED_EMAIL_KEY); } catch (_) {}
+}
+
+function stageRememberedAccess() {
+  const email = rememberedVerifiedEmail();
+  if (!email) return false;
+  state.authorized = true;
+  state.authorizedEmail = email;
+  state.pendingEmail = "";
+  els.accessEmail.value = email;
+  els.accessGate.hidden = true;
+  els.protectedApp.hidden = false;
+  document.body.classList.add("directory-unlocked");
+  return true;
 }
 
 function isHiddenColumn(column) {
@@ -441,12 +474,12 @@ function requestAccess(rawEmail, options = {}) {
   }
 
   if (exists) {
-    localStorage.setItem("polimi-verified-email", email);
+    rememberVerifiedEmail(email);
     unlockDirectory(email);
     return;
   }
 
-  localStorage.removeItem("polimi-verified-email");
+  forgetVerifiedEmail();
   state.authorized = false;
   state.authorizedEmail = "";
   setAccessBusy(true, "Redirecting…");
@@ -494,6 +527,17 @@ function consumeRequestedDirectoryView() {
   return appViewFromUrl();
 }
 
+function refreshAuthorizedDirectory() {
+  buildProfileIndex();
+  loadSavedProfiles();
+  updatePersonalizedHeader();
+  renderFilters();
+  renderQuickFilters();
+  updateRoommateMatchUI();
+  updateSavedUI();
+  applyDataPipeline();
+}
+
 function unlockDirectory(email) {
   state.authorized = true;
   state.authorizedEmail = normalizeEmail(email);
@@ -508,19 +552,13 @@ function unlockDirectory(email) {
   state.roommateMatchMeta = new WeakMap();
   restoreDirectoryPreferences();
 
-  loadSavedProfiles();
   const requestedView = consumeRequestedDirectoryView();
   if (requestedView === "saved") {
     state.savedOnly = true;
     state.roommateMatchMode = false;
     state.roommateReferenceRow = null;
   }
-  renderFilters();
-  renderQuickFilters();
-  updateRoommateMatchUI();
-  updateSavedUI();
-  updatePersonalizedHeader();
-  applyDataPipeline();
+  refreshAuthorizedDirectory();
   showAppView(requestedView, { historyMode: "replace", animate: false, scroll: false });
   setStatus(state.isOfflineCache ? "" : "online", state.isOfflineCache ? "Cached" : "Live");
   setAccessBusy(false, "Check & enter");
@@ -535,10 +573,11 @@ function unlockDirectory(email) {
 }
 
 function lockDirectory() {
-  localStorage.removeItem("polimi-verified-email");
+  forgetVerifiedEmail();
   state.authorized = false;
   state.authorizedEmail = "";
   state.pendingEmail = "";
+  state.preferencesRestored = false;
   state.roommateMatchMode = false;
   state.roommateReferenceRow = null;
   state.savedOnly = false;
@@ -675,19 +714,25 @@ function handleSheetResponse(response) {
     saveSheetCache();
     setStatus("online", "Live");
 
-    const rememberedEmail = state.authorizedEmail || state.pendingEmail || localStorage.getItem("polimi-verified-email") || "";
-    if (rememberedEmail) {
-      requestAccess(rememberedEmail, { silent: true });
-      if (state.authorized) {
-        buildProfileIndex();
-        loadSavedProfiles();
-        updatePersonalizedHeader();
-        renderFilters();
-        renderQuickFilters();
-        applyDataPipeline();
-        if (els.updatedText) els.updatedText.textContent = `Updated ${new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date())}`;
+    const pendingEmail = state.pendingEmail;
+    const rememberedEmail = state.authorizedEmail || rememberedVerifiedEmail();
+    let initializedNow = false;
+    if (pendingEmail) {
+      requestAccess(pendingEmail, { silent: true });
+      initializedNow = state.authorized;
+    } else if (rememberedEmail) {
+      state.authorized = true;
+      state.authorizedEmail = rememberedEmail;
+      if (!state.preferencesRestored) {
+        unlockDirectory(rememberedEmail);
+        initializedNow = true;
       }
-    } else {
+    }
+
+    if (state.authorized && !initializedNow) refreshAuthorizedDirectory();
+    if (state.authorized && els.updatedText) {
+      els.updatedText.textContent = `Updated ${new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date())}`;
+    } else if (!pendingEmail) {
       setAccessBusy(false, "Check & enter");
       setAccessStatus("", "Directory ready. Enter the same email you used in the form.");
       requestAnimationFrame(() => els.accessEmail.focus());
@@ -706,8 +751,8 @@ function showError(message) {
     if (els.updatedText) els.updatedText.textContent = "Showing the latest cached directory";
     if (state.authorized) applyDataPipeline();
     else {
-      const rememberedEmail = localStorage.getItem("polimi-verified-email") || "";
-      if (rememberedEmail) requestAccess(rememberedEmail, { silent: true });
+      const rememberedEmail = rememberedVerifiedEmail();
+      if (rememberedEmail) unlockDirectory(rememberedEmail);
       else { setAccessBusy(false, "Check & enter"); setAccessStatus("", "Offline copy available. Enter the email you previously used."); }
     }
     return;
@@ -861,12 +906,14 @@ function renderStudentProfile(row) {
   const telegram = contactVisibilityAllows(displayValue(row, telegramVisibilityCol)) ? displayValue(row, telegramCol) : "";
   const polimiMail = contactVisibilityAllows(displayValue(row, polimiMailVisibilityCol)) ? displayValue(row, polimiMailCol) : "";
 
+  if (els.profilePanel) {
+    els.profilePanel.classList.remove("profile-gender-female", "profile-gender-male", "profile-gender-other");
+    els.profilePanel.classList.add(`profile-gender-${genderClass(gender)}`);
+  }
+
   els.profileBody.innerHTML = "";
   const hero = document.createElement("section");
-  hero.className = "profile-hero";
-  const avatar = document.createElement("div");
-  avatar.className = "profile-avatar";
-  avatar.textContent = initials(name);
+  hero.className = "profile-hero profile-hero-text-only";
   const copy = document.createElement("div");
   copy.className = "profile-identity";
   const kicker = document.createElement("span");
@@ -901,7 +948,7 @@ function renderStudentProfile(row) {
     badges.appendChild(mailBadge);
   }
   copy.append(kicker, title, badges);
-  hero.append(avatar, copy);
+  hero.appendChild(copy);
 
   const programCard = document.createElement("section");
   programCard.className = "profile-program";
@@ -1588,30 +1635,51 @@ function cardContextForRow(row) {
   const campus = displayValue(row, semanticColumn("campus"));
   const degree = displayValue(row, semanticColumn("degree"));
   const roommate = displayValue(row, semanticColumn("roommate"));
+  const gender = displayValue(row, semanticColumn("gender"));
   const tokens = searchTokens(state.query);
   const fieldMatches = value => tokens.length && tokens.some(token => searchNormalize(value).includes(token));
-  const own = currentUserRow();
 
   if (state.roommateMatchMode) {
     const meta = state.roommateMatchMeta.get(row);
     if (meta) return { icon: "bed", label: `${roommateMatchTier(meta)} roommate fit`, tone: "roommate" };
   }
-  if (fieldMatches(campus)) return { icon: "location_on", label: campus, tone: "match" };
-  if (fieldMatches(roommate)) return { icon: "bed", label: "Looking for roommate", tone: "match" };
-  if (fieldMatches(program)) return { icon: "school", label: "Program match", tone: "match" };
-  if (fieldMatches(name)) return { icon: "person_search", label: "Name match", tone: "match" };
-  if (own === row) return { icon: "person", label: "Your profile", tone: "personal" };
-  if (isCreatorRow(row)) return { icon: "verified", label: "Community creator", tone: "personal" };
-  if (own && sameDirectoryValue(program, displayValue(own, semanticColumn("program")))) {
-    return { icon: "school", label: "Same program", tone: "program" };
+
+  if (tokens.length) {
+    if (fieldMatches(name)) return { icon: "person_search", label: "Name match", tone: "match" };
+    if (fieldMatches(program)) return { icon: "school", label: "Program match", tone: "match" };
+    if (fieldMatches(campus)) return { icon: "location_on", label: campus, tone: "match" };
+    if (fieldMatches(degree)) return { icon: "school", label: "Degree match", tone: "match" };
+    if (fieldMatches(roommate)) return { icon: "bed", label: "Looking for roommate", tone: "match" };
+    if (fieldMatches(gender)) return { icon: "person", label: gender, tone: "match" };
+    return { icon: "search", label: "Search match", tone: "match" };
   }
-  if (own && sameDirectoryValue(campus, displayValue(own, semanticColumn("campus")))) {
-    return { icon: "location_on", label: "Same campus", tone: "campus" };
+
+  const activeFilter = Object.entries(state.filters).find(([, selected]) => selected?.size);
+  if (!activeFilter) return null;
+
+  const column = state.columns[Number(activeFilter[0])];
+  const value = displayValue(row, column);
+  const own = currentUserRow();
+  const programColumn = semanticColumn("program");
+  const campusColumn = semanticColumn("campus");
+  const genderColumn = semanticColumn("gender");
+  const roommateColumn = semanticColumn("roommate");
+  const degreeColumn = semanticColumn("degree");
+
+  if (column?.index === programColumn?.index) {
+    const ownProgram = own ? displayValue(own, programColumn) : "";
+    return { icon: "school", label: sameDirectoryValue(value, ownProgram) ? "Same program" : "Program match", tone: "program" };
   }
-  if (roommateIntent(roommate).score >= 42) return { icon: "bed", label: "Looking for roommate", tone: "roommate" };
-  if (campus) return { icon: "location_on", label: campus, tone: "campus" };
-  if (degree) return { icon: "school", label: degree, tone: "degree" };
-  return { icon: "person", label: "Student profile", tone: "neutral" };
+  if (column?.index === campusColumn?.index) {
+    const ownCampus = own ? displayValue(own, campusColumn) : "";
+    return { icon: "location_on", label: sameDirectoryValue(value, ownCampus) ? "Same campus" : value, tone: "campus" };
+  }
+  if (column?.index === roommateColumn?.index) {
+    return { icon: "bed", label: roommateIntent(value).score >= 42 ? "Looking for roommate" : "Roommate match", tone: "roommate" };
+  }
+  if (column?.index === genderColumn?.index) return { icon: "person", label: value, tone: "match" };
+  if (column?.index === degreeColumn?.index) return { icon: "school", label: "Degree match", tone: "degree" };
+  return { icon: "filter_alt", label: `${column?.label || "Filter"} match`, tone: "match" };
 }
 
 function renderCards(rows, start) {
@@ -1655,11 +1723,7 @@ function renderCards(rows, start) {
     content.className = "student-card-content student-card-simple-content";
 
     const identityRow = document.createElement("div");
-    identityRow.className = "student-card-identity";
-    const monogram = document.createElement("span");
-    monogram.className = "student-card-monogram";
-    monogram.textContent = initials(name);
-    monogram.setAttribute("aria-hidden", "true");
+    identityRow.className = "student-card-identity student-card-identity-text-only";
     const identityCopy = document.createElement("div");
     identityCopy.className = "student-card-identity-copy";
 
@@ -1675,20 +1739,24 @@ function renderCards(rows, start) {
     programLine.className = "student-card-program student-card-program-simple";
     appendSearchHighlightedText(programLine, program);
     identityCopy.append(titleRow, programLine);
-    identityRow.append(monogram, identityCopy);
+    identityRow.appendChild(identityCopy);
 
     const contextData = cardContextForRow(row);
-    const context = document.createElement("span");
-    context.className = `student-context-badge context-${contextData.tone}`;
-    const contextIcon = document.createElement("span");
-    contextIcon.className = "material-symbols-rounded";
-    contextIcon.setAttribute("aria-hidden", "true");
-    contextIcon.textContent = contextData.icon;
-    const contextLabel = document.createElement("span");
-    appendSearchHighlightedText(contextLabel, contextData.label);
-    context.append(contextIcon, contextLabel);
+    content.appendChild(identityRow);
+    if (contextData) {
+      card.classList.add("has-context");
+      const context = document.createElement("span");
+      context.className = `student-context-badge context-${contextData.tone}`;
+      const contextIcon = document.createElement("span");
+      contextIcon.className = "material-symbols-rounded";
+      contextIcon.setAttribute("aria-hidden", "true");
+      contextIcon.textContent = contextData.icon;
+      const contextLabel = document.createElement("span");
+      appendSearchHighlightedText(contextLabel, contextData.label);
+      context.append(contextIcon, contextLabel);
+      content.appendChild(context);
+    }
 
-    content.append(identityRow, context);
     card.append(content);
     fragment.appendChild(card);
   });
@@ -2235,8 +2303,13 @@ function hydrateSheetCache() {
     state.sheetReady = true;
     state.cachedDataLoaded = true;
     state.isOfflineCache = true;
-    const rememberedEmail = state.authorizedEmail || localStorage.getItem("polimi-verified-email") || "";
-    if (rememberedEmail && emailExists(rememberedEmail)) unlockDirectory(rememberedEmail);
+    const rememberedEmail = state.authorizedEmail || rememberedVerifiedEmail();
+    if (rememberedEmail && !state.preferencesRestored) unlockDirectory(rememberedEmail);
+    else if (rememberedEmail) {
+      state.authorized = true;
+      state.authorizedEmail = rememberedEmail;
+      refreshAuthorizedDirectory();
+    }
     else if (!state.authorized) {
       setAccessBusy(false, "Check & enter");
       setAccessStatus("", "Directory ready from cache. We’re refreshing it in the background.");
@@ -2618,6 +2691,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupEvents();
   setupPWA();
   setupSheetGestures();
+  stageRememberedAccess();
   setView(CONFIG.defaultView);
   loadSheet();
 });

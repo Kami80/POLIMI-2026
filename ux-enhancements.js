@@ -147,14 +147,9 @@
     if (next) next.disabled = index < 0 || index >= rows.length - 1;
   }
 
-  function navigateProfile(direction) {
-    if (!els.profileSheet?.classList.contains("open")) return;
-    const rows = profileBrowseRows();
-    const index = activeProfileIndex();
-    if (index < 0) return;
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= rows.length) return;
-    const target = rows[targetIndex];
+  let profileSwapInProgress = false;
+
+  function commitProfileSwap(target, targetIndex) {
     const page = Math.floor(targetIndex / CONFIG.rowsPerPage) + 1;
     if (state.filteredRows.includes(target) && page !== state.page) {
       state.page = page;
@@ -163,6 +158,66 @@
     }
     baseOpenStudentProfile(target, { syncUrl: true });
     updateProfileBrowserNav();
+  }
+
+  async function swapProfile(target, targetIndex, direction) {
+    const body = els.profileBody;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (!body?.animate || reducedMotion) {
+      commitProfileSwap(target, targetIndex);
+      return;
+    }
+    if (profileSwapInProgress) return;
+
+    profileSwapInProgress = true;
+    body.classList.add("is-profile-swapping");
+    body.setAttribute("aria-busy", "true");
+    let committed = false;
+
+    try {
+      const exitX = direction > 0 ? -34 : 34;
+      const outgoing = body.animate([
+        { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
+        { opacity: 0, transform: `translate3d(${exitX}px, 0, 0) scale(.985)` },
+      ], {
+        duration: 150,
+        easing: "cubic-bezier(.4, 0, 1, 1)",
+        fill: "forwards",
+      });
+      await outgoing.finished;
+      outgoing.cancel();
+      if (!els.profileSheet?.classList.contains("open")) return;
+
+      commitProfileSwap(target, targetIndex);
+      committed = true;
+
+      const enterX = direction > 0 ? 40 : -40;
+      const incoming = body.animate([
+        { opacity: 0, transform: `translate3d(${enterX}px, 0, 0) scale(.985)` },
+        { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
+      ], {
+        duration: 310,
+        easing: "cubic-bezier(.16, 1, .3, 1)",
+      });
+      await incoming.finished;
+    } catch (_) {
+      if (!committed && els.profileSheet?.classList.contains("open")) commitProfileSwap(target, targetIndex);
+    } finally {
+      body.classList.remove("is-profile-swapping");
+      body.removeAttribute("aria-busy");
+      profileSwapInProgress = false;
+    }
+  }
+
+  function navigateProfile(direction) {
+    if (!els.profileSheet?.classList.contains("open")) return;
+    const rows = profileBrowseRows();
+    const index = activeProfileIndex();
+    if (index < 0) return;
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= rows.length) return;
+    const target = rows[targetIndex];
+    void swapProfile(target, targetIndex, direction);
   }
 
   /* ---------- active filter chips ---------- */

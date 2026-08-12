@@ -393,12 +393,27 @@ body {
   gap: 12px;
 }
 
+.student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) {
+  min-height: 96px;
+}
+
+.student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) .student-card-simple-content {
+  min-height: 68px;
+  justify-content: center;
+  gap: 0;
+}
+
 .student-card-identity {
   min-width: 0;
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+}
+
+.student-card-identity.student-card-identity-text-only {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0;
 }
 
 .student-card-monogram {
@@ -607,6 +622,14 @@ body {
   color: var(--green);
 }
 
+[data-theme="dark"] .telegram-group-label {
+  color: color-mix(in srgb, var(--group-accent) 28%, #fff7ec);
+}
+
+[data-theme="dark"] .telegram-group-pinned .telegram-group-label {
+  color: color-mix(in srgb, var(--green) 34%, #fff7ec);
+}
+
 .telegram-group-mark {
   display: grid;
   place-items: center;
@@ -728,6 +751,22 @@ body {
   background:
     radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 34%),
     color-mix(in srgb, var(--surface) 96%, transparent);
+}
+
+.profile-panel {
+  --profile-gender-tint: #9a7951;
+  background:
+    radial-gradient(circle at 84% 12%, color-mix(in srgb, var(--profile-gender-tint) 5%, var(--surface)), transparent 46%),
+    color-mix(in srgb, var(--surface) 96%, transparent);
+}
+
+.profile-panel.profile-gender-female { --profile-gender-tint: #b86f76; }
+.profile-panel.profile-gender-male { --profile-gender-tint: #5d7772; }
+.profile-panel.profile-gender-other { --profile-gender-tint: #9a7951; }
+
+.profile-hero.profile-hero-text-only {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
 }
 
 .profile-toolbar,
@@ -853,6 +892,26 @@ body {
 /* One-document navigation */
 .app-view {
   view-transition-name: app-view;
+}
+
+.app-mobile-nav {
+  view-transition-name: app-navigation;
+  isolation: isolate;
+}
+
+::view-transition-group(app-navigation) {
+  z-index: 2147483647;
+  animation: none;
+}
+
+::view-transition-old(app-navigation) {
+  opacity: 0;
+  animation: none;
+}
+
+::view-transition-new(app-navigation) {
+  opacity: 1;
+  animation: none;
 }
 
 ::view-transition-group(app-view) {
@@ -1106,6 +1165,16 @@ body {
     gap: 10px;
   }
 
+  .student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) {
+    min-height: 92px !important;
+  }
+
+  .student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) .student-card-simple-content {
+    min-height: 66px;
+    justify-content: center;
+    gap: 0;
+  }
+
   .student-card-identity {
     grid-template-columns: 34px minmax(0, 1fr);
     gap: 8px;
@@ -1178,6 +1247,48 @@ body {
     padding-inline: 14px;
     font-size: 12px;
   }
+
+  .pagination.pagination-v2 {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pagination.pagination-v2 .load-more-button {
+    width: min(100%, 430px);
+    min-height: 52px;
+    height: auto;
+    margin-inline: auto;
+    padding: 0 48px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+    background: linear-gradient(135deg, #a9402c, #c65e43);
+    color: #fffaf4 !important;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(64, 22, 14, .22);
+  }
+
+  .pagination.pagination-v2 .load-more-button[hidden] {
+    display: none !important;
+  }
+
+  .pagination.pagination-v2 .load-more-button > .material-symbols-rounded {
+    position: absolute;
+    left: 17px;
+    color: inherit;
+  }
+
+  .pagination.pagination-v2 .load-more-button #loadMoreLabel {
+    width: 100%;
+    display: block;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1.2;
+    text-align: center;
+  }
 }
 
 @media (max-width: 390px) {
@@ -1190,8 +1301,16 @@ body {
     padding: 11px !important;
   }
 
+  .student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) {
+    min-height: 88px !important;
+  }
+
   .student-card-simple-content {
     min-height: 97px;
+  }
+
+  .student-card.student-card-v2.student-card-simple.student-card-warm:not(.has-context) .student-card-simple-content {
+    min-height: 64px;
   }
 
   .student-card-monogram {
@@ -1202,6 +1321,15 @@ body {
   .student-card-identity {
     grid-template-columns: 31px minmax(0, 1fr);
   }
+}
+
+.profile-sheet.open .profile-body.is-profile-swapping > * {
+  animation: none !important;
+}
+
+.profile-body.is-profile-swapping {
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
