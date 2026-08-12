@@ -8,7 +8,7 @@ const POLIMI_ANNOUNCEMENTS = [
     id: "basic-safety-course-resource",
     category: "Safety",
     filter: "safety",
-    icon: "⚑",
+    icon: "health_and_safety",
     title: "Basic Safety Course · Formazione generale",
     summary: "Mandatory 4-hour general safety training for students and university workers. A valid certificate may be required to access some Polimi activities and services.",
     pinned: true,
@@ -57,7 +57,7 @@ const POLIMI_ANNOUNCEMENTS = [
     id: "summer-closure-2026",
     category: "Closure",
     filter: "closures",
-    icon: "☀",
+    icon: "beach_access",
     title: "Polimi summer holiday closure",
     summary: "University offices are closed from 8 to 23 August. Student assistance will be unavailable during this period.",
     start: "2026-08-08T00:00:00+02:00",
@@ -86,7 +86,7 @@ const POLIMI_ANNOUNCEMENTS = [
     id: "italian-course-2026",
     category: "Course",
     filter: "courses",
-    icon: "A",
+    icon: "translate",
     title: "Free online Italian language courses",
     summary: "Incoming international students can join free online Italian courses. Assessment-test registration is open from 26 August to 11 September.",
     start: "2026-08-26T00:00:00+02:00",
@@ -273,9 +273,10 @@ function actionsMarkup(item) {
   const actions = Array.isArray(item.actions) ? item.actions : [];
   return actions.map(action => {
     const external = !String(action.href).startsWith("mailto:");
+    const icon = action.type === "email" ? "mail" : action.type === "pdf" ? "picture_as_pdf" : "open_in_new";
     return `
       <a class="announcement-modal-action ${escapeHtml(action.type || "link")}" href="${escapeHtml(action.href)}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-        <span>${action.type === "email" ? "✉" : action.type === "pdf" ? "PDF" : "↗"}</span>
+        <span class="material-symbols-rounded" aria-hidden="true">${icon}</span>
         <strong>${escapeHtml(action.label)}</strong>
       </a>
     `;
@@ -298,7 +299,7 @@ function announcementCardMarkup(item) {
       <button class="announcement-card-button" type="button" aria-label="Open announcement: ${escapeHtml(item.title)}">
         <span class="announcement-card-accent" aria-hidden="true"></span>
         <span class="announcement-card-top">
-          <span class="announcement-card-icon" aria-hidden="true">${escapeHtml(item.icon || "!")}</span>
+          <span class="announcement-card-icon material-symbols-rounded" aria-hidden="true">${escapeHtml(item.icon || "notification_important")}</span>
           <span class="announcement-card-top-right">
             ${unread ? '<span class="announcement-unread-pill"><i></i>Unread</span>' : ""}
             <span class="announcement-card-status announcement-status ${status.className}">${escapeHtml(status.label)}</span>
@@ -316,8 +317,8 @@ function announcementCardMarkup(item) {
         <span class="announcement-card-tags">${tagMarkup(item.tags, 3)}</span>
 
         <span class="announcement-card-footer-v3">
-          <span><i aria-hidden="true">◷</i>${escapeHtml(item.dateContext)}</span>
-          <strong>Open notice <i aria-hidden="true">→</i></strong>
+          <span><i class="material-symbols-rounded" aria-hidden="true">calendar_month</i>${escapeHtml(item.dateContext)}</span>
+          <strong>Open notice <i class="material-symbols-rounded" aria-hidden="true">arrow_forward</i></strong>
         </span>
       </button>
     </article>
@@ -367,9 +368,9 @@ function renderAnnouncementModal(item) {
   panel.className = `announcement-modal-panel announcement-modal-${escapeHtml(item.tone || "general")}`;
   panel.innerHTML = `
     <div class="announcement-modal-toolbar">
-      <button class="announcement-modal-icon-btn" type="button" data-close-announcement aria-label="Close announcement">×</button>
+      <button class="announcement-modal-icon-btn" type="button" data-close-announcement aria-label="Close announcement"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       <span class="announcement-modal-toolbar-label">UNIVERSITY ANNOUNCEMENT</span>
-      <button class="announcement-modal-icon-btn share" type="button" data-share-announcement="${escapeHtml(item.id)}" aria-label="Share announcement">↗</button>
+      <button class="announcement-modal-icon-btn share" type="button" data-share-announcement="${escapeHtml(item.id)}" aria-label="Share announcement"><span class="material-symbols-rounded" aria-hidden="true">share</span></button>
     </div>
 
     <div class="announcement-modal-scroll">
@@ -412,7 +413,7 @@ function renderAnnouncementModal(item) {
         <div class="announcement-modal-actions">
           ${actionsMarkup(item)}
           <button class="announcement-modal-action share" type="button" data-share-announcement="${escapeHtml(item.id)}">
-            <span>↗</span><strong>Share announcement</strong>
+            <span class="material-symbols-rounded" aria-hidden="true">share</span><strong>Share announcement</strong>
           </button>
         </div>
       </div>
@@ -486,11 +487,11 @@ function showAnnouncementShareFeedback(id, copied) {
       label.textContent = copied ? "Link copied" : "Copy failed";
       setTimeout(() => { label.textContent = previous; }, 1800);
     } else {
-      const previous = button.textContent;
-      button.textContent = copied ? "✓" : "!";
+      const previous = button.innerHTML;
+      button.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">${copied ? "check" : "error"}</span>`;
       button.setAttribute("aria-label", copied ? "Announcement link copied" : "Could not copy announcement link");
       setTimeout(() => {
-        button.textContent = previous;
+        button.innerHTML = previous;
         button.setAttribute("aria-label", "Share announcement");
       }, 1800);
     }
@@ -581,7 +582,7 @@ function bindAnnouncementControls() {
 function setAnnouncementsTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const icon = document.getElementById("announcementsThemeIcon");
-  if (icon) icon.textContent = theme === "dark" ? "☀" : "☾";
+  if (icon) icon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
   localStorage.setItem("polimi_theme", theme);
 }
 

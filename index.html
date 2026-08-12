@@ -16,8 +16,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260812-ui-share-v1" />
-  <link rel="stylesheet" href="ui-polish.css?v=20260812-mobile-v4" />
+  <link rel="stylesheet" href="ui-polish.css?v=20260812-mobile-v5" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -41,11 +42,11 @@
 
         <div class="access-join-actions">
           <a class="access-primary-form" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-            <span class="access-primary-icon" aria-hidden="true">&#43;</span>
+            <span class="access-primary-icon material-symbols-rounded" aria-hidden="true">person_add</span>
             <span class="access-primary-copy"><strong>Join the directory</strong><small>Add your profile in under a minute</small></span>
-            <span class="access-primary-arrow" aria-hidden="true">&nearr;</span>
+            <span class="access-primary-arrow material-symbols-rounded" aria-hidden="true">open_in_new</span>
           </a>
-          <a class="access-announcements-link" href="announcements.html"><span aria-hidden="true">!</span><span>University updates</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span aria-hidden="true">&rarr;</span></a>
+          <a class="access-announcements-link" href="announcements.html"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span>University updates</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
         </div>
 
         <section class="access-return-panel" aria-labelledby="accessReturnTitle">
@@ -57,11 +58,11 @@
             <label for="accessEmail">Email used in the form</label>
             <div class="access-form-row">
               <div class="access-input">
-                <span aria-hidden="true">@</span>
+                <span class="material-symbols-rounded" aria-hidden="true">alternate_email</span>
                 <input id="accessEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
               </div>
               <button id="accessSubmit" type="submit" disabled>
-                <span id="accessSubmitLabel">Loading directory&hellip;</span><span aria-hidden="true">&rarr;</span>
+                <span id="accessSubmitLabel">Loading directory&hellip;</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
               </button>
             </div>
           </form>
@@ -69,7 +70,7 @@
           <div class="access-not-found" id="accessNotFound" hidden></div>
         </section>
 
-        <p class="access-privacy"><span aria-hidden="true">&#10003;</span> Your email is used only to confirm membership and is never shown in the directory.</p>
+        <p class="access-privacy"><span class="material-symbols-rounded" aria-hidden="true">verified_user</span> Your email is used only to confirm membership and is never shown in the directory.</p>
       </div>
 
       <aside class="access-visual" aria-hidden="true">
@@ -108,16 +109,16 @@
           <span class="connection-dot"></span>
           <span class="connection-text">Connecting</span>
         </span>
-        <a class="top-notices-btn" href="announcements.html" aria-label="Open university announcements"><span aria-hidden="true">!</span><span class="top-notices-label">Notices</span><i id="announcementsTopCount" hidden>0</i></a>
-        <a class="top-groups-btn" href="groups.html" aria-label="Open Telegram groups"><span aria-hidden="true">✈</span><span class="top-groups-label">Groups</span></a>
+        <a class="top-notices-btn" href="announcements.html" aria-label="Open university announcements"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span class="top-notices-label">Notices</span><i id="announcementsTopCount" hidden>0</i></a>
+        <a class="top-groups-btn" href="groups.html" aria-label="Open Telegram groups"><span class="material-symbols-rounded" aria-hidden="true">forum</span><span class="top-groups-label">Groups</span></a>
         <button class="top-profile-btn" id="myProfileButton" type="button" aria-label="Open my profile">
           <span class="top-profile-avatar" id="myProfileAvatar">ME</span><span class="top-profile-label">My profile</span>
         </button>
-        <button class="icon-btn install-app-btn" id="installAppButton" type="button" aria-label="Install Polimi Students app" title="Install app" hidden>⇩</button>
+        <button class="icon-btn install-app-btn" id="installAppButton" type="button" aria-label="Install Polimi Students app" title="Install app" hidden><span class="material-symbols-rounded" aria-hidden="true">download</span></button>
         <a class="top-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-          <span class="top-cta-plus">↗</span><span class="top-cta-label">Update my info</span>
+          <span class="top-cta-plus material-symbols-rounded" aria-hidden="true">edit</span><span class="top-cta-label">Update my info</span>
         </a>
-        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme"><span id="themeIcon">☾</span></button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme"><span class="material-symbols-rounded" id="themeIcon" aria-hidden="true">dark_mode</span></button>
       </div>
     </div>
   </header>
@@ -131,38 +132,34 @@
       </div>
       <div class="directory-intro-actions">
         <a class="directory-update-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-          <span>Update my info</span><span aria-hidden="true">↗</span>
+          <span>Update my info</span><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
         </a>
       </div>
     </section>
 
     <section class="explore-section" id="directory" aria-label="Explore students">
       <div class="section-heading">
-        <div>
-          <span class="section-kicker">STUDENT DIRECTORY</span>
-          <h2>Students</h2>
-          <p>Search, filter, or tap a card to open the full profile.</p>
-        </div>
+        <h2 id="directoryHeadingCount">Students</h2>
         <div class="directory-heading-tools">
           <div class="desktop-view-switch" aria-label="Choose view">
-            <button id="cardViewBtn" class="seg-btn active" type="button" data-view="cards"><span>▦</span> Cards</button>
-            <button id="tableViewBtn" class="seg-btn" type="button" data-view="table"><span>☷</span> Table</button>
+            <button id="cardViewBtn" class="seg-btn active" type="button" data-view="cards"><span class="material-symbols-rounded" aria-hidden="true">grid_view</span> Cards</button>
+            <button id="tableViewBtn" class="seg-btn" type="button" data-view="table"><span class="material-symbols-rounded" aria-hidden="true">table_rows</span> Table</button>
           </div>
         </div>
       </div>
 
       <div class="controls-panel">
         <label class="search-field" for="searchInput">
-          <span class="search-icon" aria-hidden="true">⌕</span>
+          <span class="material-symbols-rounded search-icon" aria-hidden="true">search</span>
           <input id="searchInput" type="search" placeholder="Search students&hellip;" aria-label="Search students by name, program, or campus" autocomplete="off" />
           <span class="search-shortcut" aria-hidden="true">/</span>
-          <button id="searchClear" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+          <button id="searchClear" class="search-clear" type="button" aria-label="Clear search" hidden><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
         </label>
         <div class="search-suggestions" id="searchSuggestions" hidden role="listbox" aria-label="Search suggestions"></div>
 
         <div class="directory-control-actions">
           <button class="filter-trigger" id="filterTrigger" type="button" aria-controls="filterSheet" aria-expanded="false">
-            <span class="filter-symbol" aria-hidden="true">☷</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
+            <span class="material-symbols-rounded filter-symbol" aria-hidden="true">tune</span><span>Filters</span><strong id="filterCount" hidden>0</strong>
           </button>
 
           <label class="sort-control sort-control-inline" for="sortSelect">
@@ -178,16 +175,16 @@
           </label>
 
           <button class="roommate-match-trigger" id="roommateMatchButton" type="button" aria-pressed="false">
-            <span class="roommate-match-icon" aria-hidden="true">⌂</span>
+            <span class="roommate-match-icon material-symbols-rounded" aria-hidden="true">bed</span>
             <span id="roommateMatchButtonLabel">Find roommates</span>
           </button>
 
           <button class="mobile-roommate-shortcut" id="mobileRoommateButton" type="button" aria-pressed="false">
-            <span aria-hidden="true">⌂</span><span>Roommates</span>
+            <span class="material-symbols-rounded" aria-hidden="true">bed</span><span>Roommates</span>
           </button>
 
           <button class="saved-trigger" id="savedTrigger" type="button" aria-pressed="false">
-            <span aria-hidden="true">♡</span><span>Saved</span><strong id="savedCount">0</strong>
+            <span class="material-symbols-rounded" aria-hidden="true">favorite</span><span>Saved</span><strong id="savedCount">0</strong>
           </button>
         </div>
 
@@ -197,19 +194,19 @@
       <div class="quick-filter-row" id="quickFilters" aria-label="Quick filters"></div>
 
       <div class="first-use-hint" id="firstUseHint" hidden>
-        <span aria-hidden="true">✦</span>
+        <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
         <p><strong>Quick tip:</strong> Tap any student to open their full profile. Use <b>Classmates</b> or <b>Same campus</b> to narrow the directory instantly.</p>
-        <button id="firstUseHintClose" type="button" aria-label="Dismiss tip">×</button>
+        <button id="firstUseHintClose" type="button" aria-label="Dismiss tip"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       </div>
 
-      <div class="results-bar">
+      <div class="results-bar" id="resultsBar">
         <p id="resultText">Loading students…</p>
         <div class="active-filter-chips" id="activeFilterChips"></div>
         <button class="clear-all" id="clearFilters" type="button" hidden>Reset filters</button>
       </div>
 
       <div class="roommate-match-banner" id="roommateMatchBanner" hidden>
-        <div class="roommate-match-banner-icon" aria-hidden="true">✦</div>
+        <div class="roommate-match-banner-icon material-symbols-rounded" aria-hidden="true">bed</div>
         <div class="roommate-match-banner-copy">
           <strong id="roommateMatchTitle">Your roommate matches</strong>
           <span id="roommateMatchText">Students looking for roommates are ranked by campus and program fit.</span>
@@ -223,7 +220,7 @@
       </div>
 
       <div class="directory-empty" id="emptyState" hidden>
-        <span class="directory-empty-icon" aria-hidden="true">⌕</span>
+        <span class="directory-empty-icon material-symbols-rounded" aria-hidden="true">search_off</span>
         <h3>No students match this view</h3>
         <p>Try another search or clear your filters to see everyone again.</p>
         <div class="directory-empty-actions">
@@ -244,10 +241,11 @@
       </div>
 
       <div class="pagination pagination-v2" id="pagination" hidden aria-label="Student directory pagination">
-        <button class="pagination-nav" id="prevPage" type="button" aria-label="Previous page">← <span>Previous</span></button>
+        <button class="pagination-nav" id="prevPage" type="button" aria-label="Previous page"><span class="material-symbols-rounded" aria-hidden="true">arrow_back</span><span class="pagination-label">Previous</span></button>
         <div class="pagination-pages" id="pageNumbers" aria-label="Page numbers"></div>
-        <button class="pagination-nav" id="nextPage" type="button" aria-label="Next page"><span>Next</span> →</button>
+        <button class="pagination-nav" id="nextPage" type="button" aria-label="Next page"><span class="pagination-label">Next</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
         <span class="pagination-info" id="pageInfo">Page 1 of 1 · 24 per page</span>
+        <button class="load-more-button" id="loadMoreButton" type="button" hidden><span class="material-symbols-rounded" aria-hidden="true">expand_more</span><span id="loadMoreLabel">Show more students</span></button>
       </div>
     </section>
   </main>
@@ -258,7 +256,7 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-head">
         <div><span>FILTERS</span><h2 id="filterTitle">Refine students</h2><p>Choose multiple values if you like.</p></div>
-        <button class="sheet-close" id="filterClose" type="button" aria-label="Close filters">×</button>
+        <button class="sheet-close" id="filterClose" type="button" aria-label="Close filters"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       </div>
       <div class="mobile-filter-content" id="mobileFilters"></div>
       <div class="sheet-actions">
@@ -274,32 +272,32 @@
     <section class="profile-panel" id="profilePanel" role="dialog" aria-modal="true" aria-labelledby="profileName">
       <div class="profile-handle" aria-hidden="true"></div>
       <header class="profile-toolbar">
-        <button class="profile-toolbar-btn" id="profileClose" type="button" aria-label="Close profile">×</button>
+        <button class="profile-toolbar-btn" id="profileClose" type="button" aria-label="Close profile"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
         <div class="profile-toolbar-center">
           <span class="profile-toolbar-label">STUDENT PROFILE</span>
           <div class="profile-browser-nav" id="profileBrowserNav" aria-label="Browse student profiles">
-            <button id="profilePrev" type="button" aria-label="Previous student">← <span>Previous</span></button>
+            <button id="profilePrev" type="button" aria-label="Previous student"><span class="material-symbols-rounded" aria-hidden="true">arrow_back</span><span>Previous</span></button>
             <span id="profilePosition">1 / 1</span>
-            <button id="profileNext" type="button" aria-label="Next student"><span>Next</span> →</button>
+            <button id="profileNext" type="button" aria-label="Next student"><span>Next</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
           </div>
         </div>
         <div class="profile-toolbar-actions">
-          <button class="profile-toolbar-btn profile-save" id="profileSave" type="button" aria-label="Save student profile" aria-pressed="false">♡</button>
+          <button class="profile-toolbar-btn profile-save" id="profileSave" type="button" aria-label="Save student profile" aria-pressed="false"><span class="material-symbols-rounded" aria-hidden="true">favorite</span></button>
           <button class="profile-toolbar-btn profile-share" id="profileShare" type="button" aria-label="Share student profile">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4A3 3 0 0 0 15 5c0 .2.02.4.06.58L8.9 9.1A3 3 0 0 0 7 8.4a3 3 0 1 0 1.9 5.3l6.16 3.52A3 3 0 0 0 15 18a3 3 0 1 0 .9-2.14l-6.12-3.5c.14-.48.14-1 0-1.48l6.12-3.5A3 3 0 0 0 18 8Z" fill="currentColor"/></svg>
+            <span class="material-symbols-rounded" aria-hidden="true">share</span>
             <span id="profileShareLabel">Share</span>
           </button>
           <div class="profile-menu-wrap">
-            <button class="profile-toolbar-btn" id="profileMenuButton" type="button" aria-label="More profile actions" aria-expanded="false">•••</button>
+            <button class="profile-toolbar-btn" id="profileMenuButton" type="button" aria-label="More profile actions" aria-expanded="false"><span class="material-symbols-rounded" aria-hidden="true">more_horiz</span></button>
             <div class="profile-menu" id="profileMenu" hidden>
-              <a id="profileUpdateAction" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">↗ Update my profile</a>
-              <button id="profileReportAction" type="button">⚑ Report to Kamyab</button>
+              <a id="profileUpdateAction" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer"><span class="material-symbols-rounded" aria-hidden="true">edit</span> Update my profile</a>
+              <button id="profileReportAction" type="button"><span class="material-symbols-rounded" aria-hidden="true">flag</span> Report to Kamyab</button>
             </div>
           </div>
         </div>
       </header>
       <div class="profile-scroll">
-        <div class="profile-swipe-hint" id="profileSwipeHint" aria-hidden="true">← Swipe to browse →</div>
+        <div class="profile-swipe-hint" id="profileSwipeHint" aria-hidden="true">Swipe to browse profiles</div>
         <div class="profile-body" id="profileBody"></div>
       </div>
       <p class="profile-contact-privacy" id="profileContactPrivacy" hidden>Contact details are visible only to students who joined the directory.</p>
@@ -307,12 +305,12 @@
     </section>
   </aside>
 
-  <nav class="mobile-nav" aria-label="Mobile navigation">
-    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon" aria-hidden="true">&#8962;</span><small>Students</small></button>
-    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">&#9825;</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
-    <a href="announcements.html" class="mobile-nav-item mobile-notices-link"><span class="mobile-nav-icon mobile-notice-icon" aria-hidden="true">!<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></a>
-    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span class="mobile-nav-icon" aria-hidden="true">&#10148;</span><small>Groups</small></a>
-    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span class="mobile-nav-icon" aria-hidden="true">&#9673;</span><small>Me</small></button>
+  <nav class="mobile-nav app-mobile-nav" aria-label="Mobile navigation">
+    <button id="mobileStudentsButton" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">groups</span><small>Students</small></button>
+    <button id="mobileSavedButton" class="mobile-nav-item" type="button" aria-pressed="false"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">favorite</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
+    <a href="announcements.html" class="mobile-nav-item mobile-notices-link"><span class="mobile-nav-icon material-symbols-rounded mobile-notice-icon" aria-hidden="true">notifications<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></a>
+    <a href="groups.html" class="mobile-nav-item mobile-groups-link"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">forum</span><small>Groups</small></a>
+    <button id="mobileMyProfileButton" class="mobile-nav-item" type="button"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">person</span><small>Me</small></button>
   </nav>
 
 
@@ -322,7 +320,7 @@
       <span class="welcome-tour-kicker">WELCOME</span>
       <h2 id="welcomeTourTitle">Your Polimi directory is ready.</h2>
       <p>Find classmates, students on your campus, and potential roommates. Tap any student to open the full profile.</p>
-      <div class="welcome-tour-tips"><span>◎ Classmates</span><span>⌖ Same campus</span><span>♡ Save profiles</span></div>
+      <div class="welcome-tour-tips"><span><i class="material-symbols-rounded" aria-hidden="true">school</i> Classmates</span><span><i class="material-symbols-rounded" aria-hidden="true">location_on</i> Same campus</span><span><i class="material-symbols-rounded" aria-hidden="true">favorite</i> Save profiles</span></div>
       <button id="welcomeTourDone" type="button">Got it</button>
     </section>
   </aside>
@@ -336,8 +334,8 @@
   </div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="announcements.js?v=20260812-ui-share-v1"></script>
-  <script src="app.js?v=20260812-mobile-v3"></script>
-  <script src="ux-enhancements.js?v=20260811-safety-v1"></script>
+  <script src="announcements.js?v=20260812-mobile-v5"></script>
+  <script src="app.js?v=20260812-mobile-v5"></script>
+  <script src="ux-enhancements.js?v=20260812-mobile-v5"></script>
 </body>
 </html>

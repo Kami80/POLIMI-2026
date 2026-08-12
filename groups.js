@@ -108,7 +108,9 @@ async function shareGroup(item, button) {
   }
   const copied = await copyText(url);
   const old = button.innerHTML;
-  button.innerHTML = copied ? '<span>Link copied</span><span aria-hidden="true">✓</span>' : '<span>Copy failed</span><span aria-hidden="true">!</span>';
+  button.innerHTML = copied
+    ? '<span>Link copied</span><span class="material-symbols-rounded" aria-hidden="true">check</span>'
+    : '<span>Copy failed</span><span class="material-symbols-rounded" aria-hidden="true">error</span>';
   setTimeout(() => { button.innerHTML = old; }, 1600);
 }
 
@@ -147,8 +149,8 @@ function renderGroups() {
     avatar.setAttribute("aria-hidden", "true");
 
     const telegramMark = document.createElement("span");
-    telegramMark.className = "telegram-group-mark";
-    telegramMark.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 3.2 2.9 10.4c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 1.9 5.8c.2.7.1 1 .9 1 .6 0 .8-.2 1.1-.5l2.7-2.6 5.6 4.2c1 .6 1.8.3 2-1l3.4-16.1c.4-1.5-.5-2.2-1.5-1.7ZM9.4 13.1l9.4-5.9c.4-.3.8-.1.5.2l-7.7 7-.3 3.1-1.9-4.4Z" fill="currentColor"/></svg>';
+    telegramMark.className = "telegram-group-mark material-symbols-rounded";
+    telegramMark.textContent = "send";
 
     top.append(avatar, telegramMark);
 
@@ -157,7 +159,8 @@ function renderGroups() {
 
     const label = document.createElement("span");
     label.className = "telegram-group-label";
-    label.textContent = item.pinned ? "📌 PINNED · MAIN COMMUNITY" : "PROGRAM GROUP";
+    if (item.pinned) label.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">push_pin</span> PINNED · MAIN COMMUNITY';
+    else label.textContent = "PROGRAM GROUP";
 
     const title = document.createElement("h2");
     title.textContent = item.program;
@@ -179,13 +182,13 @@ function renderGroups() {
       event.preventDefault();
       openTelegramLink(item.url);
     });
-    button.innerHTML = '<span>Open Telegram group</span><span aria-hidden="true">↗</span>';
+    button.innerHTML = '<span>Open Telegram group</span><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>';
     button.setAttribute("aria-label", `Open ${item.program} Telegram group`);
 
     const share = document.createElement("button");
     share.type = "button";
     share.className = "telegram-share-btn";
-    share.innerHTML = '<span>Share</span><span aria-hidden="true">⌁</span>';
+    share.innerHTML = '<span>Share</span><span class="material-symbols-rounded" aria-hidden="true">share</span>';
     share.setAttribute("aria-label", `Share ${item.program} group`);
     share.addEventListener("click", () => shareGroup(item, share));
 
@@ -216,7 +219,7 @@ function renderGroups() {
 
 function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  themeIcon.textContent = theme === "dark" ? "☀" : "☾";
+  themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
   localStorage.setItem("polimi_theme", theme);
 }
 

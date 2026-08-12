@@ -978,3 +978,769 @@
     transition: none;
   }
 }
+
+/* Unified iconography, readable type, contextual cards, and shared navigation */
+[hidden] {
+  display: none !important;
+}
+
+.material-symbols-rounded {
+  display: inline-block;
+  direction: ltr;
+  font-family: "Material Symbols Rounded" !important;
+  font-size: 1.25em;
+  font-style: normal;
+  font-weight: normal !important;
+  font-feature-settings: "liga";
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+.profile-save.active .material-symbols-rounded,
+.app-mobile-nav .mobile-nav-item.active .material-symbols-rounded {
+  font-variation-settings: "FILL" 1, "wght" 550, "GRAD" 0, "opsz" 24;
+}
+
+body small {
+  font-size: 12px !important;
+}
+
+.access-brand small,
+.access-kicker,
+.access-primary-copy small,
+.access-return-heading span,
+.access-form > label,
+.access-status,
+.access-privacy,
+.access-visual-label,
+.access-visual-state,
+.access-feature-list small,
+.directory-intro-kicker,
+.quick-filter-label,
+.filter-summary-copy small,
+.mobile-filter-summary small,
+.profile-kicker,
+.profile-toolbar-label,
+.profile-detail > div > span,
+.profile-extra-item > span,
+.telegram-group-label,
+.announcements-kicker,
+.announcements-section-kicker,
+.announcements-toolbar-copy,
+.announcement-card-date-row,
+.announcement-card-footer-v3,
+.announcement-tag,
+.announcement-status,
+.announcement-unread-pill,
+.announcement-modal-section-label,
+.announcement-modal-source span,
+.announcement-modal-source small {
+  font-size: 12px !important;
+}
+
+.access-brand strong,
+.access-primary-copy strong,
+.access-return-heading strong,
+.access-form button,
+.access-announcements-link,
+.directory-intro p,
+.search-field input,
+.filter-trigger,
+.sort-control select,
+.roommate-match-trigger,
+.saved-trigger,
+.mobile-roommate-shortcut,
+.first-use-hint p,
+.directory-empty p,
+.roommate-match-banner-copy span,
+.saved-banner span,
+.student-card-program-simple,
+.profile-about p,
+.profile-extra-item strong,
+.profile-contact-btn,
+.telegram-group-body p,
+.telegram-join-btn,
+.telegram-share-btn,
+.groups-contribute p,
+.groups-contribute-btn,
+.announcements-hero p,
+.announcements-search-wrap input,
+.announcement-card-summary,
+.announcement-modal-summary,
+.announcement-modal-copy p,
+.announcement-modal-action,
+.announcements-note p {
+  font-size: 14px !important;
+}
+
+.access-lead,
+.access-visual-copy {
+  font-size: 15px;
+}
+
+.access-feature-list strong,
+.access-form input {
+  font-size: 14px;
+}
+
+.connection-text,
+.top-notices-btn,
+.top-groups-btn,
+.top-notices-label,
+.top-groups-label,
+.top-profile-avatar,
+.top-profile-label,
+.top-cta-label,
+.top-notices-btn > i,
+.directory-update-link,
+.seg-btn,
+.sort-control > span,
+.saved-trigger > strong,
+.groups-kicker,
+.groups-header-actions a,
+.announcements-header-actions a,
+.announcements-hero-guide span,
+.announcements-hero-guide i,
+.announcements-since,
+.announcements-count,
+.mark-all-read,
+.announcement-filter,
+.announcement-filter i,
+.announcement-card-footer-v3 > span,
+.announcement-card-footer-v3 strong,
+.pagination-v2 .pagination-label,
+.pagination-v2 .pagination-page,
+.pagination-v2 .pagination-info,
+.site-footer,
+.site-footer span,
+.site-footer strong,
+.site-footer button {
+  font-size: 12px !important;
+}
+
+.directory-update-link,
+.top-profile-btn,
+.top-cta {
+  font-size: 14px;
+}
+
+.profile-swipe-hint,
+.profile-program > span,
+.profile-contact-privacy,
+.profile-browser-nav,
+.profile-browser-nav button,
+.profile-browser-nav button span,
+.profile-browser-nav > span {
+  font-size: 12px !important;
+}
+
+.profile-program > strong,
+.profile-detail strong,
+.profile-section-title strong {
+  font-size: 14px !important;
+}
+
+.pagination-v2 .pagination-nav > .material-symbols-rounded {
+  font-size: 18px !important;
+}
+
+.access-primary-icon,
+.access-primary-arrow,
+.access-announcements-link > .material-symbols-rounded,
+.access-input > .material-symbols-rounded,
+.access-form button .material-symbols-rounded,
+.access-privacy .material-symbols-rounded {
+  font-size: 21px;
+}
+
+.search-icon,
+.filter-symbol {
+  width: 24px;
+  height: 24px;
+  flex-basis: 24px;
+  background: none !important;
+  font-size: 24px !important;
+}
+
+.search-icon::before,
+.search-icon::after {
+  display: none;
+}
+
+.filter-symbol {
+  font-size: 21px !important;
+}
+
+.quick-filter-chip,
+.active-chip,
+.clear-all,
+.filter-option,
+.mobile-check,
+.sheet-actions button,
+.gender-badge,
+.creator-badge,
+.polimi-mail-badge,
+.profile-updated-badge {
+  font-size: 12px !important;
+}
+
+.quick-filter-chip > .material-symbols-rounded {
+  font-size: 18px !important;
+}
+
+.active-chip-removable b.material-symbols-rounded {
+  font-size: 15px !important;
+}
+
+#resultText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.results-bar:not(.has-active) {
+  display: none;
+}
+
+.results-bar.has-active {
+  min-height: 0;
+  padding: 12px 2px 8px;
+}
+
+mark.search-match {
+  margin-inline: -1px;
+  padding-inline: 2px;
+  border-radius: 4px;
+  background: color-mix(in srgb, #ffd54f 42%, transparent);
+  color: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+[data-theme="dark"] mark.search-match {
+  background: color-mix(in srgb, #ffd54f 30%, transparent);
+}
+
+.student-card-simple-content {
+  gap: 9px;
+}
+
+.student-context-badge {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 20%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--surface-2));
+  color: color-mix(in srgb, var(--card-accent) 78%, var(--ink));
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.student-context-badge > .material-symbols-rounded {
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.student-context-badge.context-roommate {
+  border-color: color-mix(in srgb, var(--violet) 24%, var(--line));
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+
+.student-context-badge.context-match {
+  border-color: color-mix(in srgb, var(--primary) 26%, var(--line));
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.student-context-badge.context-personal {
+  border-color: color-mix(in srgb, var(--green) 24%, var(--line));
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.student-card-simple .student-card-simple-chevron.material-symbols-rounded {
+  font-size: 22px;
+}
+
+.sort-indicator.material-symbols-rounded {
+  font-size: 16px;
+}
+
+.profile-detail-icon.material-symbols-rounded,
+.profile-section-title .material-symbols-rounded,
+.creator-badge .material-symbols-rounded,
+.polimi-mail-badge .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.creator-badge,
+.polimi-mail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.telegram-icon.material-symbols-rounded,
+.mail-icon.material-symbols-rounded {
+  font-size: 22px;
+}
+
+.telegram-arrow.material-symbols-rounded,
+.mail-arrow.material-symbols-rounded,
+.cell-link .material-symbols-rounded,
+.telegram-recommendation-card b.material-symbols-rounded,
+.telegram-recommendation-heading a .material-symbols-rounded,
+.search-suggestion b.material-symbols-rounded {
+  font-size: 17px;
+}
+
+.telegram-recommendation-heading a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.load-more-button {
+  display: none;
+}
+
+.groups-hero-badge > .material-symbols-rounded {
+  font-size: 72px;
+}
+
+.telegram-group-mark.material-symbols-rounded {
+  font-size: 23px;
+}
+
+.telegram-group-label .material-symbols-rounded {
+  margin-right: 4px;
+  font-size: 15px;
+}
+
+.announcement-card-icon.material-symbols-rounded {
+  font-size: 24px;
+}
+
+.announcement-card-footer-v3 .material-symbols-rounded,
+.announcement-modal-action > .material-symbols-rounded,
+.announcement-modal-icon-btn .material-symbols-rounded {
+  font-size: 19px;
+}
+
+.announcement-modal-hero-top p {
+  font-size: 12px !important;
+}
+
+.app-mobile-nav {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body.directory-unlocked,
+  body.groups-page,
+  body.announcements-page {
+    padding-bottom: calc(98px + env(safe-area-inset-bottom));
+  }
+
+  .directory-unlocked .top-notices-btn,
+  .directory-unlocked .top-groups-btn,
+  .groups-header-actions .announcements-header-link,
+  .groups-header-actions .groups-back-link,
+  .announcements-header-actions .announcements-header-link,
+  .announcements-header-actions .announcements-back-link {
+    display: none;
+  }
+
+  .access-brand small,
+  .access-kicker,
+  .access-primary-copy small,
+  .access-return-heading span,
+  .access-form > label,
+  .access-status,
+  .access-privacy,
+  .directory-intro-kicker,
+  .directory-intro p,
+  .directory-control-actions .filter-trigger > span:nth-child(2),
+  .directory-control-actions .sort-control > span,
+  .quick-filter-label,
+  .results-bar p,
+  .active-chip,
+  .quick-filter-chip,
+  .mobile-roommate-shortcut {
+    font-size: 12px !important;
+  }
+
+  .access-card h1 {
+    font-size: clamp(38px, 11vw, 46px);
+  }
+
+  .access-lead,
+  .directory-intro p,
+  .first-use-hint p,
+  .roommate-match-banner-copy span,
+  .saved-banner span {
+    font-size: 14px !important;
+  }
+
+  .access-primary-copy strong,
+  .access-return-heading strong,
+  .access-form button,
+  .access-announcements-link {
+    font-size: 14px;
+  }
+
+  .access-input input,
+  .search-field input,
+  .directory-control-actions .sort-control select {
+    font-size: 15px;
+  }
+
+  .access-primary-form {
+    min-height: 74px;
+  }
+
+  .access-return-panel {
+    padding: 16px;
+  }
+
+  #directory .section-heading h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .controls-panel {
+    top: 64px;
+  }
+
+  .directory-control-actions {
+    grid-template-columns: 88px minmax(0, 1fr) 110px;
+  }
+
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control,
+  .mobile-roommate-shortcut {
+    min-height: 48px;
+  }
+
+  .directory-control-actions .sort-control {
+    padding-inline: 11px;
+  }
+
+  .quick-filter-chip {
+    min-height: 38px;
+    padding-inline: 12px;
+  }
+
+  .results-bar.has-active {
+    margin-top: 7px;
+    padding: 8px 2px 10px;
+    display: grid;
+  }
+
+  .active-chip {
+    min-height: 34px;
+    padding-inline: 11px;
+  }
+
+  .results-bar .clear-all {
+    min-height: 34px;
+    font-size: 12px;
+  }
+
+  .student-grid {
+    gap: 12px;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    min-height: 206px;
+    padding: 18px 15px 16px;
+  }
+
+  .student-card-simple .student-card-title-row .student-name {
+    font-size: 16px;
+    line-height: 1.32;
+  }
+
+  .student-card-program-simple {
+    font-size: 14px !important;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+  }
+
+  .student-context-badge {
+    min-height: 30px;
+    padding: 5px 8px;
+    align-items: flex-start;
+    border-radius: 11px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .student-context-badge > .material-symbols-rounded {
+    margin-top: 1px;
+    font-size: 16px;
+  }
+
+  .pagination.pagination-v2 {
+    width: 100%;
+    padding-top: 22px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pagination-v2 .pagination-nav,
+  .pagination-v2 .pagination-pages,
+  .pagination-v2 .pagination-info {
+    display: none !important;
+  }
+
+  .pagination-v2 .load-more-button {
+    width: min(100%, 430px);
+    height: 56px;
+    padding: 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, var(--line));
+    border-radius: 17px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 850;
+    box-shadow: none;
+  }
+
+  .pagination-v2 .load-more-button .material-symbols-rounded {
+    font-size: 21px;
+  }
+
+  .app-mobile-nav {
+    position: fixed;
+    z-index: 90;
+    left: 10px;
+    right: 10px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    min-height: 76px;
+    padding: 7px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 16px 44px rgba(8, 20, 42, .22);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+  }
+
+  .app-mobile-nav .mobile-nav-item {
+    min-width: 0;
+    min-height: 62px;
+    padding: 5px 1px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 0;
+    border-radius: 17px;
+    background: transparent;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .app-mobile-nav .mobile-nav-item .mobile-nav-icon {
+    width: 31px;
+    height: 29px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: currentColor;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .app-mobile-nav .mobile-nav-item small {
+    max-width: 100%;
+    overflow: hidden;
+    color: currentColor;
+    font-size: 12px !important;
+    font-weight: 800;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-mobile-nav .mobile-nav-item.active {
+    background: transparent;
+    color: var(--primary);
+  }
+
+  .app-mobile-nav .mobile-nav-item.active .mobile-nav-icon {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 28%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .app-mobile-nav .mobile-nav-item > i,
+  .app-mobile-nav .mobile-notice-icon i {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 24px);
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--surface);
+    border-radius: 999px;
+    background: var(--coral);
+    color: #fff;
+    font-family: Manrope, sans-serif !important;
+    font-size: 12px !important;
+    font-style: normal;
+    font-weight: 850;
+    line-height: 1;
+  }
+
+  .app-mobile-nav .mobile-notice-icon i {
+    top: -6px;
+    right: -9px;
+  }
+
+  .groups-kicker,
+  .groups-count,
+  .telegram-group-label,
+  .announcements-kicker,
+  .announcements-section-kicker,
+  .announcements-toolbar-copy,
+  .announcements-count,
+  .announcements-since,
+  .mark-all-read,
+  .announcement-filter,
+  .announcement-card-date-row,
+  .announcement-card-v3 .announcement-tag,
+  .announcement-card-footer-v3 > span,
+  .announcement-card-footer-v3 strong,
+  .announcement-status,
+  .announcement-unread-pill {
+    font-size: 12px !important;
+  }
+
+  .groups-hero p,
+  .groups-search input,
+  .telegram-group-body p,
+  .telegram-join-btn,
+  .telegram-share-btn,
+  .groups-contribute p,
+  .announcements-hero p,
+  .announcements-search-wrap input,
+  .announcement-card-summary,
+  .announcements-note p {
+    font-size: 14px !important;
+  }
+
+  .telegram-group-card,
+  .telegram-group-card.telegram-group-pinned {
+    min-height: 275px;
+  }
+
+  .telegram-group-body h2,
+  .telegram-group-pinned .telegram-group-body h2 {
+    font-size: 21px;
+  }
+
+  .telegram-group-label {
+    line-height: 1.35;
+  }
+
+  .announcements-hero-guide span,
+  .announcements-hero-guide i {
+    font-size: 12px;
+  }
+
+  .announcement-filter {
+    min-height: 40px;
+    padding-inline: 12px;
+  }
+
+  .announcement-filter i {
+    min-width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+
+  .announcement-card-v3,
+  .announcement-card-button {
+    min-height: 292px;
+  }
+
+  .announcement-card-title {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .announcement-card-summary {
+    line-height: 1.6;
+  }
+
+  .announcement-card-footer-v3 .material-symbols-rounded {
+    font-size: 18px;
+  }
+
+  .announcement-modal-toolbar-label,
+  .announcement-modal-section-label,
+  .announcement-modal-source span,
+  .announcement-modal-source small,
+  .announcement-modal-highlight span,
+  .announcement-category,
+  .announcement-modal-tags .announcement-tag {
+    font-size: 12px !important;
+  }
+
+  .announcement-modal-summary,
+  .announcement-modal-copy p,
+  .announcement-modal-highlight strong,
+  .announcement-modal-source strong,
+  .announcement-modal-action strong {
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 370px) {
+  .directory-control-actions {
+    grid-template-columns: 82px minmax(0, 1fr) 102px;
+  }
+
+  .app-mobile-nav {
+    left: 6px;
+    right: 6px;
+    padding-inline: 5px;
+  }
+
+  .app-mobile-nav .mobile-nav-item small {
+    font-size: 12px !important;
+  }
+}
