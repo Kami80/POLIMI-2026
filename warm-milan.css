@@ -1500,6 +1500,10 @@ body {
 }
 
 @media (max-width: 760px) {
+  .directory-unlocked .top-profile-btn {
+    display: none;
+  }
+
   .access-inline-community-art {
     height: clamp(126px, 38vw, 156px);
     margin: 22px 0 0;
