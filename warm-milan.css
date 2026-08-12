@@ -910,9 +910,10 @@ body {
 }
 
 /* Full-page signed-in profile. */
-.top-profile-avatar.material-symbols-rounded {
-  font-size: 19px;
-  font-variation-settings: "FILL" 0, "wght" 520, "GRAD" 0, "opsz" 24;
+.top-profile-btn {
+  padding-inline: 17px;
+  justify-content: center;
+  gap: 0;
 }
 
 .me-main {
