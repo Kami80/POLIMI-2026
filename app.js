@@ -69,8 +69,8 @@ function cacheElements() {
     "connectionStatus", "themeToggle", "themeIcon", "myProfileButton", "myProfileAvatar", "installAppButton",
     "directoryIntroTitle", "directoryIntroText", "sortSelect", "savedTrigger", "savedCount", "savedBanner", "savedReset",
     "searchInput", "searchClear", "filterTrigger", "filterCount", "desktopFilters", "mobileFilters",
-    "activeFilterChips", "clearFilters", "resultText", "cardView", "tableView", "tableHead", "tableBody",
-    "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "pageNumbers", "filterSheet", "filterBackdrop",
+    "activeFilterChips", "clearFilters", "resultText", "resultsBar", "directoryHeadingCount", "cardView", "tableView", "tableHead", "tableBody",
+    "cardViewBtn", "tableViewBtn", "pagination", "prevPage", "nextPage", "pageInfo", "pageNumbers", "loadMoreButton", "loadMoreLabel", "filterSheet", "filterBackdrop",
     "filterClose", "sheetReset", "sheetApply", "mobileFilterButton", "mobileFilterBadge", "refreshButton", "updatedText",
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
@@ -164,7 +164,7 @@ function setupTheme() {
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  els.themeIcon.textContent = theme === "dark" ? "☀" : "☾";
+  if (els.themeIcon) els.themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
 }
 
 function setupEvents() {
@@ -203,6 +203,13 @@ function setupEvents() {
   els.emptyReset?.addEventListener("click", resetAllFilters);
   els.prevPage.addEventListener("click", () => changePage(-1));
   els.nextPage.addEventListener("click", () => changePage(1));
+  els.loadMoreButton?.addEventListener("click", () => {
+    const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
+    if (state.page >= pages) return;
+    state.page += 1;
+    persistDirectoryPreferences();
+    renderRows();
+  });
   els.refreshButton?.addEventListener("click", loadSheet);
 
   [els.roommateMatchButton, els.mobileRoommateButton].filter(Boolean).forEach(button => button.addEventListener("click", toggleRoommateMatchMode));
@@ -373,6 +380,15 @@ function redirectToForm() {
   }, 80);
 }
 
+function consumeRequestedDirectoryView() {
+  const url = new URL(window.location.href);
+  const view = url.searchParams.get("view");
+  if (!new Set(["saved", "me"]).has(view)) return "";
+  url.searchParams.delete("view");
+  history.replaceState(history.state, "", url.toString());
+  return view;
+}
+
 function unlockDirectory(email) {
   state.authorized = true;
   state.authorizedEmail = normalizeEmail(email);
@@ -388,6 +404,12 @@ function unlockDirectory(email) {
   restoreDirectoryPreferences();
 
   loadSavedProfiles();
+  const requestedView = consumeRequestedDirectoryView();
+  if (requestedView === "saved") {
+    state.savedOnly = true;
+    state.roommateMatchMode = false;
+    state.roommateReferenceRow = null;
+  }
   renderFilters();
   renderQuickFilters();
   updateRoommateMatchUI();
@@ -399,9 +421,10 @@ function unlockDirectory(email) {
 
   const now = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
   els.updatedText.textContent = `Updated ${now}`;
+  if (requestedView === "me") openMyProfile();
   requestAnimationFrame(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
-    openProfileFromUrl();
+    if (requestedView !== "me") openProfileFromUrl();
     maybeShowWelcomeTour();
   });
 }
@@ -678,7 +701,14 @@ function openStudentProfile(row, options = {}) {
   updateProfileMenuForRow(row);
   els.profileSheet.classList.add("open");
   els.profileSheet.setAttribute("aria-hidden", "false");
-  if (row === currentUserRow()) els.mobileMyProfileButton?.classList.add("active");
+  if (row === currentUserRow()) {
+    els.mobileStudentsButton?.classList.remove("active");
+    els.mobileStudentsButton?.removeAttribute("aria-current");
+    els.mobileSavedButton?.classList.remove("active");
+    els.mobileSavedButton?.removeAttribute("aria-current");
+    els.mobileMyProfileButton?.classList.add("active");
+    els.mobileMyProfileButton?.setAttribute("aria-current", "page");
+  }
   syncBodyLock();
   els.profilePanel?.querySelector(".profile-scroll")?.scrollTo({ top: 0, behavior: "auto" });
 
@@ -695,8 +725,10 @@ function closeStudentProfile(options = {}) {
   els.profileSheet.classList.remove("open");
   els.profileSheet.setAttribute("aria-hidden", "true");
   els.mobileMyProfileButton?.classList.remove("active");
+  els.mobileMyProfileButton?.removeAttribute("aria-current");
   state.activeProfileSlug = "";
   closeProfileMenu();
+  updateMobileNavState();
   syncBodyLock();
 
   if (syncUrl) {
@@ -757,14 +789,14 @@ function renderStudentProfile(row) {
   if (isCreatorRow(row)) {
     const creatorBadge = document.createElement("span");
     creatorBadge.className = "creator-badge profile-creator-badge";
-    creatorBadge.textContent = "✦ Creator";
+    creatorBadge.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">verified</span><span>Creator</span>';
     creatorBadge.title = "Creator of Polimi Students 2026/2027";
     badges.appendChild(creatorBadge);
   }
   if (mailtoUrl(polimiMail)) {
     const mailBadge = document.createElement("span");
     mailBadge.className = "polimi-mail-badge profile-polimi-badge";
-    mailBadge.textContent = "✓ Polimi mail";
+    mailBadge.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">mark_email_read</span><span>Polimi mail</span>';
     mailBadge.title = "Polimi mail provided";
     badges.appendChild(mailBadge);
   }
@@ -778,9 +810,9 @@ function renderStudentProfile(row) {
   const detailGrid = document.createElement("section");
   detailGrid.className = "profile-detail-grid";
   detailGrid.append(
-    createProfileDetail("Campus", campus, "⌖"),
-    createProfileDetail("Degree", degree, "◇"),
-    createProfileDetail("Roommate", roommate, "⌂")
+    createProfileDetail("Campus", campus, "location_on"),
+    createProfileDetail("Degree", degree, "school"),
+    createProfileDetail("Roommate", roommate, "bed")
   );
 
   els.profileBody.append(hero, programCard, detailGrid);
@@ -790,9 +822,10 @@ function renderStudentProfile(row) {
     about.className = "profile-about";
     const heading = document.createElement("div");
     heading.className = "profile-section-title";
-    heading.innerHTML = `<span>✦</span><strong>About me</strong>`;
+    heading.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span><strong>About me</strong>`;
     const text = document.createElement("p");
-    text.textContent = note;
+    text.dir = "auto";
+    appendProfileNote(text, note);
     about.append(heading, text);
     els.profileBody.appendChild(about);
   }
@@ -803,7 +836,7 @@ function renderStudentProfile(row) {
     extraSection.className = "profile-extra-section";
     const heading = document.createElement("div");
     heading.className = "profile-section-title";
-    heading.innerHTML = `<span>＋</span><strong>More details</strong>`;
+    heading.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">add</span><strong>More details</strong>`;
     const grid = document.createElement("div");
     grid.className = "profile-extra-grid";
     extras.forEach(column => {
@@ -824,16 +857,56 @@ function renderStudentProfile(row) {
   const telegramButton = createProfileContactButton("telegram", telegram);
   const mailButton = createProfileContactButton("mail", polimiMail);
   [telegramButton, mailButton].filter(Boolean).forEach(button => els.profileActions.appendChild(button));
+  els.profileActions.classList.toggle("single-action", els.profileActions.childElementCount === 1);
   els.profileActions.hidden = els.profileActions.childElementCount === 0;
   if (els.profileContactPrivacy) els.profileContactPrivacy.hidden = els.profileActions.hidden;
   els.profileShareLabel.textContent = "Share";
+}
+
+function appendProfileNote(container, value) {
+  const text = String(value || "");
+  const urlPattern = /https?:\/\/[^\s<>]+/gi;
+  let cursor = 0;
+
+  for (const match of text.matchAll(urlPattern)) {
+    const index = match.index || 0;
+    if (index > cursor) container.append(document.createTextNode(text.slice(cursor, index)));
+
+    const rawUrl = match[0].replace(/[),.;!?]+$/, "");
+    const trailing = match[0].slice(rawUrl.length);
+    const link = document.createElement("a");
+    link.className = "profile-inline-link";
+    link.href = rawUrl;
+
+    if (/^https?:\/\/(?:www\.)?t\.me\//i.test(rawUrl)) {
+      link.setAttribute("aria-label", "Open Telegram link");
+      const icon = document.createElement("span");
+      icon.className = "material-symbols-rounded";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = "send";
+      const label = document.createElement("span");
+      label.textContent = "Open Telegram link";
+      link.append(icon, label);
+      activateTelegramLink(link, rawUrl);
+    } else {
+      link.textContent = rawUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+
+    container.append(link);
+    if (trailing) container.append(document.createTextNode(trailing));
+    cursor = index + match[0].length;
+  }
+
+  if (cursor < text.length) container.append(document.createTextNode(text.slice(cursor)));
 }
 
 function createProfileDetail(label, value, iconText) {
   const item = document.createElement("div");
   item.className = "profile-detail";
   const icon = document.createElement("span");
-  icon.className = "profile-detail-icon";
+  icon.className = "profile-detail-icon material-symbols-rounded";
   icon.textContent = iconText;
   const copy = document.createElement("div");
   const key = document.createElement("span");
@@ -1094,7 +1167,7 @@ function renderDesktopFilters() {
     const selected = state.filters[column.index] || new Set();
     const summary = document.createElement("summary");
     const selectionText = selected.size === 0 ? "All" : selected.size === 1 ? [...selected][0] : `${selected.size} selected`;
-    summary.innerHTML = `<span class="filter-summary-copy"><small>${escapeHtml(definition.label)}</small><strong>${escapeHtml(selectionText)}</strong></span><span class="filter-chevron">⌄</span>`;
+    summary.innerHTML = `<span class="filter-summary-copy"><small>${escapeHtml(definition.label)}</small><strong>${escapeHtml(selectionText)}</strong></span><span class="filter-chevron material-symbols-rounded" aria-hidden="true">expand_more</span>`;
     details.appendChild(summary);
 
     const options = document.createElement("div");
@@ -1149,8 +1222,9 @@ function renderMobileFilters() {
     meta.textContent = selected.size ? `${selected.size} selected` : "All";
     summaryCopy.append(title, meta);
     const chevron = document.createElement("span");
-    chevron.className = "mobile-filter-chevron";
-    chevron.textContent = "⌄";
+    chevron.className = "mobile-filter-chevron material-symbols-rounded";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "expand_more";
     summary.append(summaryCopy, chevron);
 
     const options = document.createElement("div");
@@ -1257,6 +1331,7 @@ function renderActiveFilters() {
   });
   const hasAny = activeFilterCount() > 0 || Boolean(state.query);
   els.clearFilters.hidden = !hasAny;
+  els.resultsBar?.classList.toggle("has-active", hasAny);
   updateFilterBadges();
 }
 
@@ -1301,13 +1376,16 @@ function applyDataPipeline() {
   state.filteredRows = rows;
   const maxPage = Math.max(1, Math.ceil(rows.length / CONFIG.rowsPerPage));
   state.page = Math.min(state.page, maxPage);
+  let resultLabel = "";
   if (state.savedOnly) {
-    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "saved student" : "saved students"}`;
+    resultLabel = `${formatNumber(rows.length)} ${rows.length === 1 ? "saved student" : "saved students"}`;
   } else if (state.roommateMatchMode) {
-    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "potential roommate" : "potential roommates"}`;
+    resultLabel = `${formatNumber(rows.length)} ${rows.length === 1 ? "potential roommate" : "potential roommates"}`;
   } else {
-    els.resultText.textContent = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}${state.rows.length !== rows.length ? ` of ${formatNumber(state.rows.length)}` : ""}`;
+    resultLabel = `${formatNumber(rows.length)} ${rows.length === 1 ? "student" : "students"}`;
   }
+  els.resultText.textContent = resultLabel;
+  if (els.directoryHeadingCount) els.directoryHeadingCount.textContent = resultLabel;
   renderActiveFilters();
   updateSavedUI();
   updateEmptyStateCopy();
@@ -1315,19 +1393,78 @@ function applyDataPipeline() {
 }
 
 function renderRows() {
-  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
   const effectiveView = isMobile ? "cards" : state.view;
   const hasRows = state.filteredRows.length > 0;
   if (els.emptyState) els.emptyState.hidden = hasRows;
   els.cardView.hidden = !hasRows || effectiveView !== "cards";
   els.tableView.hidden = !hasRows || effectiveView !== "table";
 
-  const start = (state.page - 1) * CONFIG.rowsPerPage;
-  const pageRows = state.filteredRows.slice(start, start + CONFIG.rowsPerPage);
+  const start = isMobile ? 0 : (state.page - 1) * CONFIG.rowsPerPage;
+  const end = isMobile ? state.page * CONFIG.rowsPerPage : start + CONFIG.rowsPerPage;
+  const pageRows = state.filteredRows.slice(start, end);
 
   renderCards(pageRows, start);
   if (!isMobile) renderTable(pageRows);
   renderPagination();
+}
+
+function appendSearchHighlightedText(container, value) {
+  const text = String(value ?? "");
+  const tokens = searchTokens(state.query);
+  if (!tokens.length) {
+    container.textContent = text;
+    return;
+  }
+
+  text.split(/(\s+|[.,/()\u00b7\u2013\u2014-]+)/).forEach(part => {
+    const normalizedPart = searchNormalize(part);
+    const matches = normalizedPart && tokens.some(token => normalizedPart.includes(token));
+    if (!matches) {
+      container.appendChild(document.createTextNode(part));
+      return;
+    }
+    const mark = document.createElement("mark");
+    mark.className = "search-match";
+    mark.textContent = part;
+    container.appendChild(mark);
+  });
+}
+
+function sameDirectoryValue(a, b) {
+  return Boolean(normalize(a)) && normalize(a) === normalize(b);
+}
+
+function cardContextForRow(row) {
+  const name = displayValue(row, semanticColumn("name"));
+  const program = displayValue(row, semanticColumn("program"));
+  const campus = displayValue(row, semanticColumn("campus"));
+  const degree = displayValue(row, semanticColumn("degree"));
+  const roommate = displayValue(row, semanticColumn("roommate"));
+  const tokens = searchTokens(state.query);
+  const fieldMatches = value => tokens.length && tokens.some(token => searchNormalize(value).includes(token));
+  const own = currentUserRow();
+
+  if (state.roommateMatchMode) {
+    const meta = state.roommateMatchMeta.get(row);
+    if (meta) return { icon: "bed", label: `${roommateMatchTier(meta)} roommate fit`, tone: "roommate" };
+  }
+  if (fieldMatches(campus)) return { icon: "location_on", label: campus, tone: "match" };
+  if (fieldMatches(roommate)) return { icon: "bed", label: "Looking for roommate", tone: "match" };
+  if (fieldMatches(program)) return { icon: "school", label: "Program match", tone: "match" };
+  if (fieldMatches(name)) return { icon: "person_search", label: "Name match", tone: "match" };
+  if (own === row) return { icon: "person", label: "Your profile", tone: "personal" };
+  if (isCreatorRow(row)) return { icon: "verified", label: "Community creator", tone: "personal" };
+  if (own && sameDirectoryValue(program, displayValue(own, semanticColumn("program")))) {
+    return { icon: "school", label: "Same program", tone: "program" };
+  }
+  if (own && sameDirectoryValue(campus, displayValue(own, semanticColumn("campus")))) {
+    return { icon: "location_on", label: "Same campus", tone: "campus" };
+  }
+  if (roommateIntent(roommate).score >= 42) return { icon: "bed", label: "Looking for roommate", tone: "roommate" };
+  if (campus) return { icon: "location_on", label: campus, tone: "campus" };
+  if (degree) return { icon: "school", label: degree, tone: "degree" };
+  return { icon: "person", label: "Student profile", tone: "neutral" };
 }
 
 function renderCards(rows, start) {
@@ -1367,41 +1504,30 @@ function renderCards(rows, start) {
 
     const title = document.createElement("h3");
     title.className = "student-name";
-    title.textContent = name;
+    appendSearchHighlightedText(title, name);
     titleRow.appendChild(title);
-
-    if (isCreatorRow(row)) {
-      const creatorBadge = document.createElement("span");
-      creatorBadge.className = "card-creator-badge";
-      creatorBadge.textContent = "Creator";
-      titleRow.appendChild(creatorBadge);
-    } else if (isRecentStudent(row)) {
-      const fresh = document.createElement("span");
-      fresh.className = "card-new-badge";
-      fresh.textContent = "New";
-      titleRow.appendChild(fresh);
-    }
 
     const programLine = document.createElement("div");
     programLine.className = "student-card-program student-card-program-simple";
-    programLine.textContent = program;
+    appendSearchHighlightedText(programLine, program);
 
-    content.append(titleRow, programLine);
+    const contextData = cardContextForRow(row);
+    const context = document.createElement("span");
+    context.className = `student-context-badge context-${contextData.tone}`;
+    const contextIcon = document.createElement("span");
+    contextIcon.className = "material-symbols-rounded";
+    contextIcon.setAttribute("aria-hidden", "true");
+    contextIcon.textContent = contextData.icon;
+    const contextLabel = document.createElement("span");
+    appendSearchHighlightedText(contextLabel, contextData.label);
+    context.append(contextIcon, contextLabel);
 
-    if (state.roommateMatchMode) {
-      const meta = state.roommateMatchMeta.get(row);
-      if (meta) {
-        const match = document.createElement("span");
-        match.className = "roommate-match-mini";
-        match.textContent = roommateMatchTier(meta);
-        content.appendChild(match);
-      }
-    }
+    content.append(titleRow, programLine, context);
 
     const arrow = document.createElement("span");
-    arrow.className = "student-card-chevron student-card-simple-chevron";
+    arrow.className = "student-card-chevron student-card-simple-chevron material-symbols-rounded";
     arrow.setAttribute("aria-hidden", "true");
-    arrow.textContent = "›";
+    arrow.textContent = "chevron_right";
 
     card.append(content, arrow);
     fragment.appendChild(card);
@@ -1431,7 +1557,8 @@ function renderTable(rows) {
   columns.forEach(column => {
     const th = document.createElement("th");
     if (state.sort.index === column.index) th.classList.add("sorted");
-    th.innerHTML = `${escapeHtml(shortHeader(column.label))}<span class="sort-indicator">${state.sort.index === column.index ? (state.sort.direction === "asc" ? "↑" : "↓") : "↕"}</span>`;
+    const sortIcon = state.sort.index === column.index ? (state.sort.direction === "asc" ? "arrow_upward" : "arrow_downward") : "unfold_more";
+    th.innerHTML = `${escapeHtml(shortHeader(column.label))}<span class="sort-indicator material-symbols-rounded" aria-hidden="true">${sortIcon}</span>`;
     th.addEventListener("click", () => sortBy(column.index));
     headRow.appendChild(th);
   });
@@ -1473,7 +1600,28 @@ function sortBy(index) {
 
 function renderPagination() {
   const pages = Math.max(1, Math.ceil(state.filteredRows.length / CONFIG.rowsPerPage));
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
+  const shown = Math.min(state.page * CONFIG.rowsPerPage, state.filteredRows.length);
+  const remaining = Math.max(0, state.filteredRows.length - shown);
+
+  if (isMobile) {
+    els.pagination.hidden = remaining === 0;
+    els.pageInfo.textContent = `Showing ${formatNumber(shown)} of ${formatNumber(state.filteredRows.length)}`;
+    els.prevPage.hidden = true;
+    els.nextPage.hidden = true;
+    if (els.pageNumbers) els.pageNumbers.innerHTML = "";
+    if (els.loadMoreButton) {
+      els.loadMoreButton.hidden = remaining === 0;
+      els.loadMoreButton.setAttribute("aria-label", `Show ${formatNumber(Math.min(CONFIG.rowsPerPage, remaining))} more students`);
+    }
+    if (els.loadMoreLabel) els.loadMoreLabel.textContent = `Show ${formatNumber(Math.min(CONFIG.rowsPerPage, remaining))} more students`;
+    return;
+  }
+
   els.pagination.hidden = pages <= 1;
+  els.prevPage.hidden = false;
+  els.nextPage.hidden = false;
+  if (els.loadMoreButton) els.loadMoreButton.hidden = true;
   els.pageInfo.textContent = `Page ${state.page} of ${pages} · ${CONFIG.rowsPerPage} per page`;
   els.prevPage.disabled = state.page <= 1;
   els.nextPage.disabled = state.page >= pages;
@@ -1557,9 +1705,9 @@ function mailtoUrl(value) {
 
 function mailIcon() {
   const span = document.createElement("span");
-  span.className = "mail-icon";
+  span.className = "mail-icon material-symbols-rounded";
   span.setAttribute("aria-hidden", "true");
-  span.innerHTML = `<svg viewBox="0 0 24 24" focusable="false"><path d="M3.75 5.75h16.5a1.5 1.5 0 0 1 1.5 1.5v9.5a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5v-9.5a1.5 1.5 0 0 1 1.5-1.5Zm.12 1.5L12 13.18l8.13-5.93H3.87Zm16.38 9.5V9.1l-7.37 5.38a1.5 1.5 0 0 1-1.76 0L3.75 9.1v7.65h16.5Z" fill="currentColor"/></svg>`;
+  span.textContent = "mail";
   return span;
 }
 
@@ -1581,8 +1729,9 @@ function createMailAction(value) {
   copy.append(eyebrow, label);
 
   const arrow = document.createElement("span");
-  arrow.className = "mail-arrow";
-  arrow.textContent = "↗";
+  arrow.className = "mail-arrow material-symbols-rounded";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = "open_in_new";
 
   a.append(mailIcon(), copy, arrow);
   return a;
@@ -1633,9 +1782,9 @@ function telegramLabel(value) {
 
 function telegramIcon() {
   const span = document.createElement("span");
-  span.className = "telegram-icon";
+  span.className = "telegram-icon material-symbols-rounded";
   span.setAttribute("aria-hidden", "true");
-  span.innerHTML = `<svg viewBox="0 0 24 24" focusable="false"><path d="M21.5 3.2 18.3 20c-.24 1.18-.88 1.47-1.78.91l-4.88-3.6-2.35 2.27c-.26.26-.48.48-.98.48l.35-4.97 9.05-8.18c.39-.35-.09-.55-.61-.2L5.92 13.75l-4.82-1.5c-1.05-.33-1.07-1.05.22-1.55L20.16 3.44c.87-.32 1.63.2 1.34-.24Z" fill="currentColor"/></svg>`;
+  span.textContent = "send";
   return span;
 }
 
@@ -1656,8 +1805,9 @@ function createTelegramAction(value) {
   copy.append(eyebrow, label);
 
   const arrow = document.createElement("span");
-  arrow.className = "telegram-arrow";
-  arrow.textContent = "↗";
+  arrow.className = "telegram-arrow material-symbols-rounded";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = "open_in_new";
 
   a.append(telegramIcon(), copy, arrow);
   return a;
@@ -1693,7 +1843,7 @@ function renderCellContent(container, value) {
       a.href = text;
       a.target = "_blank";
       a.rel = "noopener noreferrer";
-      a.textContent = "Open link ↗";
+      a.innerHTML = `Open link <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>`;
       container.appendChild(a);
     }
     return;
@@ -1794,7 +1944,7 @@ function quickFilterSpec() {
         label: "Classmates",
         column: programCol,
         values: [ownProgram],
-        icon: "◎",
+        icon: "school",
         title: `Same program: ${ownProgram}`
       });
     }
@@ -1806,7 +1956,7 @@ function quickFilterSpec() {
         label: "Same campus",
         column: campusCol,
         values: [ownCampus],
-        icon: "⌖",
+        icon: "location_on",
         title: `Same campus: ${ownCampus}`
       });
     }
@@ -1816,7 +1966,7 @@ function quickFilterSpec() {
   if (roommateCol) {
     const values = [...new Set(state.rows.map(row => displayValue(row, roommateCol)).filter(Boolean))]
       .filter(value => roommateIntent(value).score >= 42);
-    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "⌂", title: "Students open to finding a roommate" });
+    if (values.length) specs.push({ label: "Roommates", column: roommateCol, values, icon: "bed", title: "Students open to finding a roommate" });
   }
 
   return specs;
@@ -1838,7 +1988,7 @@ function renderQuickFilters() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `quick-filter-chip${quickFilterActive(spec) ? " active" : ""}`;
-    button.innerHTML = `<span aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
+    button.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">${escapeHtml(spec.icon)}</span><strong>${escapeHtml(spec.label)}</strong>`;
     if (spec.title) button.title = spec.title;
     button.addEventListener("click", () => {
       if (quickFilterActive(spec)) delete state.filters[spec.column.index];
@@ -1854,7 +2004,7 @@ function renderQuickFilters() {
   const more = document.createElement("button");
   more.type = "button";
   more.className = "quick-filter-chip quick-filter-more";
-  more.innerHTML = `<span aria-hidden="true">☷</span><strong>More filters</strong>`;
+  more.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">tune</span><strong>More filters</strong>`;
   more.addEventListener("click", openFilterSheet);
   els.quickFilters.appendChild(more);
 }
@@ -1983,7 +2133,14 @@ function updateProfileSaveButton() {
   els.profileSave.classList.toggle("active", active);
   els.profileSave.setAttribute("aria-pressed", String(active));
   els.profileSave.setAttribute("aria-label", active ? "Remove student from saved profiles" : "Save student profile");
-  els.profileSave.textContent = active ? "♥" : "♡";
+  let icon = els.profileSave.querySelector(".material-symbols-rounded");
+  if (!icon) {
+    icon = document.createElement("span");
+    icon.className = "material-symbols-rounded";
+    icon.setAttribute("aria-hidden", "true");
+    els.profileSave.replaceChildren(icon);
+  }
+  icon.textContent = "favorite";
 }
 
 function toggleSavedMode() {
@@ -2028,9 +2185,14 @@ function updateSavedUI() {
 }
 
 function updateMobileNavState() {
-  els.mobileStudentsButton?.classList.toggle("active", !state.savedOnly && !state.roommateMatchMode);
+  const studentsActive = !state.savedOnly;
+  els.mobileStudentsButton?.classList.toggle("active", studentsActive);
   els.mobileSavedButton?.classList.toggle("active", state.savedOnly);
   els.mobileRoommateButton?.classList.toggle("active", state.roommateMatchMode);
+  if (studentsActive) els.mobileStudentsButton?.setAttribute("aria-current", "page");
+  else els.mobileStudentsButton?.removeAttribute("aria-current");
+  if (state.savedOnly) els.mobileSavedButton?.setAttribute("aria-current", "page");
+  else els.mobileSavedButton?.removeAttribute("aria-current");
 }
 
 function updateEmptyStateCopy() {
@@ -2066,8 +2228,8 @@ function updatePersonalizedHeader() {
   const first = name.split(/\s+/).filter(Boolean)[0] || "Student";
   const program = displayValue(row, semanticColumn("program"));
   const campus = displayValue(row, semanticColumn("campus"));
-  if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Find your people, ${first}.`;
-  if (els.directoryIntroText) els.directoryIntroText.textContent = [program && `Your program: ${program}`, campus && `Your campus: ${campus}`, "Tap any student to open the full profile."].filter(Boolean).join(" · ");
+  if (els.directoryIntroTitle) els.directoryIntroTitle.textContent = `Welcome back, ${first}.`;
+  if (els.directoryIntroText) els.directoryIntroText.textContent = [program, campus, "Discover classmates and new connections."].filter(Boolean).join(" · ");
   if (els.myProfileAvatar) els.myProfileAvatar.textContent = initials(name);
 }
 
@@ -2087,7 +2249,13 @@ function closeProfileMenu() {
 function updateProfileMenuForRow(row) {
   const own = row === currentUserRow();
   if (els.profileUpdateAction) els.profileUpdateAction.hidden = !own;
-  if (els.profileReportAction) els.profileReportAction.textContent = `⚑ Report to ${CONFIG.creatorDisplayName}`;
+  if (els.profileReportAction) {
+    const icon = document.createElement("span");
+    icon.className = "material-symbols-rounded";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "flag";
+    els.profileReportAction.replaceChildren(icon, document.createTextNode(` Report to ${CONFIG.creatorDisplayName}`));
+  }
 }
 
 function isCreatorRow(row) {

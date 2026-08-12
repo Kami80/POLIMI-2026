@@ -1744,3 +1744,708 @@ mark.search-match {
     font-size: 12px !important;
   }
 }
+
+/* =========================================================
+   Mobile QA remediation · navigation, sheets, and card actions
+   ========================================================= */
+
+/* The handle is its own grid row; keep the toolbar and contact area out of
+   the profile scroller so neither can be clipped after a swipe. */
+.profile-panel {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+
+.profile-toolbar {
+  position: relative;
+  z-index: 12;
+}
+
+.profile-share .material-symbols-rounded {
+  display: inline-grid !important;
+  place-items: center;
+  font-size: 22px;
+}
+
+.profile-contact-bar.single-action {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.profile-inline-link {
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid color-mix(in srgb, #229ed9 24%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, #229ed9 9%, var(--surface));
+  color: #168ec8;
+  direction: ltr;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.profile-inline-link .material-symbols-rounded {
+  font-size: 18px;
+}
+
+/* Group actions were previously missing from the parsed stylesheet. */
+.telegram-group-actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.telegram-group-actions .telegram-join-btn {
+  margin-top: 0;
+}
+
+.telegram-share-btn {
+  min-width: 96px;
+  min-height: 48px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid color-mix(in srgb, var(--group-accent) 18%, var(--line));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--group-accent) 7%, var(--surface));
+  color: color-mix(in srgb, var(--group-accent) 74%, var(--ink));
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 850;
+  line-height: 1;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+
+.telegram-share-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--group-accent) 34%, var(--line));
+  background: color-mix(in srgb, var(--group-accent) 12%, var(--surface));
+}
+
+.telegram-share-btn .material-symbols-rounded {
+  font-size: 19px;
+}
+
+.telegram-group-pinned .telegram-group-actions {
+  margin-top: 0;
+}
+
+.group-deep-linked {
+  border-color: color-mix(in srgb, #2aabee 62%, var(--line)) !important;
+  box-shadow: 0 0 0 4px rgba(42, 171, 238, .12), 0 20px 54px rgba(42, 171, 238, .17) !important;
+}
+
+@media (min-width: 761px) {
+  .telegram-group-pinned .telegram-share-btn {
+    min-height: 54px;
+  }
+}
+
+@media (max-width: 760px) {
+  html {
+    scroll-padding-bottom: calc(128px + env(safe-area-inset-bottom));
+  }
+
+  body.directory-unlocked,
+  body.groups-page,
+  body.announcements-page {
+    padding-bottom: calc(126px + env(safe-area-inset-bottom));
+  }
+
+  .main-shell,
+  .groups-main,
+  .announcements-main {
+    padding-bottom: calc(116px + env(safe-area-inset-bottom));
+  }
+
+  /* A shorter welcome block leaves the directory task above the fold. */
+  .directory-intro {
+    margin-bottom: 18px;
+    padding: 18px 20px 19px;
+    border-radius: 24px;
+  }
+
+  .directory-intro-kicker {
+    font-size: 12px !important;
+    letter-spacing: .11em;
+  }
+
+  .directory-intro h1 {
+    margin: 7px 0 6px;
+    font-size: clamp(29px, 8vw, 33px);
+    line-height: 1.03;
+  }
+
+  .directory-intro p {
+    max-width: 36ch;
+    font-size: 14px !important;
+    line-height: 1.48;
+  }
+
+  #directory .section-heading {
+    margin-bottom: 12px;
+  }
+
+  #directory .section-heading h2 {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
+  .controls-panel {
+    top: 64px;
+    padding-block: 7px 9px;
+    gap: 8px;
+  }
+
+  .search-field {
+    min-height: 56px;
+    border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+    border-radius: 19px;
+    box-shadow: 0 9px 26px color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+
+  .directory-control-actions {
+    grid-template-columns: 102px minmax(0, 1fr) !important;
+    gap: 8px;
+  }
+
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control {
+    min-height: 50px;
+    border-radius: 16px;
+  }
+
+  .directory-control-actions .filter-trigger {
+    padding-inline: 12px;
+  }
+
+  .directory-control-actions .sort-control {
+    padding-inline: 13px;
+  }
+
+  .mobile-roommate-shortcut {
+    display: none !important;
+  }
+
+  /* Personalized actions are all visible—no half-cut chip at the edge. */
+  .quick-filter-row {
+    margin-top: 10px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    overflow: visible;
+  }
+
+  .quick-filter-label {
+    grid-column: 1 / -1;
+    margin: 0 0 1px 2px;
+    position: static;
+    font-size: 12px !important;
+    letter-spacing: .1em;
+  }
+
+  .quick-filter-chip {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 8px;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 15px;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+
+  .quick-filter-chip > .material-symbols-rounded {
+    flex: 0 0 auto;
+    font-size: 18px !important;
+  }
+
+  .quick-filter-more {
+    display: none !important;
+  }
+
+  /* Rounded floating dock with a clear full-item active state. */
+  .app-mobile-nav,
+  .app-mobile-nav.groups-mobile-nav,
+  .app-mobile-nav.announcements-mobile-nav {
+    width: min(calc(100% - 24px), 560px);
+    min-height: 84px;
+    left: 50%;
+    right: auto !important;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    padding: 8px 7px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    overflow: visible;
+    isolation: isolate;
+    border: 1px solid color-mix(in srgb, #fff 62%, var(--line));
+    border-radius: 30px;
+    background: color-mix(in srgb, var(--surface) 91%, transparent);
+    box-shadow:
+      0 24px 54px rgba(8, 20, 42, .22),
+      0 4px 12px rgba(8, 20, 42, .08),
+      inset 0 1px 0 rgba(255, 255, 255, .82);
+    transform: translateX(-50%);
+    backdrop-filter: blur(24px) saturate(165%);
+    -webkit-backdrop-filter: blur(24px) saturate(165%);
+  }
+
+  [data-theme="dark"] .app-mobile-nav {
+    border-color: color-mix(in srgb, #fff 13%, var(--line));
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    box-shadow: 0 24px 58px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+
+  .app-mobile-nav::before {
+    content: "";
+    height: 1px;
+    position: absolute;
+    z-index: -1;
+    inset: 1px 24px auto;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .86), transparent);
+    pointer-events: none;
+  }
+
+  .app-mobile-nav .mobile-nav-item {
+    min-width: 0;
+    min-height: 66px;
+    padding: 5px 1px 6px;
+    gap: 4px;
+    border-radius: 21px;
+    transition: color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+  }
+
+  .app-mobile-nav .mobile-nav-item .mobile-nav-icon {
+    width: 36px;
+    height: 34px;
+    border-radius: 13px;
+    font-size: 23px;
+    transition: color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+  }
+
+  .app-mobile-nav .mobile-nav-item small {
+    overflow: visible;
+    font-size: 12px !important;
+    letter-spacing: -.025em;
+    text-overflow: clip;
+  }
+
+  .app-mobile-nav .mobile-nav-item.active {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary-soft) 88%, var(--surface)), color-mix(in srgb, var(--primary-soft) 42%, transparent));
+    color: var(--primary);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  .app-mobile-nav .mobile-nav-item.active .mobile-nav-icon {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--primary) 88%, #3b82f6), var(--primary));
+    color: #fff;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, .24);
+    transform: translateY(-1px);
+  }
+
+  .app-mobile-nav .mobile-nav-item > i,
+  .app-mobile-nav .mobile-notice-icon i {
+    top: 2px;
+    right: calc(50% - 25px);
+    min-width: 20px;
+    height: 20px;
+    border: 2px solid var(--surface);
+    box-shadow: 0 3px 8px rgba(197, 42, 75, .24);
+  }
+
+  .app-mobile-nav .mobile-notice-icon i {
+    top: -6px;
+    right: -9px;
+  }
+
+  /* Stable, fully visible profile sheet. */
+  .profile-panel {
+    width: 100%;
+    height: min(92dvh, 900px);
+    max-height: calc(100dvh - max(12px, env(safe-area-inset-top)));
+    grid-template-rows: auto 66px minmax(0, 1fr) auto auto;
+    border-radius: 30px 30px 0 0;
+  }
+
+  .profile-handle {
+    width: 44px;
+    height: 5px;
+    margin: 9px auto 0;
+  }
+
+  .profile-toolbar {
+    min-height: 66px;
+    padding: 7px 12px 9px;
+    grid-template-columns: 44px minmax(84px, 1fr) auto;
+    gap: 9px;
+    background: var(--surface);
+  }
+
+  .profile-toolbar-center {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .profile-toolbar-label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px !important;
+    letter-spacing: .11em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-toolbar-actions {
+    gap: 5px;
+  }
+
+  .profile-toolbar-btn,
+  .profile-share {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 15px;
+  }
+
+  .profile-share > #profileShareLabel {
+    display: none !important;
+  }
+
+  .profile-share .material-symbols-rounded {
+    display: inline-grid !important;
+  }
+
+  .profile-swipe-hint {
+    min-height: 34px;
+    padding: 0 12px;
+    display: grid;
+    place-items: center;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+    font-size: 12px !important;
+  }
+
+  .profile-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+  }
+
+  .profile-body {
+    padding: 20px 16px 24px;
+  }
+
+  .profile-hero {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .profile-avatar {
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+    font-size: 19px;
+  }
+
+  .profile-identity h2 {
+    margin: 5px 0 8px;
+    font-size: clamp(26px, 7.4vw, 32px);
+    line-height: 1.08;
+    letter-spacing: -.05em;
+  }
+
+  .profile-program {
+    margin-top: 20px;
+    padding: 15px 16px;
+    border-radius: 18px;
+  }
+
+  .profile-program > strong,
+  .profile-detail strong,
+  .profile-section-title strong {
+    font-size: 14px !important;
+  }
+
+  .profile-detail-grid {
+    gap: 8px;
+  }
+
+  .profile-detail {
+    min-height: 64px;
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .profile-about,
+  .profile-extra-section {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .profile-about p {
+    font-size: 14px !important;
+    line-height: 1.7;
+    unicode-bidi: plaintext;
+  }
+
+  .profile-contact-privacy {
+    margin: 0;
+    padding: 11px 24px 10px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    font-size: 12px !important;
+    line-height: 1.45;
+  }
+
+  .profile-contact-bar {
+    position: relative;
+    bottom: auto;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    gap: 9px;
+    box-shadow: 0 -10px 28px color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+
+  .profile-contact-btn {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 17px;
+    font-size: 14px !important;
+  }
+
+  /* Compact group cards with a deliberate icon share action. */
+  .telegram-group-card,
+  .telegram-group-card.telegram-group-pinned {
+    min-height: 0;
+    padding: 20px;
+    border-radius: 23px;
+  }
+
+  .telegram-group-body,
+  .telegram-group-pinned .telegram-group-body {
+    margin-top: 19px;
+  }
+
+  .telegram-group-body h2,
+  .telegram-group-pinned .telegram-group-body h2 {
+    margin: 9px 0 8px;
+    font-size: 21px;
+    line-height: 1.2;
+  }
+
+  .telegram-group-body p,
+  .telegram-group-pinned .telegram-group-body p {
+    font-size: 14px !important;
+    line-height: 1.58;
+  }
+
+  .telegram-group-actions,
+  .telegram-group-pinned .telegram-group-actions {
+    margin-top: 20px;
+    grid-template-columns: minmax(0, 1fr) 52px;
+    gap: 9px;
+  }
+
+  .telegram-join-btn,
+  .telegram-group-pinned .telegram-join-btn {
+    min-height: 52px;
+    border-radius: 16px;
+  }
+
+  .telegram-share-btn,
+  .telegram-group-pinned .telegram-share-btn {
+    width: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    padding: 0;
+    border-radius: 17px;
+  }
+
+  .telegram-share-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .groups-directory {
+    padding-bottom: 12px;
+  }
+
+  /* All notice filters fit; card metadata wraps without colliding with CTA. */
+  .announcements-discovery {
+    overflow: hidden;
+  }
+
+  .announcements-toolbar-v2 {
+    display: block;
+  }
+
+  .announcements-toolbar-status {
+    width: 100%;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .announcements-toolbar-status .announcements-count {
+    display: none !important;
+  }
+
+  .announcement-filter-row {
+    width: 100%;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .announcement-filter {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 7px;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 13px;
+    font-size: 12px !important;
+  }
+
+  .announcement-filter i {
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 4px;
+  }
+
+  .announcement-card-v3,
+  .announcement-card-button {
+    min-height: 0;
+  }
+
+  .announcement-card-v3 {
+    border-radius: 23px;
+  }
+
+  .announcement-card-button {
+    padding: 18px;
+  }
+
+  .announcement-card-date-row {
+    gap: 10px;
+    line-height: 1.35;
+  }
+
+  .announcement-card-topic {
+    max-width: 42%;
+  }
+
+  .announcement-card-title {
+    font-size: 20px;
+    line-height: 1.28;
+  }
+
+  .announcement-card-tags {
+    margin-top: 11px;
+  }
+
+  .announcement-card-footer-v3 {
+    margin-top: 16px;
+    padding-top: 13px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .announcement-card-footer-v3 > span {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    line-height: 1.4;
+  }
+
+  .announcement-card-footer-v3 strong {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 370px) {
+  .directory-control-actions {
+    grid-template-columns: 94px minmax(0, 1fr) !important;
+  }
+
+  .quick-filter-row {
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 6px;
+  }
+
+  .quick-filter-chip {
+    padding-inline: 6px;
+    font-size: 12px !important;
+  }
+
+  .app-mobile-nav,
+  .app-mobile-nav.groups-mobile-nav,
+  .app-mobile-nav.announcements-mobile-nav {
+    width: calc(100% - 12px);
+    padding-inline: 5px;
+  }
+
+  .app-mobile-nav .mobile-nav-item small {
+    font-size: 12px !important;
+  }
+
+  .profile-toolbar {
+    padding-inline: 9px;
+    grid-template-columns: 42px minmax(70px, 1fr) auto;
+    gap: 6px;
+  }
+
+  .profile-toolbar-btn,
+  .profile-share {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+  }
+
+  .profile-toolbar-actions {
+    gap: 3px;
+  }
+
+  .profile-toolbar-label {
+    max-width: 72px;
+    font-size: 12px !important;
+    line-height: 1.1;
+    letter-spacing: .05em;
+    white-space: normal;
+  }
+
+  .announcement-filter {
+    padding-inline: 5px;
+    font-size: 12px !important;
+  }
+
+  .announcement-filter-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

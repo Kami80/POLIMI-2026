@@ -1,0 +1,1182 @@
+/*
+  Polimi Students - Neo-glass visual system
+  Loaded after the structural styles so every route shares one depth language.
+*/
+
+:root {
+  --bg: #eaf0f8;
+  --bg-2: #dfe8f4;
+  --surface: #f3f7fc;
+  --surface-2: #edf3fa;
+  --surface-3: #e3ebf6;
+  --ink: #101827;
+  --ink-soft: #2c3a50;
+  --muted: #64738a;
+  --muted-2: #8896aa;
+  --line: rgba(120, 141, 173, .19);
+  --line-strong: rgba(91, 116, 154, .28);
+  --primary: #1769e8;
+  --primary-2: #4389f8;
+  --primary-soft: #dce9ff;
+  --violet: #7357e8;
+  --violet-soft: #e9e2ff;
+  --cyan: #078eaf;
+  --cyan-soft: #d9f4fb;
+  --coral: #dc5572;
+  --coral-soft: #ffe3eb;
+  --green: #138464;
+  --green-soft: #dff5ed;
+  --amber: #a56a0a;
+  --amber-soft: #fff0cd;
+
+  --neo-glass: rgba(244, 248, 253, .70);
+  --neo-glass-strong: rgba(246, 249, 253, .88);
+  --neo-glass-soft: rgba(240, 245, 252, .56);
+  --neo-stroke: rgba(255, 255, 255, .78);
+  --neo-highlight: rgba(255, 255, 255, .92);
+  --neo-shadow-color: rgba(92, 113, 146, .20);
+  --neo-shadow-deep: rgba(75, 98, 135, .25);
+  --neo-raised:
+    -11px -11px 26px rgba(255, 255, 255, .82),
+    11px 11px 27px var(--neo-shadow-color);
+  --neo-raised-sm:
+    -5px -5px 13px rgba(255, 255, 255, .82),
+    5px 5px 13px rgba(96, 117, 150, .17);
+  --neo-floating:
+    0 28px 70px rgba(56, 77, 112, .22),
+    0 8px 24px rgba(65, 87, 123, .12),
+    inset 0 1px 0 rgba(255, 255, 255, .78);
+  --neo-inset:
+    inset 4px 4px 10px rgba(105, 125, 156, .16),
+    inset -4px -4px 10px rgba(255, 255, 255, .78);
+  --neo-pressed:
+    inset 3px 3px 8px rgba(94, 116, 150, .20),
+    inset -3px -3px 8px rgba(255, 255, 255, .76);
+  --neo-accent: linear-gradient(135deg, #1d74ee 0%, #615fe9 58%, #26bce8 100%);
+  --neo-accent-soft: linear-gradient(135deg, rgba(38, 124, 241, .15), rgba(113, 78, 232, .11));
+  --neo-blur: blur(24px) saturate(155%);
+  --neo-radius-xl: 34px;
+  --neo-radius-lg: 26px;
+  --neo-radius-md: 19px;
+  --neo-radius-sm: 14px;
+
+  --shadow: var(--neo-floating);
+  --shadow-md: var(--neo-raised);
+  --shadow-sm: var(--neo-raised-sm);
+}
+
+[data-theme="dark"] {
+  --bg: #07101f;
+  --bg-2: #0b172b;
+  --surface: #111e34;
+  --surface-2: #14243c;
+  --surface-3: #1a2c48;
+  --ink: #f4f7ff;
+  --ink-soft: #d5e0f1;
+  --muted: #9aaac1;
+  --muted-2: #75869f;
+  --line: rgba(151, 181, 224, .13);
+  --line-strong: rgba(151, 187, 235, .23);
+  --primary: #72aaff;
+  --primary-2: #93c0ff;
+  --primary-soft: #19345a;
+  --violet: #ad96ff;
+  --violet-soft: #302752;
+  --cyan: #6bd6ee;
+  --cyan-soft: #123746;
+  --coral: #ff91a5;
+  --coral-soft: #452634;
+  --green: #67d7ad;
+  --green-soft: #143a31;
+  --amber: #f4c66a;
+  --amber-soft: #3d311d;
+
+  --neo-glass: rgba(13, 27, 48, .72);
+  --neo-glass-strong: rgba(16, 31, 54, .91);
+  --neo-glass-soft: rgba(16, 31, 54, .54);
+  --neo-stroke: rgba(173, 204, 247, .13);
+  --neo-highlight: rgba(185, 216, 255, .10);
+  --neo-shadow-color: rgba(0, 0, 0, .38);
+  --neo-shadow-deep: rgba(0, 0, 0, .52);
+  --neo-raised:
+    -9px -9px 24px rgba(33, 53, 82, .34),
+    12px 12px 30px rgba(0, 0, 0, .38);
+  --neo-raised-sm:
+    -4px -4px 12px rgba(38, 58, 87, .31),
+    5px 5px 14px rgba(0, 0, 0, .34);
+  --neo-floating:
+    0 30px 78px rgba(0, 0, 0, .54),
+    0 8px 24px rgba(0, 0, 0, .33),
+    inset 0 1px 0 rgba(185, 216, 255, .09);
+  --neo-inset:
+    inset 4px 4px 11px rgba(0, 0, 0, .35),
+    inset -4px -4px 10px rgba(42, 64, 95, .20);
+  --neo-pressed:
+    inset 3px 3px 9px rgba(0, 0, 0, .46),
+    inset -3px -3px 8px rgba(54, 79, 115, .17);
+  --neo-accent: linear-gradient(135deg, #2378ec 0%, #7665ed 58%, #27b8df 100%);
+  --neo-accent-soft: linear-gradient(135deg, rgba(56, 132, 239, .20), rgba(124, 91, 235, .13));
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: transparent;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+}
+
+/* Readable type floor for labels, chips, menus, and secondary controls. */
+.profile-menu a,
+.profile-menu button,
+.empty-state button,
+.empty-state p {
+  font-size: 13px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 26%, transparent);
+  color: var(--ink);
+}
+
+/* Ambient background */
+.app-bg {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 2%, rgba(76, 151, 255, .24), transparent 31%),
+    radial-gradient(circle at 94% 16%, rgba(131, 91, 239, .20), transparent 30%),
+    radial-gradient(circle at 58% 96%, rgba(31, 190, 222, .13), transparent 34%),
+    linear-gradient(145deg, var(--bg), var(--bg-2));
+}
+
+.app-bg::before {
+  content: "";
+  position: fixed;
+  inset: -18%;
+  background:
+    radial-gradient(circle at 26% 35%, rgba(255, 255, 255, .42), transparent 17%),
+    radial-gradient(circle at 73% 27%, rgba(118, 101, 235, .10), transparent 19%),
+    radial-gradient(circle at 58% 72%, rgba(46, 168, 238, .11), transparent 20%);
+  filter: blur(55px);
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .app-bg::before {
+  background:
+    radial-gradient(circle at 22% 34%, rgba(50, 125, 235, .15), transparent 19%),
+    radial-gradient(circle at 76% 25%, rgba(121, 90, 235, .16), transparent 20%),
+    radial-gradient(circle at 56% 72%, rgba(26, 169, 211, .09), transparent 20%);
+}
+
+.app-bg::after {
+  opacity: .22;
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 13%, transparent) .65px, transparent .75px);
+  background-size: 21px 21px;
+  mask-image: linear-gradient(to bottom, black, transparent 60%);
+}
+
+/* Shared glass and raised surfaces */
+.app-bar,
+.controls-panel,
+.announcements-discovery,
+.profile-toolbar,
+.profile-contact-bar,
+.profile-contact-privacy,
+.announcement-modal-toolbar,
+.app-mobile-nav {
+  background: var(--neo-glass);
+  border-color: var(--neo-stroke);
+  backdrop-filter: var(--neo-blur);
+  -webkit-backdrop-filter: var(--neo-blur);
+}
+
+.app-bar {
+  border-bottom: 1px solid var(--neo-stroke);
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--neo-shadow-deep) 32%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--neo-highlight) 38%, transparent);
+}
+
+.app-bar-inner {
+  height: 78px;
+}
+
+.brand-mark,
+.access-brand-mark {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, #fff 72%, transparent);
+  background: var(--neo-accent);
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+.brand-mark img,
+.access-brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.brand-copy strong,
+.access-brand strong {
+  letter-spacing: -.035em;
+}
+
+.connection,
+.top-notices-btn,
+.top-groups-btn,
+.top-profile-btn,
+.top-cta,
+.icon-btn,
+.install-app-btn,
+.groups-header-actions a,
+.announcements-header-actions a {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-2) 78%, transparent));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.icon-btn,
+.top-profile-btn {
+  border-radius: 16px;
+}
+
+.top-cta {
+  background: var(--neo-accent);
+  color: #fff;
+  border-color: rgba(255, 255, 255, .21);
+  box-shadow: 0 12px 24px rgba(30, 101, 219, .25), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+.icon-btn:active,
+.top-profile-btn:active,
+.top-notices-btn:active,
+.top-groups-btn:active,
+.groups-header-actions a:active,
+.announcements-header-actions a:active {
+  transform: translateY(1px) scale(.985);
+  box-shadow: var(--neo-pressed);
+}
+
+/* Access / welcome */
+.access-gate {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(72, 144, 244, .24), transparent 31%),
+    radial-gradient(circle at 92% 88%, rgba(118, 86, 229, .17), transparent 31%);
+}
+
+.access-shell {
+  overflow: hidden;
+  border: 1px solid var(--neo-stroke);
+  border-radius: 40px;
+  background: var(--neo-glass);
+  box-shadow: var(--neo-floating), var(--neo-raised);
+  backdrop-filter: blur(28px) saturate(155%);
+  -webkit-backdrop-filter: blur(28px) saturate(155%);
+}
+
+.access-card {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 255, 255, .52), transparent 29%),
+    linear-gradient(145deg, color-mix(in srgb, var(--neo-glass-strong) 90%, transparent), color-mix(in srgb, var(--neo-glass-soft) 88%, transparent));
+}
+
+[data-theme="dark"] .access-card {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(71, 126, 211, .10), transparent 30%),
+    linear-gradient(145deg, rgba(17, 33, 57, .92), rgba(12, 26, 47, .78));
+}
+
+.access-kicker i,
+.connection-dot {
+  box-shadow: 0 0 0 5px color-mix(in srgb, currentColor 10%, transparent), 0 0 16px currentColor;
+}
+
+.access-primary-form {
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--neo-stroke));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--primary-soft) 37%, var(--surface-2)));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.access-primary-form:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neo-raised), 0 14px 30px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.access-primary-icon,
+.access-announcements-link > span:first-child {
+  background: var(--neo-accent);
+  color: #fff;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 24%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+.access-announcements-link {
+  border: 1px solid transparent;
+  border-radius: 15px;
+}
+
+.access-announcements-link:hover {
+  border-color: var(--neo-stroke);
+  background: var(--neo-glass-soft);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.access-return-panel {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, var(--neo-glass-strong), var(--neo-glass-soft));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.access-input,
+.search-field,
+.groups-search,
+.announcements-search-wrap {
+  border: 1px solid color-mix(in srgb, var(--line-strong) 58%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+  box-shadow: var(--neo-inset);
+}
+
+.access-input:focus-within,
+.search-field:focus-within,
+.groups-search:focus-within,
+.announcements-search-wrap:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 46%, var(--neo-stroke));
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  box-shadow: var(--neo-inset), 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.access-form button,
+.sheet-apply,
+.welcome-tour-card > button:last-child,
+.directory-empty button:not(.secondary) {
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: var(--neo-accent);
+  color: #fff;
+  box-shadow: 0 12px 25px color-mix(in srgb, var(--primary) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .30);
+}
+
+.access-visual,
+.groups-hero,
+.announcements-hero-v2 {
+  border: 1px solid rgba(255, 255, 255, .18);
+  background:
+    radial-gradient(circle at 83% 10%, rgba(100, 215, 255, .27), transparent 27%),
+    radial-gradient(circle at 22% 92%, rgba(136, 99, 247, .24), transparent 30%),
+    linear-gradient(140deg, #092d66 0%, #1766d8 50%, #7355e6 100%);
+  box-shadow: 0 28px 70px rgba(28, 76, 159, .25), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.access-visual-state,
+.groups-hero-badge,
+.announcements-hero-badge,
+.announcements-hero-guide span {
+  border-color: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 12px 30px rgba(2, 20, 51, .16);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.access-feature-list > div {
+  border-color: rgba(255, 255, 255, .17);
+  background: rgba(255, 255, 255, .07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .11);
+}
+
+/* Directory shell */
+.directory-intro {
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--neo-stroke);
+  background:
+    radial-gradient(circle at 91% 4%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 31%),
+    radial-gradient(circle at 60% 120%, color-mix(in srgb, var(--violet) 10%, transparent), transparent 31%),
+    linear-gradient(145deg, var(--neo-glass-strong), var(--neo-glass-soft));
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+
+.directory-intro::after {
+  content: "";
+  width: 170px;
+  height: 170px;
+  position: absolute;
+  z-index: -1;
+  top: -95px;
+  right: 8%;
+  border: 1px solid color-mix(in srgb, var(--primary) 13%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 26px color-mix(in srgb, var(--primary) 4%, transparent), 0 0 0 54px color-mix(in srgb, var(--violet) 3%, transparent);
+}
+
+.directory-update-link,
+.directory-groups-link {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-strong);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.controls-panel,
+.announcements-discovery {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass);
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+}
+
+.filter-trigger,
+.sort-control,
+.roommate-match-trigger,
+.saved-trigger,
+.mobile-roommate-shortcut,
+.seg-btn,
+.quick-filter-chip,
+.clear-all,
+.pagination-v2 .pagination-nav,
+.pagination-v2 .pagination-page,
+.load-more-button,
+.mark-all-read,
+.announcement-filter {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 91%, transparent), color-mix(in srgb, var(--surface-2) 85%, transparent));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.filter-trigger:hover,
+.roommate-match-trigger:hover,
+.saved-trigger:hover,
+.quick-filter-chip:hover,
+.pagination-v2 .pagination-nav:hover,
+.pagination-v2 .pagination-page:hover,
+.mark-all-read:hover,
+.announcement-filter:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--neo-stroke));
+  box-shadow: var(--neo-raised);
+}
+
+.seg-btn.active,
+.quick-filter-chip.active,
+.mobile-roommate-shortcut.active,
+.announcement-filter.active,
+.pagination-v2 .pagination-page.is-active {
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--neo-stroke));
+  background: var(--neo-accent-soft);
+  color: var(--primary);
+  box-shadow: var(--neo-pressed), inset 0 1px 0 color-mix(in srgb, var(--neo-highlight) 52%, transparent);
+}
+
+.sort-control select {
+  color: var(--ink-soft);
+}
+
+.search-suggestions {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-strong);
+  box-shadow: var(--neo-floating);
+  backdrop-filter: var(--neo-blur);
+  -webkit-backdrop-filter: var(--neo-blur);
+}
+
+.search-suggestion:hover,
+.search-suggestion.is-active {
+  background: var(--neo-accent-soft);
+  box-shadow: var(--neo-pressed);
+}
+
+.active-chip,
+.student-context-badge,
+.gender-badge,
+.creator-badge,
+.polimi-mail-badge,
+.profile-updated-badge,
+.announcement-status,
+.announcement-tag,
+.announcement-unread-pill {
+  border: 1px solid color-mix(in srgb, currentColor 12%, var(--neo-stroke));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent), 0 3px 9px color-mix(in srgb, var(--neo-shadow-color) 34%, transparent);
+}
+
+.student-grid {
+  gap: clamp(14px, 1.6vw, 20px);
+}
+
+.student-card.student-card-v2.student-card-simple {
+  border: 1px solid var(--neo-stroke);
+  border-radius: 27px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--card-accent) 12%, transparent), transparent 38%),
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-2) 83%, transparent));
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-female {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(236, 94, 166, .17), transparent 38%),
+    linear-gradient(145deg, color-mix(in srgb, #fff1f8 54%, var(--surface)), color-mix(in srgb, var(--surface-2) 88%, transparent));
+}
+
+.student-card.student-card-v2.student-card-simple.card-gender-male {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(45, 177, 226, .16), transparent 38%),
+    linear-gradient(145deg, color-mix(in srgb, #eaf8ff 50%, var(--surface)), color-mix(in srgb, var(--surface-2) 88%, transparent));
+}
+
+[data-theme="dark"] .student-card.student-card-v2.student-card-simple.card-gender-female {
+  background: radial-gradient(circle at 100% 0%, rgba(226, 84, 158, .14), transparent 38%), linear-gradient(145deg, #142138, #101c31);
+}
+
+[data-theme="dark"] .student-card.student-card-v2.student-card-simple.card-gender-male {
+  background: radial-gradient(circle at 100% 0%, rgba(39, 165, 219, .14), transparent 38%), linear-gradient(145deg, #142238, #101c31);
+}
+
+.student-card.student-card-v2.student-card-simple:hover {
+  transform: translateY(-6px) scale(1.008);
+  border-color: color-mix(in srgb, var(--card-accent) 30%, var(--neo-stroke));
+  box-shadow: -12px -12px 28px color-mix(in srgb, var(--neo-highlight) 78%, transparent), 16px 18px 36px color-mix(in srgb, var(--neo-shadow-deep) 64%, transparent);
+}
+
+.student-card.student-card-v2.student-card-simple:active {
+  transform: translateY(-1px) scale(.994);
+  box-shadow: var(--neo-pressed);
+}
+
+.student-card-simple .student-card-simple-chevron,
+.student-card-arrow,
+.student-card-chevron {
+  border: 1px solid var(--neo-stroke);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.student-card-simple:hover .student-card-simple-chevron {
+  background: var(--neo-accent);
+  color: #fff;
+  box-shadow: 0 9px 20px color-mix(in srgb, var(--card-accent) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+.student-table-wrap,
+.directory-empty,
+.saved-banner,
+.roommate-match-banner,
+.first-use-hint,
+.telegram-recommendations,
+.groups-contribute,
+.announcements-note {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, var(--neo-glass-strong), var(--neo-glass-soft));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.student-table-wrap {
+  overflow: hidden;
+  border-radius: var(--neo-radius-lg);
+}
+
+.student-table tbody tr:hover {
+  background: var(--neo-accent-soft);
+}
+
+.pagination-v2 .pagination-page.is-active,
+.pagination-v2 .load-more-button {
+  background: var(--neo-accent);
+  color: #fff;
+  border-color: rgba(255, 255, 255, .20);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+/* Groups */
+.groups-search,
+.announcements-search-wrap {
+  border-radius: 18px;
+}
+
+.telegram-group-grid {
+  gap: clamp(14px, 1.7vw, 20px);
+}
+
+.telegram-group-card,
+.telegram-group-card.telegram-group-pinned {
+  border: 1px solid var(--neo-stroke);
+  background:
+    radial-gradient(circle at 96% 2%, color-mix(in srgb, var(--group-accent) 14%, transparent), transparent 36%),
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 93%, transparent), color-mix(in srgb, var(--surface-2) 84%, transparent));
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+}
+
+[data-theme="dark"] .telegram-group-card,
+[data-theme="dark"] .telegram-group-card.telegram-group-pinned {
+  background: radial-gradient(circle at 96% 2%, color-mix(in srgb, var(--group-accent) 14%, transparent), transparent 38%), linear-gradient(145deg, #14243b, #0f1c31);
+}
+
+.telegram-group-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--group-accent) 35%, var(--neo-stroke));
+  box-shadow: -11px -11px 27px color-mix(in srgb, var(--neo-highlight) 74%, transparent), 16px 18px 38px color-mix(in srgb, var(--neo-shadow-deep) 62%, transparent);
+}
+
+.telegram-group-avatar {
+  border: 1px solid color-mix(in srgb, var(--group-accent) 16%, var(--neo-stroke));
+  background: color-mix(in srgb, var(--group-accent) 10%, var(--surface));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.telegram-group-mark {
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: linear-gradient(145deg, #32b8ef, #1597d5);
+  box-shadow: 0 10px 22px rgba(34, 158, 217, .27), inset 0 1px 0 rgba(255, 255, 255, .34);
+}
+
+.telegram-group-pinned .telegram-group-label {
+  border: 1px solid color-mix(in srgb, var(--group-accent) 14%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent);
+}
+
+.telegram-join-btn {
+  border: 1px solid color-mix(in srgb, var(--group-accent) 16%, var(--neo-stroke));
+  background: color-mix(in srgb, var(--group-accent) 8%, var(--surface));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.telegram-group-pinned .telegram-join-btn {
+  border-color: rgba(255, 255, 255, .20);
+  background: linear-gradient(145deg, #31b5ec, #168fd0);
+  box-shadow: 0 12px 26px rgba(34, 158, 217, .25), inset 0 1px 0 rgba(255, 255, 255, .31);
+}
+
+.telegram-share-btn {
+  border-color: var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.telegram-share-btn:active {
+  transform: translateY(1px) scale(.98);
+  box-shadow: var(--neo-pressed);
+}
+
+/* Announcements */
+.announcements-since,
+.mark-all-read {
+  box-shadow: var(--neo-raised-sm);
+}
+
+.announcement-feed {
+  gap: clamp(14px, 1.7vw, 20px);
+}
+
+.announcement-card-v3 {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-2) 83%, transparent));
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight);
+}
+
+.announcement-card-button {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--notice-accent) 13%, transparent), transparent 38%),
+    transparent;
+}
+
+.announcement-card-v3.is-unread,
+.announcement-card-v3.is-unread .announcement-card-button {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--notice-accent) 17%, transparent), transparent 40%),
+    linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 24%, var(--surface)), color-mix(in srgb, var(--surface-2) 82%, transparent));
+}
+
+.announcement-card-v3.is-unread {
+  border-color: color-mix(in srgb, var(--notice-accent) 30%, var(--neo-stroke)) !important;
+  box-shadow: var(--neo-raised), inset 0 1px 0 var(--neo-highlight) !important;
+}
+
+.announcement-card-v3:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--notice-accent) 34%, var(--neo-stroke));
+  box-shadow: -11px -11px 27px color-mix(in srgb, var(--neo-highlight) 74%, transparent), 16px 18px 38px color-mix(in srgb, var(--neo-shadow-deep) 62%, transparent);
+}
+
+.announcement-card-icon,
+.announcement-modal-date-tile,
+.announcement-modal-highlight,
+.announcement-modal-source {
+  border: 1px solid color-mix(in srgb, var(--notice-accent) 14%, var(--neo-stroke));
+  background: color-mix(in srgb, var(--notice-soft) 72%, var(--surface));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+[data-theme="dark"] .announcement-modal-date-tile,
+[data-theme="dark"] .announcement-modal-highlight,
+[data-theme="dark"] .announcement-modal-source {
+  border-color: color-mix(in srgb, var(--notice-accent) 20%, var(--neo-stroke));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--notice-accent) 11%, var(--surface-2)), color-mix(in srgb, var(--surface) 86%, transparent));
+}
+
+[data-theme="dark"] .announcement-modal-highlight span,
+[data-theme="dark"] .announcement-modal-source span,
+[data-theme="dark"] .announcement-modal-source small {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .announcement-modal-highlight strong,
+[data-theme="dark"] .announcement-modal-source strong {
+  color: var(--ink-soft);
+}
+
+.announcement-card-footer-v3 strong i {
+  border: 1px solid color-mix(in srgb, var(--notice-accent) 13%, transparent);
+  box-shadow: var(--neo-raised-sm);
+}
+
+/* Sheets, dialogs, and profile */
+.profile-backdrop,
+.sheet-backdrop,
+.welcome-tour-backdrop,
+.announcement-modal {
+  background: rgba(5, 13, 28, .54);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+.profile-panel,
+.sheet-panel,
+.welcome-tour-card,
+.announcement-modal-panel {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-strong);
+  box-shadow: var(--neo-floating);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+}
+
+.profile-panel,
+.announcement-modal-panel {
+  border-radius: 34px;
+}
+
+.profile-handle,
+.sheet-handle,
+.announcement-modal-panel::before {
+  background: color-mix(in srgb, var(--muted-2) 54%, transparent);
+  box-shadow: 0 1px 0 var(--neo-highlight);
+}
+
+.profile-toolbar-btn,
+.announcement-modal-icon-btn,
+.sheet-close,
+.profile-menu a,
+.profile-menu button {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.profile-toolbar-btn:active,
+.announcement-modal-icon-btn:active,
+.sheet-close:active {
+  transform: translateY(1px) scale(.98);
+  box-shadow: var(--neo-pressed);
+}
+
+.profile-menu {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-strong);
+  box-shadow: var(--neo-floating);
+  backdrop-filter: var(--neo-blur);
+  -webkit-backdrop-filter: var(--neo-blur);
+}
+
+.profile-avatar {
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--neo-stroke));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 70%, var(--surface)), color-mix(in srgb, var(--violet-soft) 58%, var(--surface-2)));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.profile-program,
+.profile-detail,
+.profile-about,
+.profile-extra-section,
+.profile-extra-item {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 91%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.profile-program {
+  background: var(--neo-accent-soft);
+}
+
+.profile-detail-icon,
+.profile-section-title > span {
+  border: 1px solid var(--neo-stroke);
+  background: color-mix(in srgb, var(--surface) 87%, transparent);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.profile-about {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--violet-soft) 37%, var(--surface)), color-mix(in srgb, var(--surface-2) 82%, transparent));
+}
+
+.profile-contact-btn {
+  border: 1px solid rgba(255, 255, 255, .20);
+  box-shadow: 0 12px 25px rgba(18, 96, 170, .22), inset 0 1px 0 rgba(255, 255, 255, .30);
+}
+
+.profile-contact-btn.telegram {
+  background: linear-gradient(145deg, #32b6ec, #178fd0);
+}
+
+.profile-contact-btn.mail {
+  background: var(--neo-accent);
+}
+
+.mobile-filter-group {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
+  box-shadow: var(--neo-raised-sm), inset 0 1px 0 var(--neo-highlight);
+}
+
+.mobile-check {
+  border: 1px solid transparent;
+}
+
+.mobile-check:hover {
+  border-color: var(--neo-stroke);
+  background: var(--neo-glass-soft);
+}
+
+.mobile-check-box,
+.mobile-check-count {
+  border: 1px solid var(--neo-stroke);
+  background: color-mix(in srgb, var(--surface-2) 90%, transparent);
+  box-shadow: var(--neo-inset);
+}
+
+.mobile-check input:checked + .mobile-check-box {
+  background: var(--neo-accent);
+  border-color: rgba(255, 255, 255, .18);
+  box-shadow: 0 7px 15px color-mix(in srgb, var(--primary) 23%, transparent), inset 0 1px 0 rgba(255, 255, 255, .30);
+}
+
+.sheet-reset {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, var(--surface), var(--surface-2));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.announcement-modal-hero {
+  background:
+    radial-gradient(circle at 87% 11%, color-mix(in srgb, var(--notice-accent) 19%, transparent), transparent 31%),
+    linear-gradient(145deg, color-mix(in srgb, var(--notice-soft) 34%, var(--neo-glass-strong)), var(--neo-glass-soft));
+}
+
+.announcement-modal-body {
+  background: color-mix(in srgb, var(--surface) 56%, transparent);
+}
+
+.announcement-modal-action {
+  border: 1px solid var(--neo-stroke);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
+  box-shadow: var(--neo-raised-sm);
+}
+
+.announcement-modal-action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neo-raised);
+}
+
+.announcement-modal-action > span {
+  box-shadow: var(--neo-raised-sm);
+}
+
+.welcome-tour-card {
+  border-radius: 30px;
+}
+
+.welcome-tour-tips span {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-soft);
+  box-shadow: var(--neo-raised-sm);
+}
+
+.app-toast {
+  border: 1px solid var(--neo-stroke);
+  background: var(--neo-glass-strong);
+  color: var(--ink);
+  box-shadow: var(--neo-floating);
+  backdrop-filter: var(--neo-blur);
+  -webkit-backdrop-filter: var(--neo-blur);
+}
+
+.site-footer {
+  color: var(--muted);
+}
+
+/* Mobile neo-glass application shell */
+@media (max-width: 760px) {
+  .filter-sheet {
+    z-index: 140;
+  }
+
+  .filter-sheet .sheet-panel {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+
+  .filter-sheet .mobile-filter-content {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .filter-sheet .sheet-actions {
+    position: relative;
+    bottom: auto;
+    z-index: 4;
+    margin-top: 0;
+    background: linear-gradient(to top, var(--neo-glass-strong) 78%, color-mix(in srgb, var(--neo-glass-strong) 92%, transparent));
+  }
+
+  .filter-sheet .sheet-head > div > span,
+  .filter-sheet .mobile-filter-summary small,
+  .filter-sheet .mobile-check-count {
+    font-size: 12px;
+  }
+
+  .filter-sheet .sheet-head p,
+  .filter-sheet .mobile-check-label {
+    font-size: 13px;
+  }
+
+  .filter-sheet .mobile-filter-summary strong,
+  .filter-sheet .sheet-actions button {
+    font-size: 14px;
+  }
+
+  .access-shell {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .app-bar-inner {
+    height: 68px;
+  }
+
+  .main-shell,
+  .groups-main,
+  .announcements-main {
+    padding-top: 14px;
+  }
+
+  .directory-intro {
+    border-radius: 27px;
+    box-shadow: -7px -7px 18px color-mix(in srgb, var(--neo-highlight) 80%, transparent), 9px 10px 23px color-mix(in srgb, var(--neo-shadow-color) 75%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .controls-panel {
+    padding: 9px;
+    border: 1px solid var(--neo-stroke);
+    border-radius: 25px;
+    background: color-mix(in srgb, var(--neo-glass-strong) 88%, transparent);
+    box-shadow: 0 15px 35px color-mix(in srgb, var(--neo-shadow-deep) 38%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .search-field,
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control {
+    border-color: var(--neo-stroke);
+    background: color-mix(in srgb, var(--surface-2) 89%, transparent);
+  }
+
+  .directory-control-actions .filter-trigger,
+  .directory-control-actions .sort-control {
+    box-shadow: var(--neo-raised-sm);
+  }
+
+  .quick-filter-row {
+    margin-top: 14px;
+  }
+
+  .quick-filter-chip {
+    min-height: 46px;
+    border-radius: 16px;
+  }
+
+  .student-grid {
+    gap: 15px;
+  }
+
+  .student-card.student-card-v2.student-card-simple {
+    border-radius: 25px;
+    box-shadow: -7px -7px 17px color-mix(in srgb, var(--neo-highlight) 76%, transparent), 9px 10px 23px color-mix(in srgb, var(--neo-shadow-color) 72%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .student-card.student-card-v2.student-card-simple:hover {
+    transform: none;
+    box-shadow: -7px -7px 17px color-mix(in srgb, var(--neo-highlight) 76%, transparent), 9px 10px 23px color-mix(in srgb, var(--neo-shadow-color) 72%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .app-mobile-nav,
+  .app-mobile-nav.groups-mobile-nav,
+  .app-mobile-nav.announcements-mobile-nav {
+    border: 1px solid var(--neo-stroke);
+    border-radius: 32px;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--neo-glass-strong) 92%, transparent), color-mix(in srgb, var(--neo-glass) 84%, transparent));
+    box-shadow: 0 25px 60px color-mix(in srgb, var(--neo-shadow-deep) 70%, transparent), inset 0 1px 0 var(--neo-highlight), inset 0 -1px 0 color-mix(in srgb, var(--line-strong) 45%, transparent);
+  }
+
+  .app-mobile-nav .mobile-nav-item {
+    border: 1px solid transparent;
+    border-radius: 22px;
+  }
+
+  .app-mobile-nav .mobile-nav-item.active {
+    border-color: color-mix(in srgb, var(--primary) 17%, var(--neo-stroke));
+    background: var(--neo-accent-soft);
+    box-shadow: var(--neo-pressed), inset 0 1px 0 color-mix(in srgb, var(--neo-highlight) 50%, transparent);
+  }
+
+  .app-mobile-nav .mobile-nav-item.active .mobile-nav-icon {
+    background: var(--neo-accent);
+    box-shadow: 0 9px 20px color-mix(in srgb, var(--primary) 32%, transparent), inset 0 1px 0 rgba(255, 255, 255, .32);
+  }
+
+  .groups-hero,
+  .announcements-hero-v2 {
+    border-radius: 27px;
+    box-shadow: 0 20px 48px rgba(24, 74, 156, .24), inset 0 1px 0 rgba(255, 255, 255, .22);
+  }
+
+  .groups-search,
+  .announcements-discovery {
+    border-radius: 23px;
+  }
+
+  .telegram-group-card,
+  .telegram-group-card.telegram-group-pinned,
+  .announcement-card-v3 {
+    border-radius: 25px;
+    box-shadow: -7px -7px 17px color-mix(in srgb, var(--neo-highlight) 74%, transparent), 9px 10px 24px color-mix(in srgb, var(--neo-shadow-color) 74%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .telegram-group-card:hover,
+  .announcement-card-v3:hover {
+    transform: none;
+  }
+
+  .profile-panel,
+  .announcement-modal-panel {
+    border-radius: 34px 34px 0 0;
+    background: color-mix(in srgb, var(--neo-glass-strong) 94%, transparent);
+  }
+
+  .profile-toolbar,
+  .profile-contact-privacy,
+  .profile-contact-bar,
+  .announcement-modal-toolbar {
+    background: color-mix(in srgb, var(--neo-glass-strong) 90%, transparent);
+  }
+
+  .profile-swipe-hint {
+    background: color-mix(in srgb, var(--neo-glass-soft) 84%, transparent);
+  }
+
+  .profile-program,
+  .profile-detail,
+  .profile-about,
+  .profile-extra-section {
+    box-shadow: -5px -5px 12px color-mix(in srgb, var(--neo-highlight) 70%, transparent), 6px 7px 15px color-mix(in srgb, var(--neo-shadow-color) 68%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+
+  .sheet-panel {
+    background: color-mix(in srgb, var(--neo-glass-strong) 95%, transparent);
+  }
+
+  .mobile-filter-group {
+    box-shadow: -5px -5px 13px color-mix(in srgb, var(--neo-highlight) 72%, transparent), 6px 7px 16px color-mix(in srgb, var(--neo-shadow-color) 68%, transparent), inset 0 1px 0 var(--neo-highlight);
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-copy {
+    display: grid;
+    min-width: 0;
+  }
+
+  .brand-copy strong {
+    overflow: hidden;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .access-card {
+    padding-inline: 17px;
+  }
+
+  .directory-intro,
+  .telegram-group-card,
+  .announcement-card-v3 {
+    border-radius: 23px;
+  }
+
+  .quick-filter-row .quick-filter-chip:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .quick-filter-row .quick-filter-chip:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  .groups-hero,
+  .announcements-page-v2 .announcements-hero-v2 {
+    padding: 22px 20px;
+  }
+
+  .groups-hero h1,
+  .announcements-page-v2 .announcements-hero-v2 h1 {
+    font-size: 30px;
+    line-height: 1.03;
+  }
+
+  .announcements-hero-guide {
+    display: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .app-bar,
+  .controls-panel,
+  .announcements-discovery,
+  .profile-panel,
+  .sheet-panel,
+  .announcement-modal-panel,
+  .app-mobile-nav,
+  .search-suggestions,
+  .profile-menu {
+    background: var(--surface);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .student-card,
+  .telegram-group-card,
+  .announcement-card-v3,
+  .quick-filter-chip,
+  .announcement-filter,
+  .profile-toolbar-btn,
+  .icon-btn {
+    transition: none !important;
+  }
+}
