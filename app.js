@@ -86,7 +86,7 @@ function cacheElements() {
     "profileSheet", "profileBackdrop", "profilePanel", "profileClose", "profileShare", "profileShareLabel", "profileBody", "profileActions", "profileContactPrivacy",
     "profileSave", "profileMenuButton", "profileMenu", "profileUpdateAction", "profileReportAction",
     "roommateMatchButton", "roommateMatchButtonLabel", "mobileRoommateButton", "roommateMatchBanner", "roommateMatchTitle", "roommateMatchText", "roommateMatchReset",
-    "studentAppView", "noticesAppView", "groupsAppView", "meAppView", "mePage", "mePageName", "mePageSubtitle", "mePageBadges", "mePageBody", "mePageShare", "mePageSwitchEmail", "mePageAccountEmail", "topNoticesButton", "topGroupsButton",
+    "studentAppView", "noticesAppView", "groupsAppView", "meAppView", "mePage", "mePageName", "mePageSubtitle", "mePageBadges", "mePageBody", "mePageShare", "mePageSwitchEmail", "mePageAccountEmail", "topStudentsButton", "topNoticesButton", "topGroupsButton",
     "mobileStudentsButton", "mobileSavedButton", "mobileSavedBadge", "mobileNoticesButton", "mobileGroupsButton", "mobileMyProfileButton",
     "quickFilters", "emptyState", "emptyReset", "welcomeTour", "welcomeTourBackdrop", "welcomeTourDone", "appToast"
   ].forEach(id => els[id] = document.getElementById(id));

@@ -159,6 +159,7 @@ body {
 
 .icon-btn,
 .top-profile-btn,
+.top-students-btn,
 .top-notices-btn,
 .top-groups-btn,
 .top-cta,
@@ -179,6 +180,7 @@ body {
 }
 
 .top-notices-btn > span:first-child,
+.top-students-btn > span:first-child,
 .top-groups-btn > span:first-child,
 .search-icon,
 .filter-symbol,

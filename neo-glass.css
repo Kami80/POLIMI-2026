@@ -224,6 +224,7 @@ body {
 }
 
 .connection,
+.top-students-btn,
 .top-notices-btn,
 .top-groups-btn,
 .top-profile-btn,
@@ -251,6 +252,7 @@ body {
 
 .icon-btn:active,
 .top-profile-btn:active,
+.top-students-btn:active,
 .top-notices-btn:active,
 .top-groups-btn:active,
 .groups-header-actions a:active,
