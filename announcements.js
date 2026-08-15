@@ -5,6 +5,79 @@
 */
 const POLIMI_ANNOUNCEMENTS = [
   {
+    id: "polimi-ai-opportunities",
+    category: "AI",
+    filter: "courses",
+    icon: "neurology",
+    title: "Discover Polimi AI · research, courses & open learning",
+    summary: "Explore Polimi's AI ecosystem: 50+ years of research, AI teaching across every master's programme, free MOOCs, scientific seminars and centres connecting academia with industry.",
+    dateLabel: "Available year-round",
+    dateShort: "AI",
+    dateMonth: "POLIMI",
+    dateContext: "Research · courses · free initiatives",
+    tone: "course",
+    priority: 3,
+    tags: ["Artificial intelligence", "Free MOOCs", "AI seminars", "Research"],
+    highlights: [
+      { label: "AI at Polimi", value: "Since AIRLab was founded in 1973" },
+      { label: "Teaching", value: "AI courses in every master's programme" },
+      { label: "Open learning", value: "Free MOOCs, available to everyone" },
+      { label: "AI ecosystem", value: "AIRIC · FAIR · ELLIS · Observatory" }
+    ],
+    fullText: [
+      "Artificial Intelligence has been part of Politecnico di Milano since 1973, when AIRLab — the Artificial Intelligence and Robotics Laboratory — was founded. Today, Polimi presents AI as a transversal competence developed across its departments, laboratories and degree programmes.",
+      "Research is organised around four complementary directions: methods and technologies; business and corporate organisation; ethics and regulation; and real-world applications. Together, they connect next-generation algorithms with their organisational, legal and societal impact.",
+      "Polimi was the first Italian university to introduce an Artificial Intelligence course, in 1989. AI is now taught in every master's degree programme, with more than 15 specialised courses on AI fundamentals alongside domain-specific teaching for Engineering, Architecture and Design.",
+      "For flexible, self-paced learning, Polimi Open Knowledge offers free online MOOCs open to everyone. Topics include a non-technical overview of AI, legal issues, and the ethical, social and cultural impact of AI. The annual AI Seminars also bring researchers, academics and professionals together around frontier techniques and applications; presentations are open to students and staff within and beyond Polimi.",
+      "The wider ecosystem includes AIRIC, which connects applied research with public and private organisations; the FAIR foundation's Adaptive AI research and the Milan ELLIS Unit; and the AI Observatory, which studies adoption, market development and the impact of AI on organisations.",
+      "Use the official links below to choose the route that fits you: explore the research, find courses and open learning, follow scientific seminars, or learn how Polimi turns AI expertise into practical innovation."
+    ],
+    actions: [
+      {
+        label: "Explore Polimi AI",
+        href: "https://www.polimi.it/en/research/polimi-ai",
+        type: "link"
+      },
+      {
+        label: "AI research directions",
+        href: "https://www.polimi.it/en/research/polimi-ai/the-research",
+        type: "link"
+      },
+      {
+        label: "Courses & MOOCs",
+        href: "https://www.polimi.it/en/research/polimi-ai/courses",
+        type: "link"
+      },
+      {
+        label: "Free AI MOOCs",
+        href: "https://www.polimi.it/en/research/polimi-ai/detail/moocs-on-ai",
+        type: "link"
+      },
+      {
+        label: "AI Seminars",
+        href: "https://www.polimi.it/en/research/polimi-ai/detail/ai-seminars",
+        type: "link"
+      },
+      {
+        label: "AIRIC applied research",
+        href: "https://www.polimi.it/en/research/polimi-ai/airic",
+        type: "link"
+      },
+      {
+        label: "FAIR & ELLIS networks",
+        href: "https://www.polimi.it/en/research/polimi-ai/excellence-networks",
+        type: "link"
+      },
+      {
+        label: "AI Observatory",
+        href: "https://www.polimi.it/en/research/polimi-ai/ai-observatory",
+        type: "link"
+      }
+    ],
+    source: "Politecnico di Milano · Polimi AI",
+    signature: ["Official research, education and initiative links"]
+  },
+  {
     id: "basic-safety-course-resource",
     category: "Safety",
     filter: "safety",

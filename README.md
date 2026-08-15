@@ -82,6 +82,7 @@ The page updates automatically; no HTML changes are needed.
 
 University notices are available at `announcements.html`. The page currently includes:
 
+- A Polimi AI guide covering research, courses, free MOOCs, seminars, AIRIC, excellence networks and the AI Observatory.
 - Polimi summer office closure: August 8–23, 2026.
 - Free online Italian language courses and assessment registration: August 26–September 11, 2026.
 
