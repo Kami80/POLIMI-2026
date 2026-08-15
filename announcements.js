@@ -78,6 +78,54 @@ const POLIMI_ANNOUNCEMENTS = [
     signature: ["Official research, education and initiative links"]
   },
   {
+    id: "polimi-open-knowledge-moocs",
+    category: "Course",
+    filter: "courses",
+    icon: "school",
+    title: "Free online courses for everyone · Polimi Open Knowledge",
+    summary: "Build academic, professional and digital skills through POK, Polimi's free MOOC platform for students, teachers, researchers, professionals and lifelong learners.",
+    dateLabel: "Free · open year-round",
+    dateShort: "POK",
+    dateMonth: "MOOC",
+    dateContext: "Online learning · open to everyone",
+    tone: "course",
+    priority: 4,
+    tags: ["Free courses", "Online", "Open to everyone", "Open Badges"],
+    highlights: [
+      { label: "Cost", value: "Free" },
+      { label: "Who can join", value: "Everyone — not only Polimi students" },
+      { label: "Digital topics", value: "Data literacy · AI · sustainability" },
+      { label: "Recognition", value: "Open Badges available" }
+    ],
+    fullText: [
+      "Polimi Open Knowledge (POK) is the MOOC — Massive Open Online Courses — portal of Politecnico di Milano. Launched in June 2014, it offers online courses that are free and open to everyone.",
+      "The platform supports learners throughout university and professional transitions: from high school to university, from a bachelor's degree to a master's, and from university to the world of work. Its courses are also designed for teachers, researchers, professionals and anyone interested in continuous learning.",
+      "POK includes courses developed by Politecnico di Milano as well as other universities and institutions. It also hosts content from Edvance, a Digital Education Hub created by 17 universities and AFAM institutions, with advanced digital-skills topics including data literacy, artificial intelligence and digital sustainability.",
+      "The catalogue covers technical and transversal skills aligned with the labour market, alongside resources for teachers and educational technologists on digital and blended education, artificial intelligence and open education.",
+      "Selected learning paths can provide certificates in the form of Open Badges, helping learners use the skills they acquire in academic activities and professional life.",
+      "Read the official Polimi overview for full details, then visit the POK portal to explore the available courses."
+    ],
+    actions: [
+      {
+        label: "Official POK information",
+        href: "https://www.polimi.it/en/education/moocs-polimi-open-knowledge",
+        type: "link"
+      },
+      {
+        label: "Browse free POK courses",
+        href: "https://www.pok.polimi.it/",
+        type: "link"
+      },
+      {
+        label: "Explore Edvance",
+        href: "https://www.edvance.it/",
+        type: "link"
+      }
+    ],
+    source: "Politecnico di Milano · Education · Polimi Open Knowledge",
+    signature: ["Free online courses open to everyone"]
+  },
+  {
     id: "basic-safety-course-resource",
     category: "Safety",
     filter: "safety",
