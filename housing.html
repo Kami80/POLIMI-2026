@@ -8,7 +8,7 @@
 <meta content="Milan Home Hunt imports rental listing links into a private research desk for Polimi students: extract details, compare true costs, verify commute, contact landlords, and track every home." name="description"/>
 <link href="icons/favicon-64.png" rel="icon" sizes="64x64" type="image/png"/>
 <link href="icons/apple-touch-icon.png" rel="apple-touch-icon"/>
-<link href="manifest.webmanifest?v=20260818-homehunt-v8-mobile-ux" rel="manifest"/>
+<link href="manifest.webmanifest?v=20260818-homehunt-v9-clean-home" rel="manifest"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link crossorigin="" href="https://r.jina.ai" rel="preconnect"/>
@@ -23,6 +23,7 @@
 <link href="housing-mobile.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
 <link href="housing-ux-v6.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
 <link href="housing-v8.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
+<link href="housing-v9.css?v=20260818-homehunt-v9-clean-home" rel="stylesheet"/>
 <title>Milan Home Hunt · Polimi Students</title>
 </head>
 <body class="housing-page housing-clean-v3 housing-mobile-v5 housing-ux-v6">
@@ -44,9 +45,9 @@
 <main class="shell housing-main">
 <section aria-labelledby="huntTitle" class="hunt-hero" data-mobile-screen="home">
 <div class="hunt-hero-copy">
-<span class="hunt-kicker"><span class="material-symbols-rounded">home_work</span>MILAN HOME HUNT · PRIVATE RENTALS</span>
-<h1 id="huntTitle">Milan <span>Home Hunt</span></h1>
-<p>Paste a rental link, review what was extracted, then save, compare and contact—all without losing track of the original listing.</p>
+<span class="hunt-kicker"><span class="material-symbols-rounded">home_work</span>PRIVATE RENTALS · MILAN</span>
+<h1 id="huntTitle">Home <span>Hunt</span></h1>
+<p>Search the real rental sites. Paste a listing here. Keep only the homes worth comparing.</p>
 <div class="hunt-hero-actions">
 <a class="hunt-primary-btn" href="#quickAdd"><span class="material-symbols-rounded">add_link</span> Add a home</a>
 <a class="hunt-secondary-btn" href="#searchGuide"><span class="material-symbols-rounded">travel_explore</span> Search guide</a>
@@ -61,6 +62,16 @@
 <div class="hero-command-grid" id="heroCommandGrid"></div>
 <a class="hero-next-action" href="#myHomes" id="heroNextAction"><span class="material-symbols-rounded">task_alt</span><span><b>Start your shortlist</b><small>Save your first real listing</small></span><span class="material-symbols-rounded">arrow_forward</span></a>
 </aside>
+</section>
+<section class="home-source-dock" data-mobile-screen="home" aria-label="Pinned Milan rental searches">
+  <div class="home-source-dock-inner">
+    <div class="home-source-dock-label"><span class="material-symbols-rounded">travel_explore</span><span><b>Search Milan</b><small>Open a real site, then bring the listing back.</small></span></div>
+    <div class="home-source-actions">
+      <a id="pinnedHousingAnywhere" class="source-pin source-pin-ha" href="https://housinganywhere.com/s/Milan--Italy/student-room" target="_blank" rel="noopener noreferrer"><span class="source-pin-mark">HA</span><span>HousingAnywhere</span><span class="material-symbols-rounded">open_in_new</span></a>
+      <a id="pinnedSpotahome" class="source-pin source-pin-spot" href="https://www.spotahome.com/s/milan/for-rent%3Arooms" target="_blank" rel="noopener noreferrer"><span class="source-pin-mark">S</span><span>Spotahome</span><span class="material-symbols-rounded">open_in_new</span></a>
+      <button class="source-guide-btn" id="openSearchGuideBtn" type="button" aria-label="Open Milan search and neighborhood guide"><span class="material-symbols-rounded">map</span><span>Guide</span></button>
+    </div>
+  </div>
 </section>
 <section class="hh-start-guide" data-mobile-screen="home" aria-labelledby="hhStartGuideTitle">
   <div class="hh-start-guide-card">
@@ -83,7 +94,7 @@
     </div>
   </div>
 </section>
-<details class="tool-disclosure hh-main-search-disclosure" data-mobile-screen="home"><summary><span><span class="material-symbols-rounded">travel_explore</span><span><b>Where to search & live</b><small>Plan your campus area, streets, budget and supported rental sources.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="searchGuide">
+<details class="tool-disclosure hh-main-search-disclosure" data-mobile-screen="home" id="mainSearchGuideDisclosure"><summary><span><span class="material-symbols-rounded">travel_explore</span><span><b>Plan where to live</b><small>Campus, neighborhoods, streets and budget.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="searchGuide">
 <div class="nested-tool-actions"><button class="hunt-secondary-btn" id="copySearchBrief" type="button"><span class="material-symbols-rounded">content_copy</span> Copy my search brief</button></div><div class="search-planner-grid">
 <form class="hunt-card search-profile" id="searchProfileForm">
 <div class="card-label">MY SEARCH PROFILE</div>
@@ -172,7 +183,7 @@
 
 <nav aria-label="Milan Home Hunt sections" class="hunt-jumpbar"><a href="#quickAdd"><span class="material-symbols-rounded">add_link</span>Add home</a><a href="#myHomes"><span class="material-symbols-rounded">favorite</span>My homes</a><a href="#compareHomes"><span class="material-symbols-rounded">compare_arrows</span>Compare</a></nav><section aria-labelledby="quickAddTitle" class="hunt-section quick-add-section" id="quickAdd" data-mobile-screen="home">
 <div class="hunt-section-heading compact-heading">
-<div><span class="section-index">01 · ADD HOME</span><h2 id="quickAddTitle">Save a listing link</h2><p>Paste a real rental listing. Review the extracted details, then add it to your shortlist.</p></div>
+<div><span class="section-index">ADD A LISTING</span><h2 id="quickAddTitle">Paste a home link</h2><p>We’ll extract the useful details. You review them before saving.</p></div>
 <span class="best-effort-pill" id="importerStatus"><span class="material-symbols-rounded">shield_lock</span><span>Checking importer…</span></span>
 </div>
 <div class="quick-import hunt-card">
@@ -216,7 +227,7 @@
 </div>
 </section><section aria-labelledby="dashboardTitle" class="hunt-section dashboard-section" id="dashboard" data-mobile-screen="home">
 <div class="hunt-section-heading compact-heading">
-<div><span class="section-index">02 · OVERVIEW</span><h2 id="dashboardTitle">Your housing overview</h2><p>Only the things that need attention: follow-ups, viewings, changes, and your strongest options.</p></div>
+<div><span class="section-index">YOUR SHORTLIST</span><h2 id="dashboardTitle">At a glance</h2><p>Follow-ups, viewings and your strongest saved options.</p></div>
 <button class="hunt-ghost-btn" id="openScoreSettings" type="button"><span class="material-symbols-rounded">tune</span>Fit-score weights</button>
 </div>
 <div class="dashboard-grid" id="dashboardGrid"></div>
@@ -342,6 +353,6 @@
 <a class="mobile-quick-add" href="#quickAdd"><span class="material-symbols-rounded">add_link</span><span>Save listing</span></a>
 <div aria-live="polite" class="toast" id="housingToast" role="status"></div>
 <script src="home-hunt-config.js?v=20260818-importer-v2"></script>
-<script src="housing.js?v=20260818-homehunt-v8-mobile-ux"></script>
+<script src="housing.js?v=20260818-homehunt-v9-clean-home"></script>
 </body>
 </html>
