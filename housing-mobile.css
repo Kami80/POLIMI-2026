@@ -1,0 +1,223 @@
+/* Home Hunt V5 — mobile app shell. Loaded after housing.css. */
+.housing-mobile-v5 .hh-mobile-tabbar{display:none}
+.housing-mobile-v5 .hh-mobile-screen-title{display:none}
+
+@media (max-width:760px){
+  html{scroll-padding-top:68px}
+  body.housing-mobile-v5{background:var(--hunt-bg,#f7f3ed);overscroll-behavior-y:none}
+  .housing-mobile-v5 .app-bg{opacity:.25}
+  .housing-mobile-v5 .housing-main{width:100%;padding:0 14px calc(104px + env(safe-area-inset-bottom));}
+
+  /* Compact native-app header */
+  .housing-mobile-v5 .housing-app-bar{position:sticky;top:0;z-index:90;height:58px;background:color-mix(in srgb,var(--hunt-bg,#fff) 92%,transparent);backdrop-filter:blur(18px);border-bottom:1px solid var(--hunt-line)}
+  .housing-mobile-v5 .housing-app-bar .app-bar-inner{height:58px;padding:0 14px}
+  .housing-mobile-v5 .brand{gap:9px;min-width:0}
+  .housing-mobile-v5 .brand-mark{width:34px;height:34px;border-radius:10px}
+  .housing-mobile-v5 .brand-copy strong{font-size:14px;line-height:1.1}
+  .housing-mobile-v5 .brand-copy small{font-size:10px;margin-top:2px;white-space:nowrap}
+  .housing-mobile-v5 .housing-header-link{display:none!important}
+  .housing-mobile-v5 .housing-header-actions{gap:4px}
+  .housing-mobile-v5 .housing-header-actions .icon-btn{width:40px;height:40px;border-radius:12px}
+
+  /* Screen switching: only one app surface is visible on phone */
+  .housing-mobile-v5 [data-mobile-screen]{display:none!important}
+  .housing-mobile-v5 [data-mobile-screen].mobile-screen-active{display:block!important}
+  .housing-mobile-v5 .hunt-jumpbar,.housing-mobile-v5 .mobile-nav.app-mobile-nav,.housing-mobile-v5 .mobile-quick-add,.housing-mobile-v5 .housing-footer{display:none!important}
+
+  /* Home intro becomes a small welcome strip */
+  .housing-mobile-v5 .hunt-hero{padding:18px 0 2px;grid-template-columns:1fr!important;gap:0!important}
+  .housing-mobile-v5 .hunt-hero-copy{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+  .housing-mobile-v5 .hunt-kicker{font-size:10px;letter-spacing:.08em;margin-bottom:7px}
+  .housing-mobile-v5 .hunt-hero h1{font-size:27px!important;line-height:1.08;margin:0 0 7px;letter-spacing:-.035em}
+  .housing-mobile-v5 .hunt-hero p{font-size:13px!important;line-height:1.5;margin:0;color:var(--hunt-muted);max-width:34em}
+  .housing-mobile-v5 .hunt-hero-actions,.housing-mobile-v5 .hunt-trust-row,.housing-mobile-v5 .hero-command-card{display:none!important}
+
+  /* Each screen starts near the top; no giant numbered article sections */
+  .housing-mobile-v5 .hunt-section{padding:18px 0 0!important;margin:0!important}
+  .housing-mobile-v5 .hunt-section-heading{display:flex!important;align-items:flex-end;justify-content:space-between;gap:10px;margin:0 0 12px}
+  .housing-mobile-v5 .hunt-section-heading>div:first-child{min-width:0}
+  .housing-mobile-v5 .section-index{display:none!important}
+  .housing-mobile-v5 .hunt-section-heading h2{font-size:21px!important;line-height:1.15;margin:0 0 4px;letter-spacing:-.025em}
+  .housing-mobile-v5 .hunt-section-heading p{font-size:12px!important;line-height:1.45;margin:0;color:var(--hunt-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .housing-mobile-v5 .hunt-section-heading .section-actions{margin:0!important;flex:0 0 auto}
+  .housing-mobile-v5 .hunt-section-heading .section-actions .hunt-ghost-btn{width:42px;height:42px;padding:0;font-size:0;border-radius:12px}
+  .housing-mobile-v5 .hunt-section-heading .section-actions .material-symbols-rounded{font-size:20px}
+  .housing-mobile-v5 #openScoreSettings{width:42px;height:42px;padding:0;font-size:0;border-radius:12px;flex:0 0 auto}
+  .housing-mobile-v5 #openScoreSettings .material-symbols-rounded{font-size:20px}
+
+  /* Add/import is the hero action */
+  .housing-mobile-v5 .quick-add-section{padding-top:14px!important}
+  .housing-mobile-v5 .quick-add-section .hunt-section-heading{align-items:flex-start}
+  .housing-mobile-v5 #importerStatus.best-effort-pill{width:auto!important;max-width:42px!important;height:42px;padding:0!important;justify-content:center;border-radius:12px;font-size:0!important;flex:0 0 42px}
+  .housing-mobile-v5 #importerStatus.best-effort-pill span:last-child{display:none}
+  .housing-mobile-v5 .quick-import{display:block!important;border-radius:18px!important;border:1px solid var(--hunt-line)!important;box-shadow:0 7px 24px rgba(43,37,31,.06)!important;overflow:hidden}
+  .housing-mobile-v5 .quick-import-main{padding:14px!important}
+  .housing-mobile-v5 .quick-import-side{display:none!important}
+  .housing-mobile-v5 .url-detect-row{margin-bottom:8px}
+  .housing-mobile-v5 .url-field-label{font-size:11px}
+  .housing-mobile-v5 .source-detected{font-size:10px;max-width:48%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .housing-mobile-v5 .url-import-row{display:grid!important;grid-template-columns:44px 1fr!important;gap:8px!important}
+  .housing-mobile-v5 .url-field{grid-column:1/-1!important;height:50px;border-radius:14px!important}
+  .housing-mobile-v5 .url-field input{font-size:16px!important;min-width:0}
+  .housing-mobile-v5 #pasteListingUrl{width:44px;height:46px;padding:0;font-size:0;border-radius:13px}
+  .housing-mobile-v5 #pasteListingUrl .material-symbols-rounded{font-size:20px}
+  .housing-mobile-v5 #importListingBtn{height:46px;justify-content:center;border-radius:13px;font-size:14px}
+  .housing-mobile-v5 .import-step-list{display:grid!important;grid-template-columns:repeat(5,1fr);gap:4px!important;margin-top:12px!important}
+  .housing-mobile-v5 .import-step-list[hidden]{display:none!important}
+  .housing-mobile-v5 .import-step-list span{padding:0!important;border:0!important;background:transparent!important;display:block!important;font-size:0!important;text-align:center}
+  .housing-mobile-v5 .import-step-list i{display:block;width:100%!important;height:4px!important;border-radius:999px!important}
+  .housing-mobile-v5 .quick-import-actions{display:flex!important;gap:8px;margin-top:12px;overflow:auto;scrollbar-width:none}
+  .housing-mobile-v5 .quick-import-actions::-webkit-scrollbar{display:none}
+  .housing-mobile-v5 .quick-import-actions .text-btn{flex:0 0 auto;min-height:38px;padding:8px 10px;border:1px solid var(--hunt-line);border-radius:11px;font-size:11px;background:var(--hunt-card)}
+  .housing-mobile-v5 #copyBookmarkletBtn,.housing-mobile-v5 #shareInstallHelpBtn{display:none!important}
+  .housing-mobile-v5 .paste-text-fallback{margin-top:12px}
+  .housing-mobile-v5 .paste-text-fallback>summary{font-size:11px}
+
+  /* Overview = compact scrollable activity chips */
+  .housing-mobile-v5 #dashboard{padding-top:20px!important}
+  .housing-mobile-v5 #dashboard .hunt-section-heading p{display:none}
+  .housing-mobile-v5 .dashboard-grid{display:flex!important;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;padding:1px 1px 8px;margin:0 -14px 0;padding-left:14px;padding-right:14px;scrollbar-width:none}
+  .housing-mobile-v5 .dashboard-grid::-webkit-scrollbar{display:none}
+  .housing-mobile-v5 .dash-card{flex:0 0 142px;min-height:96px!important;padding:12px!important;border-radius:16px!important;scroll-snap-align:start;box-shadow:none!important}
+  .housing-mobile-v5 .dash-card .material-symbols-rounded{font-size:20px}
+  .housing-mobile-v5 .dash-card strong{font-size:22px}
+  .housing-mobile-v5 .dash-card b{font-size:11px}
+  .housing-mobile-v5 .dash-card small{font-size:9.5px;line-height:1.3}
+  .housing-mobile-v5 .onboarding-panel{display:block!important;padding:14px!important;border-radius:16px!important;box-shadow:none!important;margin-top:8px}
+  .housing-mobile-v5 .onboarding-copy h3{font-size:16px;margin:3px 0 4px}
+  .housing-mobile-v5 .onboarding-copy p{font-size:11px;line-height:1.45;margin:0}
+  .housing-mobile-v5 .onboarding-steps{display:flex!important;gap:8px;overflow:auto;margin-top:12px;scrollbar-width:none}
+  .housing-mobile-v5 .onboarding-steps>*{flex:0 0 168px}
+
+  /* Saved homes screen */
+  .housing-mobile-v5 #myHomes{padding-top:18px!important}
+  .housing-mobile-v5 .pipeline-disclosure{margin:0 0 10px}
+  .housing-mobile-v5 .pipeline-disclosure>summary{min-height:48px;padding:12px 13px;border-radius:14px;font-size:12px}
+  .housing-mobile-v5 .pipeline-disclosure>summary small{display:none!important}
+  .housing-mobile-v5 .kanban-board{grid-auto-columns:minmax(245px,82vw)!important;gap:8px!important}
+  .housing-mobile-v5 .homes-toolbar{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;padding:10px!important;border-radius:16px!important;margin-bottom:10px;box-shadow:none!important}
+  .housing-mobile-v5 .homes-search{grid-column:1/-1!important;height:44px;border-radius:12px!important}
+  .housing-mobile-v5 .homes-search input{font-size:15px}
+  .housing-mobile-v5 .homes-toolbar select,.housing-mobile-v5 .favorites-toggle{height:42px;min-width:0;font-size:11px;border-radius:11px}
+  .housing-mobile-v5 .favorites-toggle{width:100%!important}
+  .housing-mobile-v5 .homes-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .housing-mobile-v5 .home-card{display:grid!important;grid-template-columns:108px minmax(0,1fr)!important;border-radius:17px!important;overflow:hidden;box-shadow:none!important;min-height:142px}
+  .housing-mobile-v5 .home-card-media{height:100%!important;min-height:142px!important;border-radius:0!important}
+  .housing-mobile-v5 .home-card-media img{height:100%;object-fit:cover}
+  .housing-mobile-v5 .home-card-badges{top:7px;left:7px;right:auto;display:grid;gap:4px}
+  .housing-mobile-v5 .home-card-badges .health-badge{display:none}
+  .housing-mobile-v5 .favorite-btn{width:34px;height:34px;top:7px;right:7px}
+  .housing-mobile-v5 .home-card-body{padding:11px 11px 10px!important;min-width:0}
+  .housing-mobile-v5 .home-source-row{margin-bottom:3px}
+  .housing-mobile-v5 .home-source-row span{font-size:9px}
+  .housing-mobile-v5 .home-source-row small{display:none}
+  .housing-mobile-v5 .home-card h3{font-size:14px!important;line-height:1.25;margin:0 0 4px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .housing-mobile-v5 .home-location{font-size:10px!important;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:7px}
+  .housing-mobile-v5 .home-location .material-symbols-rounded{font-size:14px}
+  .housing-mobile-v5 .home-price-row{align-items:end;margin-bottom:7px}
+  .housing-mobile-v5 .home-price-row>strong{font-size:17px!important}
+  .housing-mobile-v5 .home-price-row>strong small{font-size:9px}
+  .housing-mobile-v5 .home-price-row>span{font-size:8px!important}
+  .housing-mobile-v5 .home-price-row>span b{font-size:11px!important}
+  .housing-mobile-v5 .home-metrics{display:flex!important;gap:5px;margin-bottom:7px}
+  .housing-mobile-v5 .home-metric{padding:5px 6px!important;border-radius:8px!important;min-width:0;flex:1}
+  .housing-mobile-v5 .home-metric:nth-child(3){display:none}
+  .housing-mobile-v5 .home-metric span{font-size:7.5px!important}
+  .housing-mobile-v5 .home-metric strong{font-size:10px!important;white-space:nowrap}
+  .housing-mobile-v5 .home-warning,.housing-mobile-v5 .winner-chip{display:none!important}
+  .housing-mobile-v5 .home-card-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:6px;margin-top:0}
+  .housing-mobile-v5 .home-card-actions button{height:34px!important;padding:0 7px!important;border-radius:9px!important;font-size:10px!important}
+  .housing-mobile-v5 .home-card-actions .material-symbols-rounded{font-size:15px!important}
+  .housing-mobile-v5 .homes-empty{padding:34px 18px!important;border-radius:18px!important}
+
+  /* Compare screen */
+  .housing-mobile-v5 #compareHomes{padding-top:18px!important}
+  .housing-mobile-v5 .compare-empty{padding:20px!important;border-radius:16px!important}
+  .housing-mobile-v5 .compare-shell{padding:10px!important;border-radius:16px!important;box-shadow:none!important}
+  .housing-mobile-v5 .comparison-insights{display:flex!important;overflow:auto;gap:7px;scrollbar-width:none}
+  .housing-mobile-v5 .comparison-insights>*{flex:0 0 150px}
+  .housing-mobile-v5 .compare-table-wrap{margin:10px -10px -10px;overflow:auto;border-top:1px solid var(--hunt-line)}
+  .housing-mobile-v5 .compare-table{min-width:620px;font-size:10px}
+  .housing-mobile-v5 .compare-table th,.housing-mobile-v5 .compare-table td{padding:9px 8px}
+
+  /* Tools screen = simple settings list */
+  .housing-mobile-v5 #toolsHub{padding-top:18px!important}
+  .housing-mobile-v5 .tools-heading{margin-bottom:10px}
+  .housing-mobile-v5 .tools-heading p{display:none}
+  .housing-mobile-v5 .tool-disclosure{margin:0 0 9px!important;border-radius:15px!important;background:var(--hunt-card);box-shadow:none!important}
+  .housing-mobile-v5 .tool-disclosure>summary{min-height:58px;padding:12px 13px!important;border-radius:15px;font-size:13px}
+  .housing-mobile-v5 .tool-disclosure>summary>span:first-child{gap:10px}
+  .housing-mobile-v5 .tool-disclosure>summary .material-symbols-rounded{font-size:21px}
+  .housing-mobile-v5 .tool-disclosure>summary b{font-size:13px}
+  .housing-mobile-v5 .tool-disclosure>summary small{display:block!important;font-size:9.5px!important;line-height:1.25;margin-top:2px}
+  .housing-mobile-v5 .nested-tool-section{padding:10px!important}
+  .housing-mobile-v5 .search-profile,.housing-mobile-v5 .area-guide-card,.housing-mobile-v5 .contact-settings,.housing-mobile-v5 .question-card,.housing-mobile-v5 .message-card,.housing-mobile-v5 .docs-card,.housing-mobile-v5 .install-card{padding:13px!important;border-radius:14px!important}
+  .housing-mobile-v5 .platform-grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .housing-mobile-v5 .platform-card{padding:12px!important;border-radius:13px!important}
+  .housing-mobile-v5 .platform-card h3{font-size:13px!important}
+  .housing-mobile-v5 .platform-card p{display:none}
+  .housing-mobile-v5 .final-check-grid{grid-template-columns:1fr!important;gap:7px!important}
+
+  /* Dialogs become full-screen phone surfaces */
+  .housing-mobile-v5 .hunt-dialog{padding:0!important;background:var(--hunt-bg,#fff)}
+  .housing-mobile-v5 .hunt-dialog::backdrop{background:rgba(18,16,14,.42)}
+  .housing-mobile-v5 .hunt-dialog .dialog-frame,.housing-mobile-v5 .workspace-frame{width:100vw!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;border-radius:0!important;border:0!important;display:flex;flex-direction:column;overflow:hidden}
+  .housing-mobile-v5 .dialog-header{position:sticky;top:0;z-index:4;flex:0 0 auto;padding:13px 14px!important;background:var(--hunt-card);border-bottom:1px solid var(--hunt-line)}
+  .housing-mobile-v5 .dialog-header h2{font-size:20px!important;margin-top:2px}
+  .housing-mobile-v5 .dialog-header p{font-size:10.5px!important;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .housing-mobile-v5 .dialog-header .icon-btn{width:40px;height:40px}
+  .housing-mobile-v5 .editor-dialog form{overflow:hidden}
+  .housing-mobile-v5 .import-preview{flex:0 0 auto;padding:10px 14px!important}
+  .housing-mobile-v5 .editor-fields{display:grid!important;grid-template-columns:1fr 1fr!important;padding:12px 14px!important;gap:10px!important;overflow-y:auto;overscroll-behavior:contain}
+  .housing-mobile-v5 .editor-fields .span-2,.housing-mobile-v5 .editor-fields .span-3{grid-column:1/-1!important}
+  .housing-mobile-v5 .editor-fields label>span{font-size:10px}
+  .housing-mobile-v5 .editor-fields input,.housing-mobile-v5 .editor-fields select,.housing-mobile-v5 .editor-fields textarea{font-size:16px!important;min-height:44px}
+  .housing-mobile-v5 [data-confidence]{font-size:8px!important}
+  .housing-mobile-v5 .editor-cost-preview{flex:0 0 auto;grid-template-columns:repeat(3,1fr)!important;padding:8px 14px!important}
+  .housing-mobile-v5 .cost-preview-cell{padding:7px!important}
+  .housing-mobile-v5 .cost-preview-cell span{font-size:7px}
+  .housing-mobile-v5 .cost-preview-cell strong{font-size:11px}
+  .housing-mobile-v5 .dialog-footer{position:sticky;bottom:0;z-index:5;flex:0 0 auto;padding:10px 14px calc(10px + env(safe-area-inset-bottom))!important;background:var(--hunt-card);border-top:1px solid var(--hunt-line);gap:8px}
+  .housing-mobile-v5 .dialog-footer button{min-height:46px;flex:1;justify-content:center}
+  .housing-mobile-v5 #workspaceContent{overflow-y:auto;overscroll-behavior:contain;flex:1}
+  .housing-mobile-v5 .workspace-hero{display:block!important;padding:0!important}
+  .housing-mobile-v5 .workspace-media{height:220px!important;border-radius:0!important}
+  .housing-mobile-v5 .workspace-summary{padding:14px!important}
+  .housing-mobile-v5 .workspace-summary h2{font-size:20px!important}
+  .housing-mobile-v5 .workspace-price{font-size:27px!important}
+  .housing-mobile-v5 .workspace-kpis{grid-template-columns:repeat(2,1fr)!important;gap:7px!important}
+  .housing-mobile-v5 .workspace-kpi{padding:8px!important}
+  .housing-mobile-v5 .workspace-kpi span{font-size:8px!important}
+  .housing-mobile-v5 .workspace-kpi strong{font-size:12px!important}
+  .housing-mobile-v5 .workspace-tabs{position:sticky;top:0;z-index:3;background:var(--hunt-card);padding:6px 8px!important;gap:4px;overflow-x:auto;border-top:1px solid var(--hunt-line);border-bottom:1px solid var(--hunt-line)}
+  .housing-mobile-v5 .workspace-tabs button{flex:0 0 auto;font-size:10px!important;padding:8px 10px!important;border-radius:9px}
+  .housing-mobile-v5 .workspace-panel{padding:10px!important}
+  .housing-mobile-v5 .workspace-grid{grid-template-columns:1fr!important;gap:9px!important}
+  .housing-mobile-v5 .workspace-section,.housing-mobile-v5 .workspace-section.span-2{grid-column:auto!important;padding:13px!important;border-radius:14px!important}
+  .housing-mobile-v5 .workspace-section h3{font-size:15px!important}
+  .housing-mobile-v5 .detail-row{font-size:11px!important}
+
+  /* Dedicated Home Hunt bottom nav */
+  .housing-mobile-v5 .hh-mobile-tabbar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:120;display:grid;grid-template-columns:1fr 1fr 64px 1fr 1fr;align-items:end;padding:7px 7px 6px;border:1px solid color-mix(in srgb,var(--hunt-line) 85%,transparent);border-radius:21px;background:color-mix(in srgb,var(--hunt-card) 94%,transparent);backdrop-filter:blur(24px);box-shadow:0 10px 35px rgba(30,25,21,.16)}
+  .housing-mobile-v5 .hh-mobile-tabbar button{height:48px;min-width:0;border:0;background:transparent;color:var(--hunt-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:13px;font:inherit;cursor:pointer}
+  .housing-mobile-v5 .hh-mobile-tabbar button .material-symbols-rounded{font-size:21px}
+  .housing-mobile-v5 .hh-mobile-tabbar button small{font-size:9px;font-weight:750}
+  .housing-mobile-v5 .hh-mobile-tabbar button.active{color:var(--hunt-orange)}
+  .housing-mobile-v5 .hh-mobile-tabbar .hh-add-tab{width:58px;height:58px;margin:-17px auto 0;border-radius:18px;background:var(--hunt-orange);color:white;box-shadow:0 8px 20px color-mix(in srgb,var(--hunt-orange) 35%,transparent)}
+  .housing-mobile-v5 .hh-mobile-tabbar .hh-add-tab .material-symbols-rounded{font-size:27px}
+  .housing-mobile-v5 .hh-mobile-tabbar .hh-add-tab small{color:white}
+
+  .housing-mobile-v5 .toast{bottom:calc(90px + env(safe-area-inset-bottom))!important;left:14px!important;right:14px!important;width:auto!important;font-size:12px}
+}
+
+@media (max-width:380px){
+  .housing-mobile-v5 .housing-main{padding-left:11px;padding-right:11px}
+  .housing-mobile-v5 .hunt-hero h1{font-size:24px!important}
+  .housing-mobile-v5 .home-card{grid-template-columns:96px minmax(0,1fr)!important}
+  .housing-mobile-v5 .hh-mobile-tabbar{left:5px;right:5px}
+  .housing-mobile-v5 .hh-mobile-tabbar button small{font-size:8px}
+}
+@media (max-width:760px){
+  .housing-mobile-v5 .weight-list,.housing-mobile-v5 .diff-list,.housing-mobile-v5 #duplicateContent,.housing-mobile-v5 .share-preview{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px!important}
+  .housing-mobile-v5 .score-frame .weight-total{flex:0 0 auto;margin:0 14px 8px}
+}

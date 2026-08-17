@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#B84A32" />
+  <meta name="description" content="Milan Home Hunt is a private rental research desk for Polimi students: save listing links, compare true costs, verify commute, contact landlords, and track every home." />
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest?v=20260818-homehunt-v2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://r.jina.ai" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260818-homehunt-v2" />
+  <link rel="stylesheet" href="ui-polish.css?v=20260815-navbar-v1" />
+  <link rel="stylesheet" href="neo-glass.css?v=20260815-navbar-v1" />
+  <link rel="stylesheet" href="compact-motion.css?v=20260812-v2" />
+  <link rel="stylesheet" href="warm-milan.css?v=20260815-navbar-v1" />
+  <link rel="stylesheet" href="housing.css?v=20260818-homehunt-v2" />
+  <title>Milan Home Hunt · Polimi Students</title>
+</head>
+<body class="housing-page">
+  <div class="app-bg" aria-hidden="true"></div>
+
+  <header class="app-bar housing-app-bar">
+    <div class="shell app-bar-inner">
+      <a class="brand" href="index.html" aria-label="Back to Polimi Students">
+        <span class="brand-mark" aria-hidden="true"><img src="icons/icon-192.png" alt="" /></span>
+        <span class="brand-copy"><strong>Polimi Students</strong><small>Milan Home Hunt · 2026/27</small></span>
+      </a>
+      <div class="app-actions housing-header-actions">
+        <a class="housing-header-link" href="announcements.html"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span>Notices</span></a>
+        <a class="housing-header-link" href="groups.html"><span class="material-symbols-rounded" aria-hidden="true">forum</span><span>Community</span></a>
+        <a class="housing-header-link housing-home-link" href="index.html"><span class="material-symbols-rounded" aria-hidden="true">arrow_back</span><span>Students</span></a>
+        <button class="icon-btn" id="housingThemeToggle" type="button" aria-label="Toggle theme"><span class="material-symbols-rounded" id="housingThemeIcon" aria-hidden="true">dark_mode</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell housing-main">
+    <section class="hunt-hero" aria-labelledby="huntTitle">
+      <div class="hunt-hero-copy">
+        <span class="hunt-kicker"><span class="material-symbols-rounded">home_work</span>MILAN HOME HUNT · PRIVATE RENTALS</span>
+        <h1 id="huntTitle">Your Milan housing <span>command center.</span></h1>
+        <p>Search on the real rental websites. Save only the homes you care about. Home Hunt organizes the link, costs, commute, missing details, messages, viewings, and decisions in one private workspace.</p>
+        <div class="hunt-hero-actions">
+          <a class="hunt-primary-btn" href="#quickAdd"><span class="material-symbols-rounded">add_link</span>Save a listing</a>
+          <a class="hunt-secondary-btn" href="#searchGuide"><span class="material-symbols-rounded">travel_explore</span>Where to search</a>
+        </div>
+        <div class="hunt-trust-row">
+          <span><span class="material-symbols-rounded">inventory_2</span>No fake inventory</span>
+          <span><span class="material-symbols-rounded">lock</span>Shortlist stays on-device</span>
+          <span><span class="material-symbols-rounded">difference</span>Source changes never overwrite silently</span>
+        </div>
+      </div>
+      <aside class="hero-command-card">
+        <div class="hero-command-top"><span>HOME HUNT STATUS</span><b id="heroSavedCount">0 homes</b></div>
+        <div class="hero-command-grid" id="heroCommandGrid"></div>
+        <a class="hero-next-action" id="heroNextAction" href="#myHomes"><span class="material-symbols-rounded">task_alt</span><span><b>Start your shortlist</b><small>Save your first real listing</small></span><span class="material-symbols-rounded">arrow_forward</span></a>
+      </aside>
+    </section>
+
+    <nav class="hunt-jumpbar" aria-label="Milan Home Hunt sections">
+      <a href="#dashboard"><span>01</span>Dashboard</a>
+      <a href="#quickAdd"><span>02</span>Save</a>
+      <a href="#myHomes"><span>03</span>Pipeline</a>
+      <a href="#compareHomes"><span>04</span>Compare</a>
+      <a href="#contactDesk"><span>05</span>Contact</a>
+      <a href="#toolkit"><span>06</span>Toolkit</a>
+    </nav>
+
+    <section class="hunt-section dashboard-section" id="dashboard" aria-labelledby="dashboardTitle">
+      <div class="hunt-section-heading compact-heading">
+        <div><span class="section-index">01 · DASHBOARD</span><h2 id="dashboardTitle">What needs your attention?</h2><p>Return here to see follow-ups, viewings, listing changes, and the strongest homes in your shortlist.</p></div>
+        <button class="hunt-ghost-btn" id="openScoreSettings" type="button"><span class="material-symbols-rounded">tune</span>Fit-score weights</button>
+      </div>
+      <div class="dashboard-grid" id="dashboardGrid"></div>
+      <div class="onboarding-panel hunt-card" id="onboardingPanel">
+        <div class="onboarding-copy"><span class="card-label">FIRST HOME IN 4 STEPS</span><h3>Build a useful shortlist, not a pile of tabs.</h3><p>Home Hunt intentionally starts empty. You discover homes on real marketplaces and bring only serious candidates here.</p></div>
+        <div class="onboarding-steps" id="onboardingSteps"></div>
+      </div>
+    </section>
+
+    <section class="hunt-section quick-add-section" id="quickAdd" aria-labelledby="quickAddTitle">
+      <div class="hunt-section-heading compact-heading">
+        <div><span class="section-index">02 · SAVE A HOME</span><h2 id="quickAddTitle">Paste a listing. We’ll build the case file.</h2><p>Source detection happens immediately. Import is best-effort, and every extracted field is reviewable before it becomes part of your shortlist.</p></div>
+        <span class="best-effort-pill"><span class="material-symbols-rounded">verified_user</span>Import confidence shown per field</span>
+      </div>
+
+      <div class="quick-import hunt-card">
+        <div class="quick-import-main">
+          <div class="url-detect-row">
+            <label class="url-field-label" for="listingUrl">Listing URL</label>
+            <span class="source-detected" id="sourceDetected"><i></i><b>Waiting for a link</b></span>
+          </div>
+          <div class="url-import-row">
+            <div class="url-field"><span class="material-symbols-rounded">link</span><input id="listingUrl" type="url" inputmode="url" placeholder="https://www.idealista.it/immobile/..." autocomplete="off" /></div>
+            <button class="hunt-ghost-btn" id="pasteListingUrl" type="button"><span class="material-symbols-rounded">content_paste</span>Paste</button>
+            <button class="hunt-primary-btn" id="importListingBtn" type="button"><span class="material-symbols-rounded">auto_awesome</span>Import</button>
+          </div>
+          <div class="import-progress" id="importProgress" hidden><div class="progress-track"><i id="importProgressBar"></i></div><span id="importProgressText">Reading listing…</span></div>
+          <div class="import-alert" id="importAlert" hidden></div>
+          <div class="quick-import-actions">
+            <button class="text-btn" id="manualAddBtn" type="button"><span class="material-symbols-rounded">edit_square</span>Add manually</button>
+            <button class="text-btn" id="copyBookmarkletBtn" type="button"><span class="material-symbols-rounded">bookmark_add</span>Copy “Save to Home Hunt” bookmarklet</button>
+            <button class="text-btn" id="shareInstallHelpBtn" type="button"><span class="material-symbols-rounded">ios_share</span>Phone share shortcut</button>
+          </div>
+        </div>
+        <aside class="quick-import-side">
+          <span class="card-label">ONE-TAP SAVING</span>
+          <h3>Browse first. Save only what matters.</h3>
+          <p>When the PWA is installed on a compatible device, sharing a rental URL to Home Hunt opens this page with the link ready to import. Desktop users can use the bookmarklet.</p>
+          <div class="share-flow"><span>Rental site</span><span class="material-symbols-rounded">arrow_forward</span><span>Share / bookmarklet</span><span class="material-symbols-rounded">arrow_forward</span><b>Home Hunt</b></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="hunt-section" id="searchGuide" aria-labelledby="searchGuideTitle">
+      <div class="hunt-section-heading">
+        <div><span class="section-index">SEARCH GUIDE</span><h2 id="searchGuideTitle">Search where the fresh inventory already lives.</h2><p>Set your target once, then open the real marketplaces with a focused brief instead of browsing Milan blindly.</p></div>
+        <button class="hunt-ghost-btn" id="copySearchBrief" type="button"><span class="material-symbols-rounded">content_copy</span>Copy my brief</button>
+      </div>
+      <div class="search-planner-grid">
+        <form class="hunt-card search-profile" id="searchProfileForm">
+          <div class="card-label">MY SEARCH PROFILE</div>
+          <div class="field-grid two-col">
+            <label><span>Polimi campus</span><select id="profileCampus"><option value="leonardo">Leonardo · Città Studi</option><option value="lamasa">Bovisa · La Masa / Engineering</option><option value="durando">Bovisa · Durando / Design</option></select></label>
+            <label><span>Home type</span><select id="profileType"><option value="room">Private room</option><option value="shared">Shared / twin room</option><option value="studio">Studio</option><option value="apartment">Entire apartment</option><option value="coliving">Private coliving</option></select></label>
+            <label><span>Maximum housing budget</span><div class="money-field"><b>€</b><input id="profileBudget" type="number" min="300" max="5000" step="25" value="800" /></div></label>
+            <label><span>Maximum commute</span><select id="profileCommute"><option value="20">20 min</option><option value="30" selected>30 min</option><option value="40">40 min</option><option value="50">50 min</option><option value="60">60 min</option></select></label>
+            <label><span>Move-in</span><input id="profileMoveIn" type="date" /></label>
+            <label><span>Priority</span><select id="profilePriority"><option value="balanced">Balanced</option><option value="budget">Lowest total cost</option><option value="commute">Shortest commute</option><option value="social">Student / social area</option></select></label>
+          </div>
+          <div class="search-brief-box" id="searchBriefBox"></div>
+        </form>
+        <div class="hunt-card area-guide-card"><div class="card-label">START WITH THESE AREAS</div><div id="areaRecommendations" class="area-recommendations"></div><p class="micro-note"><span class="material-symbols-rounded">info</span>Area times are only planning estimates. Home-level scoring uses your verified commute whenever you add one.</p></div>
+      </div>
+      <div class="platform-grid" id="platformGrid" aria-label="Rental platforms"></div>
+    </section>
+
+    <section class="hunt-section" id="myHomes" aria-labelledby="myHomesTitle">
+      <div class="hunt-section-heading">
+        <div><span class="section-index">03 · PIPELINE</span><h2 id="myHomesTitle">Move each home from “maybe” to a decision.</h2><p>Drag cards across the board on desktop, or update status from a property workspace on mobile. Your timeline keeps the full history.</p></div>
+        <div class="section-actions"><button class="hunt-ghost-btn" id="exportHomesBtn" type="button"><span class="material-symbols-rounded">download</span>Backup</button><label class="hunt-ghost-btn file-btn"><span class="material-symbols-rounded">upload</span>Restore<input id="restoreHomesInput" type="file" accept="application/json" hidden /></label></div>
+      </div>
+
+      <div class="kanban-shell hunt-card">
+        <div class="kanban-board" id="kanbanBoard" aria-label="Housing pipeline"></div>
+      </div>
+
+      <div class="homes-toolbar hunt-card">
+        <div class="homes-search"><span class="material-symbols-rounded">search</span><input id="homesSearch" type="search" placeholder="Search titles, areas, notes…" /></div>
+        <select id="homesStatusFilter" aria-label="Filter by status"><option value="all">All statuses</option><option value="saved">Saved</option><option value="contacted">Contacted</option><option value="replied">Replied</option><option value="viewing">Viewing</option><option value="finalist">Finalist</option><option value="chosen">Chosen</option><option value="rejected">Rejected</option><option value="unavailable">Unavailable</option></select>
+        <select id="homesSort" aria-label="Sort saved homes"><option value="score">Best fit</option><option value="value">Best value</option><option value="firstYear">Lowest first-year cost</option><option value="monthly">Lowest monthly cost</option><option value="commute">Shortest verified commute</option><option value="recent">Recently saved</option></select>
+        <button class="favorites-toggle" id="favoritesOnly" type="button" aria-pressed="false"><span class="material-symbols-rounded">favorite</span>Favorites</button>
+      </div>
+
+      <div class="homes-empty hunt-card" id="homesEmpty"><span class="material-symbols-rounded">home_work</span><h3>No homes saved yet.</h3><p>Open a real rental platform, copy one serious listing, then bring the link back here.</p><a href="#searchGuide" class="hunt-primary-btn">Open search guide</a></div>
+      <div class="homes-grid" id="homesGrid"></div>
+    </section>
+
+    <section class="hunt-section" id="compareHomes" aria-labelledby="compareHomesTitle">
+      <div class="hunt-section-heading">
+        <div><span class="section-index">04 · COMPARE</span><h2 id="compareHomesTitle">Compare the decision, not just the rent.</h2><p>Select 2–4 homes. Home Hunt identifies cheapest monthly, lowest upfront, shortest commute, most complete, best value, and best overall fit.</p></div>
+        <div class="section-actions"><button class="hunt-ghost-btn" id="shareShortlistBtn" type="button"><span class="material-symbols-rounded">share</span>Share shortlist</button><button class="hunt-ghost-btn" id="clearCompareBtn" type="button"><span class="material-symbols-rounded">restart_alt</span>Clear</button></div>
+      </div>
+      <div class="compare-empty hunt-card" id="compareEmpty"><span class="material-symbols-rounded">compare_arrows</span><div><strong>No comparison yet.</strong><p>Select “Compare” on 2–4 saved homes.</p></div></div>
+      <div class="compare-shell hunt-card" id="compareShell" hidden><div class="comparison-insights" id="comparisonInsights"></div><div class="compare-table-wrap"><table class="compare-table" id="compareTable"></table></div></div>
+    </section>
+
+    <section class="hunt-section" id="contactDesk" aria-labelledby="contactDeskTitle">
+      <div class="hunt-section-heading"><div><span class="section-index">05 · CONTACT DESK</span><h2 id="contactDeskTitle">Use the right message for the right moment.</h2><p>Generate first contact, follow-up, viewing, missing-cost, availability, or decline messages in English or Italian.</p></div></div>
+      <div class="contact-grid">
+        <div class="hunt-card contact-settings">
+          <div class="card-label">MESSAGE SETUP</div>
+          <label><span>Home</span><select id="contactHomeSelect"><option value="">Choose a saved home</option></select></label>
+          <label><span>Message type</span><select id="messageType"><option value="first">First contact</option><option value="followup">Follow-up</option><option value="viewing">Request a viewing</option><option value="costs">Ask about missing costs</option><option value="availability">Confirm availability</option><option value="decline">Politely decline</option></select></label>
+          <div class="field-grid two-col"><label><span>Your name</span><input id="contactName" type="text" placeholder="Your name" /></label><label><span>Program</span><input id="contactProgram" type="text" placeholder="e.g. MSc Chemical Engineering" /></label><label><span>Move-in</span><input id="contactMoveIn" type="text" placeholder="e.g. 1 September" /></label><label><span>Stay length</span><input id="contactDuration" type="text" placeholder="e.g. 12 months" /></label></div>
+          <div class="language-toggle" role="group" aria-label="Message language"><button class="active" data-language="english" type="button">English</button><button data-language="italian" type="button">Italiano</button></div>
+          <button class="hunt-primary-btn full-width" id="generateMessageBtn" type="button"><span class="material-symbols-rounded">auto_awesome</span>Generate message</button>
+        </div>
+        <div class="hunt-card question-card"><div class="card-label">QUESTIONS TO ASK</div><div id="questionList" class="question-list"><div class="contact-empty"><span class="material-symbols-rounded">quiz</span><p>Choose a home to generate only the questions its listing leaves unanswered.</p></div></div></div>
+        <div class="hunt-card message-card"><div class="message-card-top"><span class="card-label">READY TO COPY</span><button id="copyLandlordMessage" type="button" disabled><span class="material-symbols-rounded">content_copy</span>Copy</button></div><textarea id="landlordMessage" rows="13" readonly placeholder="Your landlord message will appear here."></textarea><p class="micro-note"><span class="material-symbols-rounded">gavel</span>This organizes communication; it is not legal advice.</p></div>
+      </div>
+    </section>
+
+    <section class="hunt-section" id="toolkit" aria-labelledby="toolkitTitle">
+      <div class="hunt-section-heading"><div><span class="section-index">06 · TOOLKIT</span><h2 id="toolkitTitle">Be ready before the perfect home appears.</h2><p>Track application readiness without storing sensitive documents, and keep a practical verification checklist before money changes hands.</p></div></div>
+      <div class="toolkit-grid">
+        <div class="hunt-card docs-card"><div class="card-label">DOCUMENT READINESS</div><h3>Your private readiness checklist</h3><p>Home Hunt stores only checkmarks—not your passport, bank statements, or other sensitive files.</p><div class="docs-list" id="documentChecklist"></div><div class="readiness-meter"><span><b id="readinessPercent">0%</b> ready</span><div><i id="readinessBar"></i></div></div></div>
+        <div class="hunt-card install-card"><div class="card-label">FAST CAPTURE</div><h3>Save from your phone or browser.</h3><p>Install the site as a PWA for compatible share-target support, or use the desktop bookmarklet to send the current rental page into Home Hunt.</p><div class="install-actions"><button class="hunt-primary-btn" id="installPwaBtn" type="button" hidden><span class="material-symbols-rounded">install_mobile</span>Install Home Hunt</button><button class="hunt-secondary-btn" id="copyBookmarkletBtn2" type="button"><span class="material-symbols-rounded">bookmark_add</span>Copy bookmarklet</button></div><p class="micro-note">Share-target support depends on browser/OS. If unavailable, copy/paste always works.</p></div>
+      </div>
+    </section>
+
+    <section class="hunt-section hunt-final-check" aria-labelledby="finalCheckTitle">
+      <div class="hunt-final-copy"><span class="section-index">BEFORE YOU PAY</span><h2 id="finalCheckTitle">Verify evidence, not vibes.</h2><p>Home Hunt flags missing information, but it cannot certify a landlord or listing. Use this final evidence check before paying or signing.</p></div>
+      <div class="final-check-grid">
+        <label><input type="checkbox" />I verified who is renting the property.</label><label><input type="checkbox" />I reviewed the rental contract and dates.</label><label><input type="checkbox" />I understand rent, deposit, fees, bills, and refund terms.</label><label><input type="checkbox" />I inspected the home or had a trustworthy live/video viewing.</label><label><input type="checkbox" />The payment account and recipient match the agreement.</label><label><input type="checkbox" />I kept copies of messages, documents, and payment proof.</label>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="hunt-dialog editor-dialog" id="listingEditorDialog">
+    <form method="dialog" class="dialog-frame" id="listingEditorForm">
+      <header class="dialog-header"><div><span class="card-label" id="editorModeLabel">REVIEW IMPORT</span><h2 id="listingEditorTitle">Check what we found.</h2><p>Confidence labels show what came directly from the source versus what still needs your confirmation.</p></div><button class="icon-btn" value="cancel" aria-label="Close"><span class="material-symbols-rounded">close</span></button></header>
+      <div class="import-preview" id="editorPreview"></div>
+      <input id="editId" type="hidden" /><input id="editUrl" type="hidden" /><input id="editImage" type="hidden" />
+      <div class="field-grid three-col editor-fields">
+        <label class="span-2"><span>Listing title <em data-confidence="title"></em></span><input id="editTitle" type="text" required /></label>
+        <label><span>Source <em data-confidence="source"></em></span><input id="editSource" type="text" readonly /></label>
+        <label><span>Monthly rent <em data-confidence="rent"></em></span><div class="money-field"><b>€</b><input id="editRent" type="number" min="0" step="10" required /></div></label>
+        <label><span>Bills / charges <em data-confidence="bills"></em></span><div class="money-field"><b>€</b><input id="editBills" type="number" min="0" step="10" placeholder="Unknown" /></div></label>
+        <label><span>Bills status <em data-confidence="billsStatus"></em></span><select id="editBillsStatus"><option value="unknown">Not clear</option><option value="included">Included</option><option value="extra">Paid separately</option><option value="partial">Some included</option></select></label>
+        <label><span>Deposit <em data-confidence="deposit"></em></span><div class="money-field"><b>€</b><input id="editDeposit" type="number" min="0" step="10" placeholder="Unknown" /></div></label>
+        <label><span>Agency/admin fee <em data-confidence="agencyFee"></em></span><div class="money-field"><b>€</b><input id="editAgencyFee" type="number" min="0" step="10" placeholder="Unknown" /></div></label>
+        <label><span>Type <em data-confidence="type"></em></span><select id="editType"><option value="room">Private room</option><option value="shared">Shared / twin</option><option value="studio">Studio</option><option value="apartment">Apartment</option><option value="coliving">Coliving</option><option value="other">Other</option></select></label>
+        <label><span>Area <em data-confidence="area"></em></span><select id="editArea"></select></label>
+        <label class="span-2"><span>Address/location <em data-confidence="address"></em></span><input id="editAddress" type="text" placeholder="As shown in listing" /></label>
+        <label><span>Size <em data-confidence="size"></em></span><div class="unit-field"><input id="editSize" type="number" min="0" step="1" /><b>m²</b></div></label>
+        <label><span>Bedrooms/rooms <em data-confidence="rooms"></em></span><input id="editRooms" type="number" min="0" step="1" /></label>
+        <label><span>Available from <em data-confidence="available"></em></span><input id="editAvailable" type="text" /></label>
+        <label><span>Furnished? <em data-confidence="furnished"></em></span><select id="editFurnished"><option value="unknown">Not clear</option><option value="yes">Yes</option><option value="no">No</option><option value="partial">Partly</option></select></label>
+        <label><span>Contract mentioned? <em data-confidence="contract"></em></span><select id="editContract"><option value="unknown">Not clear</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label><span>Status</span><select id="editStatus"><option value="saved">Saved</option><option value="contacted">Contacted</option><option value="replied">Replied</option><option value="viewing">Viewing</option><option value="finalist">Finalist</option><option value="chosen">Chosen 🎉</option><option value="rejected">Rejected</option><option value="unavailable">Unavailable</option></select></label>
+        <label class="span-3"><span>Description snapshot <em data-confidence="description"></em></span><textarea id="editDescription" rows="4"></textarea></label>
+        <label class="span-3"><span>Private notes</span><textarea id="editNotes" rows="3" placeholder="Landlord name, impressions, deal-breakers…"></textarea></label>
+      </div>
+      <div class="editor-cost-preview" id="editorCostPreview"></div>
+      <footer class="dialog-footer"><button class="hunt-secondary-btn" value="cancel" type="button" id="cancelEditorBtn">Cancel</button><button class="hunt-primary-btn" type="submit"><span class="material-symbols-rounded">bookmark_add</span>Save to My Homes</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="hunt-dialog workspace-dialog" id="workspaceDialog">
+    <div class="dialog-frame workspace-frame"><header class="dialog-header"><div><span class="card-label">PROPERTY WORKSPACE</span><h2 id="workspaceTitle">Home</h2><p id="workspaceSubtitle"></p></div><button class="icon-btn" id="closeWorkspaceBtn" type="button" aria-label="Close"><span class="material-symbols-rounded">close</span></button></header><div id="workspaceContent"></div></div>
+  </dialog>
+
+  <dialog class="hunt-dialog" id="scoreDialog"><form method="dialog" class="dialog-frame score-frame"><header class="dialog-header"><div><span class="card-label">PERSONAL FIT SCORE</span><h2>Decide what matters to you.</h2><p>Weights are normalized automatically. Every saved home recalculates immediately.</p></div><button class="icon-btn" value="cancel" aria-label="Close"><span class="material-symbols-rounded">close</span></button></header><div class="weight-list" id="weightControls"></div><div class="weight-total" id="weightTotal"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="resetWeightsBtn" type="button">Reset balanced</button><button class="hunt-primary-btn" value="default">Done</button></footer></form></dialog>
+
+  <dialog class="hunt-dialog" id="diffDialog"><div class="dialog-frame"><header class="dialog-header"><div><span class="card-label">LISTING HEALTH</span><h2>Source changes found.</h2><p>Nothing is overwritten automatically. Review the differences first.</p></div><button class="icon-btn" id="closeDiffBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div class="diff-list" id="diffList"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="dismissDiffBtn" type="button">Keep my saved data</button><button class="hunt-primary-btn" id="applyDiffBtn" type="button">Apply selected changes</button></footer></div></dialog>
+
+  <dialog class="hunt-dialog" id="duplicateDialog"><div class="dialog-frame"><header class="dialog-header"><div><span class="card-label">POSSIBLE DUPLICATE</span><h2>This home may already be saved.</h2><p>Compare the candidate and merge instead of creating two records for the same property.</p></div><button class="icon-btn" id="closeDuplicateBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div id="duplicateContent"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="saveDuplicateAnywayBtn" type="button">Save separately</button><button class="hunt-primary-btn" id="mergeDuplicateBtn" type="button">Merge into existing</button></footer></div></dialog>
+
+  <dialog class="hunt-dialog" id="shareDialog"><div class="dialog-frame"><header class="dialog-header"><div><span class="card-label">SHAREABLE SHORTLIST</span><h2>Send a clean decision summary.</h2><p>Share only the comparison summary and original listing links—your private notes stay private.</p></div><button class="icon-btn" id="closeShareBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div class="share-preview" id="sharePreview"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="copyShareSummaryBtn" type="button"><span class="material-symbols-rounded">content_copy</span>Copy summary</button><button class="hunt-primary-btn" id="nativeShareBtn" type="button"><span class="material-symbols-rounded">share</span>Share</button></footer></div></dialog>
+
+  <footer class="housing-footer"><div class="shell"><div><strong>Polimi Students · Milan Home Hunt</strong><span>A private research and decision desk for Milan rentals.</span></div><a href="index.html">Back to student directory <span class="material-symbols-rounded">arrow_forward</span></a></div></footer>
+
+  <nav class="mobile-nav app-mobile-nav has-housing" aria-label="Mobile navigation">
+    <a class="mobile-nav-item" href="index.html"><span class="mobile-nav-icon material-symbols-rounded">groups</span><small>Students</small></a><a class="mobile-nav-item" href="groups.html"><span class="mobile-nav-icon material-symbols-rounded">forum</span><small>Community</small></a><a class="mobile-nav-item active" href="housing.html" aria-current="page"><span class="mobile-nav-icon material-symbols-rounded">home_work</span><small>Home Hunt</small></a><a class="mobile-nav-item" href="announcements.html"><span class="mobile-nav-icon material-symbols-rounded">notifications</span><small>Notices</small></a><a class="mobile-nav-item" href="index.html?view=directory"><span class="mobile-nav-icon material-symbols-rounded">search</span><small>Directory</small></a>
+  </nav>
+  <a class="mobile-quick-add" href="#quickAdd"><span class="material-symbols-rounded">add_link</span><span>Save listing</span></a>
+  <div class="toast" id="housingToast" role="status" aria-live="polite"></div>
+  <script src="housing.js?v=20260818-homehunt-v2"></script>
+</body>
+</html>

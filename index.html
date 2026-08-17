@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="neo-glass.css?v=20260815-navbar-v1" />
   <link rel="stylesheet" href="compact-motion.css?v=20260812-v2" />
   <link rel="stylesheet" href="warm-milan.css?v=20260815-navbar-v1" />
+  <link rel="stylesheet" href="readability-v6.css?v=20260818-homehunt-v6-ux" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -54,6 +55,8 @@
             <span class="access-primary-arrow material-symbols-rounded" aria-hidden="true">open_in_new</span>
           </a>
           <a class="access-announcements-link" href="announcements.html"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span>University updates</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+          <a class="access-announcements-link access-housing-link" href="housing.html"><span class="material-symbols-rounded" aria-hidden="true">home_work</span><span>Milan Home Hunt</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+          <div class="access-homehunt-mini" aria-label="How Milan Home Hunt works"><span><b>1</b> Search real rental sites</span><span><b>2</b> Paste a listing</span><span><b>3</b> Review & compare</span></div>
           <button class="access-announcements-link access-install-link" id="accessInstallButton" type="button" hidden>
             <span class="material-symbols-rounded" aria-hidden="true">install_mobile</span><span id="accessInstallLabel">Install app</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
           </button>
@@ -125,6 +128,7 @@
         <button class="top-students-btn" id="topStudentsButton" type="button" data-app-view="students" aria-label="Open student directory"><span class="material-symbols-rounded" aria-hidden="true">groups</span><span class="top-students-label">Students</span></button>
         <button class="top-notices-btn" id="topNoticesButton" type="button" data-app-view="notices" aria-label="Open university announcements"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span class="top-notices-label">Notices</span><i id="announcementsTopCount" hidden>0</i></button>
         <button class="top-groups-btn" id="topGroupsButton" type="button" data-app-view="groups" aria-label="Open communities"><span class="material-symbols-rounded" aria-hidden="true">forum</span><span class="top-groups-label">Community</span></button>
+        <a class="top-housing-btn" href="housing.html" aria-label="Open Milan Home Hunt"><span class="material-symbols-rounded" aria-hidden="true">home_work</span><span class="top-housing-label">Home Hunt</span></a>
         <button class="top-profile-btn" id="myProfileButton" type="button" data-app-view="me" aria-label="Open my profile">
           <span class="top-profile-label">My profile</span>
         </button>
@@ -148,9 +152,28 @@
         <p id="directoryIntroText">Discover classmates, campus connections, and potential roommates.</p>
       </div>
       <div class="directory-intro-actions">
+        <a class="directory-groups-link directory-housing-link" href="housing.html"><span class="material-symbols-rounded" aria-hidden="true">home_work</span><span>Home Hunt</span></a>
         <a class="directory-update-link" href="https://docs.google.com/forms/d/e/1FAIpQLScaMc4FaCOXqVHRq0NsBdv4FXi6NoKjLQoZ2wQY26TVA8gqnQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
           <span>Update my info</span><span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
         </a>
+      </div>
+    </section>
+
+    <section class="main-homehunt-guide" aria-labelledby="mainHomeHuntGuideTitle">
+      <div class="main-homehunt-guide-inner">
+        <div class="main-homehunt-copy">
+          <span class="main-homehunt-kicker"><span class="material-symbols-rounded" aria-hidden="true">home_work</span>MILAN HOME HUNT</span>
+          <h2 id="mainHomeHuntGuideTitle">Found a rental? Bring the link here.</h2>
+          <p>Search Milan on the real rental platforms, then let Home Hunt turn serious listings into one organized shortlist with costs, commute checks, questions and comparison.</p>
+          <a class="main-homehunt-cta" href="housing.html"><span>Open Home Hunt</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+        </div>
+        <div class="main-homehunt-steps" aria-label="Home Hunt quick guide">
+          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">travel_explore</span><div><strong>Search real rental sites</strong><small>Idealista, Immobiliare.it, HousingAnywhere and Spotahome.</small></div></div>
+          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">content_paste</span><div><strong>Paste the listing URL</strong><small>Home Hunt attempts to extract the important property details.</small></div></div>
+          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span><div><strong>Review before saving</strong><small>Confirm prices, fees, availability and anything the listing leaves unclear.</small></div></div>
+          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span><div><strong>Compare and follow up</strong><small>Track favorites, commute, true cost, landlord questions and next steps.</small></div></div>
+          <div class="main-homehunt-platforms"><b>Private rentals only</b><span>No fake inventory</span><span>Local shortlist</span><span>Manual fallback</span></div>
+        </div>
       </div>
     </section>
 
@@ -438,9 +461,10 @@
     <div class="announcement-modal-panel" id="announcementModalPanel"></div>
   </div>
 
-  <nav class="mobile-nav app-mobile-nav" aria-label="Mobile navigation">
+  <nav class="mobile-nav app-mobile-nav has-housing" aria-label="Mobile navigation">
     <button id="mobileStudentsButton" class="mobile-nav-item active" type="button" data-app-view="students" aria-label="Students"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">groups</span><small>Students</small></button>
     <button id="mobileSavedButton" class="mobile-nav-item" type="button" data-app-view="saved" aria-label="Saved students" aria-pressed="false"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">favorite</span><small>Saved</small><i id="mobileSavedBadge" hidden>0</i></button>
+    <a class="mobile-nav-item mobile-housing-link" href="housing.html" aria-label="Milan Home Hunt"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">home_work</span><small>Home Hunt</small></a>
     <button id="mobileNoticesButton" class="mobile-nav-item mobile-notices-link" type="button" data-app-view="notices" aria-label="Notices"><span class="mobile-nav-icon material-symbols-rounded mobile-notice-icon" aria-hidden="true">notifications<i id="mobileAnnouncementsUnread" hidden>0</i></span><small>Notices</small></button>
     <button id="mobileGroupsButton" class="mobile-nav-item mobile-groups-link" type="button" data-app-view="groups" aria-label="Communities"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">forum</span><small>Community</small></button>
     <button id="mobileMyProfileButton" class="mobile-nav-item" type="button" data-app-view="me" aria-label="My profile"><span class="mobile-nav-icon material-symbols-rounded" aria-hidden="true">person</span><small>Me</small></button>

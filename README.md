@@ -142,3 +142,64 @@ This build additionally includes:
 - Pinned mandatory Basic Safety Course notice with Online Services → Safety Course path, official Italian/English course links, and optional study-notes PDF (`basic-safety-course.pdf`).
 - HPC and CS Telegram group.
 - Larger filter-sheet typography on desktop and mobile.
+
+## Milan Home Hunt
+
+`housing.html` is a private-rental research and shortlist tool for incoming students. POLIMI residences are intentionally not included. The section is designed around a simple principle: **search on the real rental platforms, then bring only the listings you care about back into Polimi Students.**
+
+The Home Hunt flow includes:
+
+- search profile with campus, budget, home type, move-in date and maximum commute
+- area suggestions and direct search cards for Idealista, Immobiliare.it, HousingAnywhere and Spotahome
+- paste-a-link importer for individual public listing URLs
+- best-effort extraction of title, rent, bills, deposit, agency/admin fee, area, address, size, rooms, availability, furnishing, contract mentions, description and image
+- mandatory review/edit step before an imported listing is saved
+- manual-entry fallback when a listing blocks automated reading, requires login, or cannot be parsed
+- browser-local **My Homes** shortlist with favorites, notes and pipeline statuses (Saved → Contacted → Replied → Viewing → Finalist → Chosen)
+- refresh-from-source action for previously saved URLs
+- normalized monthly-cost and upfront-cash estimates
+- campus commute planning estimates based on the selected area
+- listing completeness / fit scoring and automatic "items to verify" warnings
+- side-by-side comparison for up to four homes
+- automatic questions to ask based on missing listing details
+- English / Italian landlord-message generator
+- JSON backup and restore for the local shortlist
+- final pre-payment verification checklist
+
+### Listing importer architecture
+
+Home Hunt V4 keeps the main website compatible with static hosting such as GitHub Pages, but moves URL fetching/extraction into the included `home-hunt-worker/` Cloudflare Worker. The frontend sends only the user-selected listing URL to `POST /api/import-home`; the Worker validates the URL against an allowlist, fetches the public listing page, runs a provider adapter, and returns a normalized property object.
+
+Supported URL importers: Idealista, Immobiliare.it, HousingAnywhere, and Spotahome. Extraction prioritizes structured JSON-LD/OpenGraph data, then provider-aware text rules. Fields include rent, recurring charges, deposit, fees, address, size, rooms, bedrooms, bathrooms, floor, furnishing, elevator, balcony, A/C, availability, minimum stay, contract mentions, advertiser/agency, description, and listing images where exposed.
+
+Security: only HTTPS URLs on the approved rental domains are accepted; credentials, non-standard ports, arbitrary hosts, localhost/private-network targets, and cross-provider redirects are rejected. The Worker limits redirects, response size, and request time. CORS is restricted through `ALLOWED_ORIGINS`.
+
+If direct provider retrieval fails, the Worker can optionally use Jina Reader as a server-side fallback. Before a Worker endpoint is connected, the frontend can temporarily use the previous browser Reader fallback so development does not dead-end. Users can also paste listing text or add the home manually. Extracted values are always shown in a review form before saving, and source refreshes remain non-destructive.
+
+Configure the deployed Worker URL in `home-hunt-config.js`. See `IMPORTER_SETUP.md` and `home-hunt-worker/README.md`.
+
+
+## Milan Home Hunt V2 (2026-08-18)
+Home Hunt is a private-rental research and decision workspace rather than a rental search engine. Users discover current inventory on real marketplaces, then save individual listing URLs into the app.
+
+V2 includes: source-aware import with field confidence, manual fallback, property workspaces, drag-and-drop housing pipeline, personalized fit-score weights, true monthly/upfront/first-year cost views, verified commute workflow, duplicate detection/merge, source refresh with non-destructive diffs, contact timeline + next actions + calendar export, multi-context English/Italian landlord messages, evidence-based verification checks, document-readiness tracking without file storage, Web Share Target support, bookmarklet capture, returning-user dashboard, 2–4 home decision comparison, shareable shortlist summaries, mobile quick-add, onboarding/empty states, JSON backup/restore, and local-only shortlist storage.
+
+POLIMI residences are intentionally excluded from Home Hunt.
+
+## Milan Home Hunt V3 — clean interface (2026-08-18)
+V3 keeps the full V2 feature set but reorganizes it around progressive disclosure. The primary flow is now Add Home → Overview → My Homes → Compare. The Kanban pipeline is collapsed until requested, while Search Guide, Landlord Messages, Readiness/Capture, and Before You Pay live inside expandable tool panels. Typography and form controls were enlarged, shadows/glass effects reduced, and the main housing cards/dialogs were simplified for clearer desktop and mobile scanning.
+
+## Milan Home Hunt V4 — secure URL importer (2026-08-18)
+V4 adds the serverless property importer, provider adapters, SSRF/domain protections, structured-data-first extraction, extended property facts, staged import feedback, pasted-text fallback, and secure source refresh. The clean V3 interface and all V2 decision/CRM features remain.
+
+### Home Hunt V5 — phone-first app shell
+
+The Housing page now uses a dedicated mobile app experience at phone widths: Home, Saved, Compare, and Tools are separate screens with a persistent bottom tab bar and a central Add action. The URL importer remains the primary action, saved-home cards become compact list cards, advanced tools stay out of the daily flow, and property/editor dialogs become full-screen mobile workspaces. Desktop keeps the full multi-section layout.
+
+
+## Home Hunt V6 UX pass
+- Phone-first typography/readability audit with larger labels and touch targets.
+- First-screen 4-step Home Hunt guide.
+- Main student page now explains the housing workflow before users open Home Hunt.
+- Empty-state dashboard noise is removed until the first home is saved.
+- Import helper clarifies that individual property URLs should be pasted and all extracted data is reviewed before saving.

@@ -1,7 +1,7 @@
 {
   "name": "Polimi Students 2026/2027",
   "short_name": "Polimi Students",
-  "description": "A student directory for the Polimi 2026/2027 community.",
+  "description": "Polimi Students 2026/2027 with Milan Home Hunt: import rental listing links, review extracted details, compare costs, verify commute, and track private homes.",
   "lang": "en",
   "dir": "ltr",
   "id": "./",
@@ -9,7 +9,11 @@
   "scope": "./",
   "display": "standalone",
   "prefer_related_applications": false,
-  "categories": ["education", "social"],
+  "categories": [
+    "education",
+    "social",
+    "productivity"
+  ],
   "background_color": "#F2ECE2",
   "theme_color": "#B84A32",
   "orientation": "any",
@@ -35,6 +39,17 @@
   ],
   "shortcuts": [
     {
+      "name": "Milan Home Hunt",
+      "short_name": "Home Hunt",
+      "url": "housing.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
       "name": "Announcements",
       "short_name": "Notices",
       "url": "index.html?view=notices",
@@ -56,5 +71,15 @@
         }
       ]
     }
-  ]
+  ],
+  "share_target": {
+    "action": "housing.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

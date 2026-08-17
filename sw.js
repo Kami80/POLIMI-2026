@@ -1,9 +1,15 @@
-const CACHE_NAME = "polimi-students-warm-milan-v24";
+const CACHE_NAME = "polimi-students-warm-milan-v33-home-hunt-v7-street-guide";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./groups.html",
   "./groups.js",
+  "./housing.html",
+  "./housing.css",
+  "./housing-mobile.css",
+  "./housing-ux-v6.css",
+  "./housing.js",
+  "./home-hunt-config.js",
   "./community-photos/persian-polimi-community-floating.webp",
   "./community-photos/esfahan-to-italy-floating.webp",
   "./community-photos/biomedical-engineering-floating.webp",
@@ -19,6 +25,7 @@ const APP_SHELL = [
   "./neo-glass.css",
   "./compact-motion.css",
   "./warm-milan.css",
+  "./readability-v6.css",
   "./app.js",
   "./ux-enhancements.js",
   "./navigation-motion.js",
@@ -59,7 +66,7 @@ self.addEventListener("fetch", event => {
       fetch(request).then(response => {
         if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())));
         return response;
-      }).catch(() => caches.match(request).then(cached => cached || caches.match("./") || caches.match("./index.html")))
+      }).catch(() => caches.match(request).then(cached => cached || (url.pathname.endsWith("/housing.html") ? caches.match("./housing.html") : null) || caches.match("./") || caches.match("./index.html")))
     );
     return;
   }

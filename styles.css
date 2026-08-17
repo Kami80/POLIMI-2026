@@ -4733,3 +4733,19 @@ body.announcement-modal-open {
   .filter-sheet .mobile-check-count { font-size: 8.5px; }
   .filter-sheet .sheet-actions button { font-size: 11px; }
 }
+
+
+/* Milan Housing navigation entry */
+.top-housing-btn { min-height: 42px; padding: 0 13px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink-soft); text-decoration: none; font-size: 11px; font-weight: 800; box-shadow: var(--shadow-sm); transition: transform .16s ease, border-color .16s ease; }
+.top-housing-btn:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+.top-housing-btn > span:first-child { color: var(--green); font-size: 16px; }
+.directory-housing-link { border-color: color-mix(in srgb, var(--green) 22%, var(--line)); background: color-mix(in srgb, var(--green-soft) 35%, var(--surface)); color: var(--green); }
+.access-housing-link > span:first-child { color: var(--green); }
+.mobile-nav.has-housing { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .top-housing-btn { display: none; }
+  .directory-intro-actions:has(.directory-housing-link) { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 420px) {
+  .mobile-nav.has-housing .mobile-nav-item small { font-size: 6.4px; }
+}
