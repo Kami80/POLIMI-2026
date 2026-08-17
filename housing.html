@@ -8,7 +8,7 @@
 <meta content="Milan Home Hunt imports rental listing links into a private research desk for Polimi students: extract details, compare true costs, verify commute, contact landlords, and track every home." name="description"/>
 <link href="icons/favicon-64.png" rel="icon" sizes="64x64" type="image/png"/>
 <link href="icons/apple-touch-icon.png" rel="apple-touch-icon"/>
-<link href="manifest.webmanifest?v=20260818-homehunt-v7-street-guide" rel="manifest"/>
+<link href="manifest.webmanifest?v=20260818-homehunt-v8-mobile-ux" rel="manifest"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link crossorigin="" href="https://r.jina.ai" rel="preconnect"/>
@@ -19,9 +19,10 @@
 <link href="neo-glass.css?v=20260815-navbar-v1" rel="stylesheet"/>
 <link href="compact-motion.css?v=20260812-v2" rel="stylesheet"/>
 <link href="warm-milan.css?v=20260815-navbar-v1" rel="stylesheet"/>
-<link href="housing.css?v=20260818-homehunt-v7-platform-fix" rel="stylesheet"/>
-<link href="housing-mobile.css?v=20260818-homehunt-v7-platform-fix" rel="stylesheet"/>
-<link href="housing-ux-v6.css?v=20260818-homehunt-v7-street-guide" rel="stylesheet"/>
+<link href="housing.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
+<link href="housing-mobile.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
+<link href="housing-ux-v6.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
+<link href="housing-v8.css?v=20260818-homehunt-v8-mobile-ux" rel="stylesheet"/>
 <title>Milan Home Hunt · Polimi Students</title>
 </head>
 <body class="housing-page housing-clean-v3 housing-mobile-v5 housing-ux-v6">
@@ -44,8 +45,8 @@
 <section aria-labelledby="huntTitle" class="hunt-hero" data-mobile-screen="home">
 <div class="hunt-hero-copy">
 <span class="hunt-kicker"><span class="material-symbols-rounded">home_work</span>MILAN HOME HUNT · PRIVATE RENTALS</span>
-<h1 id="huntTitle">Find your Milan home. <span>Stay organized.</span></h1>
-<p>Search on real rental websites, save the homes you care about, and manage the decision in one calm workspace.</p>
+<h1 id="huntTitle">Milan <span>Home Hunt</span></h1>
+<p>Paste a rental link, review what was extracted, then save, compare and contact—all without losing track of the original listing.</p>
 <div class="hunt-hero-actions">
 <a class="hunt-primary-btn" href="#quickAdd"><span class="material-symbols-rounded">add_link</span> Add a home</a>
 <a class="hunt-secondary-btn" href="#searchGuide"><span class="material-symbols-rounded">travel_explore</span> Search guide</a>
@@ -71,18 +72,18 @@
       </div>
     </div>
     <div class="hh-guide-steps">
-      <div class="hh-guide-step"><span class="material-symbols-rounded" aria-hidden="true">travel_explore</span><div><b>1. Search</b><small>Browse Idealista, Immobiliare.it, HousingAnywhere or Spotahome.</small></div></div>
+      <div class="hh-guide-step"><span class="material-symbols-rounded" aria-hidden="true">travel_explore</span><div><b>1. Search</b><small>Browse HousingAnywhere or Spotahome, then bring serious listings back here.</small></div></div>
       <div class="hh-guide-step"><span class="material-symbols-rounded" aria-hidden="true">link</span><div><b>2. Paste the link</b><small>Copy one property URL and import it into Home Hunt.</small></div></div>
       <div class="hh-guide-step"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span><div><b>3. Review</b><small>Check the extracted rent, fees, address, availability and missing details.</small></div></div>
       <div class="hh-guide-step"><span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span><div><b>4. Decide</b><small>Compare true cost, verify commute, contact landlords and track progress.</small></div></div>
     </div>
     <div class="hh-guide-footer">
-      <div class="hh-supported"><span>Supported:</span><span>Idealista</span><span>Immobiliare.it</span><span>HousingAnywhere</span><span>Spotahome</span></div>
+      <div class="hh-supported"><span>Direct import:</span><span>HousingAnywhere</span><span>Spotahome</span></div>
       <a class="hh-guide-link" href="#searchGuide">Open the detailed Milan search guide <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
     </div>
   </div>
 </section>
-<details class="tool-disclosure hh-main-search-disclosure" data-mobile-screen="home"><summary><span><span class="material-symbols-rounded">travel_explore</span><span><b>Search guide</b><small>Set your Milan search profile and open the main rental platforms.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="searchGuide">
+<details class="tool-disclosure hh-main-search-disclosure" data-mobile-screen="home"><summary><span><span class="material-symbols-rounded">travel_explore</span><span><b>Where to search & live</b><small>Plan your campus area, streets, budget and supported rental sources.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="searchGuide">
 <div class="nested-tool-actions"><button class="hunt-secondary-btn" id="copySearchBrief" type="button"><span class="material-symbols-rounded">content_copy</span> Copy my search brief</button></div><div class="search-planner-grid">
 <form class="hunt-card search-profile" id="searchProfileForm">
 <div class="card-label">MY SEARCH PROFILE</div>
@@ -181,11 +182,12 @@
 <span class="source-detected" id="sourceDetected"><i></i><b>Waiting for a link</b></span>
 </div>
 <div class="url-import-row">
-<div class="url-field"><span class="material-symbols-rounded">link</span><input autocomplete="off" id="listingUrl" inputmode="url" placeholder="https://www.idealista.it/immobile/..." type="url"/></div>
+<div class="url-field"><span class="material-symbols-rounded">link</span><input autocomplete="off" id="listingUrl" inputmode="url" placeholder="https://housinganywhere.com/room/..." type="url"/></div>
 <button class="hunt-ghost-btn" id="pasteListingUrl" type="button"><span class="material-symbols-rounded">content_paste</span>Paste</button>
 <button class="hunt-primary-btn" id="importListingBtn" type="button"><span class="material-symbols-rounded">auto_awesome</span>Import</button>
 </div>
 <p class="import-helper"><span class="material-symbols-rounded" aria-hidden="true">info</span><span>Paste an individual property page, not a search-results page. You will always review extracted details before anything is saved.</span></p>
+<div class="active-source-note"><span class="material-symbols-rounded">verified</span><span><b>Best automatic import now:</b> HousingAnywhere and Spotahome. Other sources can still be saved with pasted text or manual details.</span></div>
 <div class="import-progress" hidden="" id="importProgress"><div class="progress-track"><i id="importProgressBar"></i></div><span id="importProgressText">Reading listing…</span></div>
 <div class="import-step-list" hidden id="importStepList" aria-live="polite">
   <span data-import-step="detect"><i></i>Detect source</span>
@@ -225,7 +227,7 @@
 </section><section aria-labelledby="myHomesTitle" class="hunt-section" id="myHomes" data-mobile-screen="homes">
 <div class="hunt-section-heading">
 <div><span class="section-index">03 · MY HOMES</span><h2 id="myHomesTitle">Your saved homes</h2><p>Review your shortlist first. Open the pipeline board only when you want to manage stages.</p></div>
-<div class="section-actions"><button class="hunt-ghost-btn" id="exportHomesBtn" type="button"><span class="material-symbols-rounded">download</span>Backup</button><label class="hunt-ghost-btn file-btn"><span class="material-symbols-rounded">upload</span>Restore<input accept="application/json" hidden="" id="restoreHomesInput" type="file"/></label></div>
+
 </div>
 <details class="pipeline-disclosure"><summary><span><span class="material-symbols-rounded">view_kanban</span> Pipeline board</span><small>Drag homes between stages when you need the CRM view</small></summary><div class="kanban-shell hunt-card">
 <div aria-label="Housing pipeline" class="kanban-board" id="kanbanBoard"></div>
@@ -240,12 +242,18 @@
 <div class="homes-grid" id="homesGrid"></div>
 </section><section aria-labelledby="compareHomesTitle" class="hunt-section" id="compareHomes" data-mobile-screen="compare">
 <div class="hunt-section-heading">
-<div><span class="section-index">04 · COMPARE</span><h2 id="compareHomesTitle">Compare your finalists</h2><p>Select 2–4 homes and compare true cost, commute, completeness, and fit side by side.</p></div>
+<div><span class="section-index">04 · COMPARE</span><h2 id="compareHomesTitle">Compare homes</h2><p>Pick 2–4 saved homes. We surface the important differences without making you read giant listing titles.</p></div>
 <div class="section-actions"><button class="hunt-ghost-btn" id="shareShortlistBtn" type="button"><span class="material-symbols-rounded">share</span>Share shortlist</button><button class="hunt-ghost-btn" id="clearCompareBtn" type="button"><span class="material-symbols-rounded">restart_alt</span>Clear</button></div>
 </div>
 <div class="compare-empty hunt-card" id="compareEmpty"><span class="material-symbols-rounded">compare_arrows</span><div><strong>No comparison yet.</strong><p>Select “Compare” on 2–4 saved homes.</p></div></div>
-<div class="compare-shell hunt-card" hidden="" id="compareShell"><div class="comparison-insights" id="comparisonInsights"></div><div class="compare-table-wrap"><table class="compare-table" id="compareTable"></table></div></div>
-</section><section class="hunt-section tools-hub" id="toolsHub" data-mobile-screen="tools"><div class="hunt-section-heading tools-heading"><div><span class="section-index">MORE TOOLS</span><h2>Open advanced tools only when you need them.</h2><p>Landlord communication, readiness, and payment checks stay available without crowding your daily shortlist.</p></div></div><details class="tool-disclosure"><summary><span><span class="material-symbols-rounded">chat</span><span><b>Landlord messages</b><small>Generate messages and questions for a saved home.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="contactDesk">
+<div class="compare-shell hunt-card" hidden="" id="compareShell"><div class="comparison-insights" id="comparisonInsights"></div><div class="compare-mobile-cards" id="comparisonMobile"></div><div class="compare-table-wrap"><table class="compare-table" id="compareTable"></table></div></div>
+</section><section class="hunt-section tools-hub" id="toolsHub" data-mobile-screen="tools"><div class="hunt-section-heading tools-heading"><div><span class="section-index">HOUSING TOOLKIT</span><h2>Useful tools, one tap away.</h2><p>Prepare messages, tune your fit score, check documents, protect yourself before paying, and back up your shortlist.</p></div></div>
+<div class="tool-launcher-grid" aria-label="Housing tools">
+<button type="button" class="tool-launcher" data-open-tool="toolMessages"><span class="material-symbols-rounded">chat</span><div><b>Messages</b><small>English + Italian landlord drafts</small></div><span class="material-symbols-rounded">arrow_forward</span></button>
+<button type="button" class="tool-launcher" data-open-score><span class="material-symbols-rounded">tune</span><div><b>Fit score</b><small>Choose what matters most</small></div><span class="material-symbols-rounded">arrow_forward</span></button>
+<button type="button" class="tool-launcher" data-open-tool="toolReadiness"><span class="material-symbols-rounded">task_alt</span><div><b>Readiness</b><small>Documents + fast capture</small></div><span class="material-symbols-rounded">arrow_forward</span></button>
+<button type="button" class="tool-launcher" data-open-tool="toolSafety"><span class="material-symbols-rounded">verified_user</span><div><b>Before paying</b><small>Evidence-based safety check</small></div><span class="material-symbols-rounded">arrow_forward</span></button>
+</div><details class="tool-disclosure" id="toolMessages"><summary><span><span class="material-symbols-rounded">chat</span><span><b>Landlord messages</b><small>Generate messages and questions for a saved home.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="contactDesk">
 <div class="contact-grid">
 <div class="hunt-card contact-settings">
 <div class="card-label">MESSAGE SETUP</div>
@@ -258,17 +266,17 @@
 <div class="hunt-card question-card"><div class="card-label">QUESTIONS TO ASK</div><div class="question-list" id="questionList"><div class="contact-empty"><span class="material-symbols-rounded">quiz</span><p>Choose a home to generate only the questions its listing leaves unanswered.</p></div></div></div>
 <div class="hunt-card message-card"><div class="message-card-top"><span class="card-label">READY TO COPY</span><button disabled="" id="copyLandlordMessage" type="button"><span class="material-symbols-rounded">content_copy</span>Copy</button></div><textarea id="landlordMessage" placeholder="Your landlord message will appear here." readonly="" rows="13"></textarea><p class="micro-note"><span class="material-symbols-rounded">gavel</span>This organizes communication; it is not legal advice.</p></div>
 </div>
-</section></details><details class="tool-disclosure"><summary><span><span class="material-symbols-rounded">task_alt</span><span><b>Readiness &amp; capture</b><small>Application checklist, PWA capture, backup tools.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="toolkit">
+</section></details><details class="tool-disclosure" id="toolReadiness"><summary><span><span class="material-symbols-rounded">task_alt</span><span><b>Readiness &amp; capture</b><small>Application checklist, PWA capture, backup tools.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section" id="toolkit">
 <div class="toolkit-grid">
 <div class="hunt-card docs-card"><div class="card-label">DOCUMENT READINESS</div><h3>Your private readiness checklist</h3><p>Home Hunt stores only checkmarks—not your passport, bank statements, or other sensitive files.</p><div class="docs-list" id="documentChecklist"></div><div class="readiness-meter"><span><b id="readinessPercent">0%</b> ready</span><div><i id="readinessBar"></i></div></div></div>
 <div class="hunt-card install-card"><div class="card-label">FAST CAPTURE</div><h3>Save from your phone or browser.</h3><p>Install the site as a PWA for compatible share-target support, or use the desktop bookmarklet to send the current rental page into Home Hunt.</p><div class="install-actions"><button class="hunt-primary-btn" hidden="" id="installPwaBtn" type="button"><span class="material-symbols-rounded">install_mobile</span>Install Home Hunt</button><button class="hunt-secondary-btn" id="copyBookmarkletBtn2" type="button"><span class="material-symbols-rounded">bookmark_add</span>Copy bookmarklet</button></div><p class="micro-note">Share-target support depends on browser/OS. If unavailable, copy/paste always works.</p></div>
 </div>
-</section></details><details class="tool-disclosure"><summary><span><span class="material-symbols-rounded">verified_user</span><span><b>Before you pay</b><small>A final evidence checklist before signing or transferring money.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="hunt-final-check nested-tool-section">
+</section></details><details class="tool-disclosure" id="toolSafety"><summary><span><span class="material-symbols-rounded">verified_user</span><span><b>Before you pay</b><small>A final evidence checklist before signing or transferring money.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="hunt-final-check nested-tool-section">
 <div class="hunt-final-copy"><h2 id="finalCheckTitle">Verify evidence, not vibes.</h2><p>Home Hunt flags missing information, but it cannot certify a landlord or listing. Use this final evidence check before paying or signing.</p></div>
 <div class="final-check-grid">
 <label><input type="checkbox"/>I verified who is renting the property.</label><label><input type="checkbox"/>I reviewed the rental contract and dates.</label><label><input type="checkbox"/>I understand rent, deposit, fees, bills, and refund terms.</label><label><input type="checkbox"/>I inspected the home or had a trustworthy live/video viewing.</label><label><input type="checkbox"/>The payment account and recipient match the agreement.</label><label><input type="checkbox"/>I kept copies of messages, documents, and payment proof.</label>
 </div>
-</section></details></section>
+</section></details><details class="tool-disclosure" id="toolData"><summary><span><span class="material-symbols-rounded">cloud_download</span><span><b>Backup & restore</b><small>Keep a portable copy of your shortlist and preferences.</small></span></span><span class="material-symbols-rounded disclosure-arrow">expand_more</span></summary><section class="nested-tool-section data-tool-section"><div class="hunt-card data-tool-card"><div><span class="card-label">YOUR DATA</span><h3>Keep your shortlist portable.</h3><p>Export a JSON backup before changing devices or clearing browser storage. Restore it later on any device running Home Hunt.</p></div><div class="data-tool-actions"><button class="hunt-primary-btn" id="exportHomesBtn" type="button"><span class="material-symbols-rounded">download</span>Download backup</button><label class="hunt-secondary-btn file-btn"><span class="material-symbols-rounded">upload</span>Restore backup<input accept="application/json" hidden="" id="restoreHomesInput" type="file"/></label></div></div></section></details></section>
 </main>
 <dialog class="hunt-dialog editor-dialog" id="listingEditorDialog">
 <form class="dialog-frame" id="listingEditorForm" method="dialog">
@@ -278,11 +286,11 @@
 <div class="field-grid three-col editor-fields">
 <label class="span-2"><span>Listing title <em data-confidence="title"></em></span><input id="editTitle" required="" type="text"/></label>
 <label><span>Source <em data-confidence="source"></em></span><input id="editSource" readonly="" type="text"/></label>
-<label><span>Monthly rent <em data-confidence="rent"></em></span><div class="money-field"><b>€</b><input id="editRent" min="0" required="" step="10" type="number"/></div></label>
-<label><span>Bills / charges <em data-confidence="bills"></em></span><div class="money-field"><b>€</b><input id="editBills" min="0" placeholder="Unknown" step="10" type="number"/></div></label>
+<label><span>Monthly rent <em data-confidence="rent"></em></span><div class="money-field"><b>€</b><input id="editRent" inputmode="decimal" min="0" required="" step="1" type="number"/></div></label>
+<label><span>Bills / charges <em data-confidence="bills"></em></span><div class="money-field"><b>€</b><input id="editBills" inputmode="decimal" min="0" placeholder="Unknown" step="1" type="number"/></div></label>
 <label><span>Bills status <em data-confidence="billsStatus"></em></span><select id="editBillsStatus"><option value="unknown">Not clear</option><option value="included">Included</option><option value="extra">Paid separately</option><option value="partial">Some included</option></select></label>
-<label><span>Deposit <em data-confidence="deposit"></em></span><div class="money-field"><b>€</b><input id="editDeposit" min="0" placeholder="Unknown" step="10" type="number"/></div></label>
-<label><span>Agency/admin fee <em data-confidence="agencyFee"></em></span><div class="money-field"><b>€</b><input id="editAgencyFee" min="0" placeholder="Unknown" step="10" type="number"/></div></label>
+<label><span>Deposit <em data-confidence="deposit"></em></span><div class="money-field"><b>€</b><input id="editDeposit" inputmode="decimal" min="0" placeholder="Unknown" step="1" type="number"/></div></label>
+<label><span>Agency/admin fee <em data-confidence="agencyFee"></em></span><div class="money-field"><b>€</b><input id="editAgencyFee" inputmode="decimal" min="0" placeholder="Unknown" step="1" type="number"/></div></label>
 <label><span>Type <em data-confidence="type"></em></span><select id="editType"><option value="room">Private room</option><option value="shared">Shared / twin</option><option value="studio">Studio</option><option value="apartment">Apartment</option><option value="coliving">Coliving</option><option value="other">Other</option></select></label>
 <label><span>Area <em data-confidence="area"></em></span><select id="editArea"></select></label>
 <label class="span-2"><span>Address/location <em data-confidence="address"></em></span><input id="editAddress" placeholder="As shown in listing" type="text"/></label>
@@ -312,8 +320,9 @@
 <footer class="dialog-footer"><button class="hunt-secondary-btn" id="cancelEditorBtn" type="button" value="cancel">Cancel</button><button class="hunt-primary-btn" type="submit"><span class="material-symbols-rounded">bookmark_add</span>Save to My Homes</button></footer>
 </form>
 </dialog>
+<dialog class="hunt-dialog quick-view-dialog" id="quickViewDialog"><div class="dialog-frame quick-view-frame"><header class="quick-view-header"><div><span class="card-label">SAVED HOME</span><span class="quick-view-status" id="quickViewStatus">Saved</span></div><button aria-label="Close preview" class="icon-btn" id="closeQuickViewBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div id="quickViewContent"></div></div></dialog>
 <dialog class="hunt-dialog workspace-dialog" id="workspaceDialog">
-<div class="dialog-frame workspace-frame"><header class="dialog-header"><div><span class="card-label">PROPERTY WORKSPACE</span><h2 id="workspaceTitle">Home</h2><p id="workspaceSubtitle"></p></div><button aria-label="Close" class="icon-btn" id="closeWorkspaceBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div id="workspaceContent"></div></div>
+<div class="dialog-frame workspace-frame"><header class="dialog-header"><div><span class="card-label">HOME DETAILS</span><h2 id="workspaceTitle">Property details</h2><p id="workspaceSubtitle"></p></div><button aria-label="Close" class="icon-btn" id="closeWorkspaceBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div id="workspaceContent"></div></div>
 </dialog>
 <dialog class="hunt-dialog" id="scoreDialog"><form class="dialog-frame score-frame" method="dialog"><header class="dialog-header"><div><span class="card-label">PERSONAL FIT SCORE</span><h2>Decide what matters to you.</h2><p>Weights are normalized automatically. Every saved home recalculates immediately.</p></div><button aria-label="Close" class="icon-btn" value="cancel"><span class="material-symbols-rounded">close</span></button></header><div class="weight-list" id="weightControls"></div><div class="weight-total" id="weightTotal"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="resetWeightsBtn" type="button">Reset balanced</button><button class="hunt-primary-btn" value="default">Done</button></footer></form></dialog>
 <dialog class="hunt-dialog" id="diffDialog"><div class="dialog-frame"><header class="dialog-header"><div><span class="card-label">LISTING HEALTH</span><h2>Source changes found.</h2><p>Nothing is overwritten automatically. Review the differences first.</p></div><button class="icon-btn" id="closeDiffBtn" type="button"><span class="material-symbols-rounded">close</span></button></header><div class="diff-list" id="diffList"></div><footer class="dialog-footer"><button class="hunt-secondary-btn" id="dismissDiffBtn" type="button">Keep my saved data</button><button class="hunt-primary-btn" id="applyDiffBtn" type="button">Apply selected changes</button></footer></div></dialog>
@@ -324,7 +333,7 @@
 <button class="active" data-hh-screen="home" type="button"><span class="material-symbols-rounded">home</span><small>Home</small></button>
 <button data-hh-screen="homes" type="button"><span class="material-symbols-rounded">favorite</span><small>Saved</small></button>
 <button class="hh-add-tab" data-hh-screen="add" type="button"><span class="material-symbols-rounded">add</span><small>Add</small></button>
-<button data-hh-screen="compare" type="button"><span class="material-symbols-rounded">compare_arrows</span><small>Compare</small></button>
+<button data-hh-screen="compare" type="button"><span class="material-symbols-rounded">compare_arrows</span><small>Match</small></button>
 <button data-hh-screen="tools" type="button"><span class="material-symbols-rounded">apps</span><small>Tools</small></button>
 </nav>
 <nav aria-label="Mobile navigation" class="mobile-nav app-mobile-nav has-housing">
@@ -332,7 +341,7 @@
 </nav>
 <a class="mobile-quick-add" href="#quickAdd"><span class="material-symbols-rounded">add_link</span><span>Save listing</span></a>
 <div aria-live="polite" class="toast" id="housingToast" role="status"></div>
-<script src="home-hunt-config.js?v=20260818-importer-v1"></script>
-<script src="housing.js?v=20260818-homehunt-v5-mobile"></script>
+<script src="home-hunt-config.js?v=20260818-importer-v2"></script>
+<script src="housing.js?v=20260818-homehunt-v8-mobile-ux"></script>
 </body>
 </html>
