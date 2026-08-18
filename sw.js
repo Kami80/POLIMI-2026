@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-warm-milan-v35-home-hunt-v9-clean-home";
+const CACHE_NAME = "polimi-students-warm-milan-v36-home-hunt-v10-clean-app";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const APP_SHELL = [
   "./housing-ux-v6.css",
   "./housing-v8.css",
   "./housing-v9.css",
+  "./housing-v10.css",
   "./housing.js",
   "./home-hunt-config.js",
   "./community-photos/persian-polimi-community-floating.webp",
