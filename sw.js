@@ -1,4 +1,4 @@
-const CACHE_NAME = "polimi-students-warm-milan-v36-home-share-v10";
+const CACHE_NAME = "polimi-students-warm-milan-v37-index-repair";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -29,7 +29,6 @@ const APP_SHELL = [
   "./compact-motion.css",
   "./warm-milan.css",
   "./readability-v6.css",
-  "./index-v10.css",
   "./app.js",
   "./ux-enhancements.js",
   "./navigation-motion.js",
