@@ -1,0 +1,220 @@
+/* Polimi Students — V10 clean index layer. Loaded last. */
+:root{
+  --index-surface:rgba(255,252,247,.94);
+  --index-surface-solid:#fffaf4;
+  --index-page:#f5efe7;
+  --index-line:rgba(73,58,45,.12);
+  --index-muted:#786d63;
+  --index-ink:#2f2924;
+  --index-accent:#b84a32;
+  --index-shadow:0 10px 28px rgba(49,38,28,.07);
+}
+[data-theme="dark"]{
+  --index-surface:rgba(31,29,27,.94);
+  --index-surface-solid:#211f1d;
+  --index-page:#191816;
+  --index-line:rgba(255,245,235,.10);
+  --index-muted:#b9afa6;
+  --index-ink:#f5eee7;
+  --index-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+body{font-family:Manrope,system-ui,sans-serif}
+
+/* --- Access gate: one clear decision at a time --- */
+.access-gate{padding:32px 18px}
+.access-shell{max-width:1080px;gap:18px}
+.access-card,.access-visual{border-radius:24px;box-shadow:var(--index-shadow)}
+.access-card{padding:28px}
+.access-brand{margin-bottom:28px}
+.access-intro h1{max-width:620px;letter-spacing:-.045em;line-height:1.02}
+.access-lead{max-width:560px;line-height:1.55}
+.access-inline-community-art{display:none}
+.access-join-actions{gap:8px}
+.access-primary-form,.access-announcements-link,.access-install-link{min-height:54px;border-radius:15px}
+.access-announcements-link{background:transparent;box-shadow:none}
+.access-homehunt-mini{margin:4px 4px 0;display:flex!important;align-items:flex-start;gap:7px;color:var(--index-muted);font-size:11px!important;line-height:1.45}
+.access-homehunt-mini .material-symbols-rounded{font-size:16px;color:var(--index-accent)}
+.access-return-panel{margin-top:18px;border-radius:17px;padding:18px}
+.access-return-heading strong{font-size:15px}
+.access-return-heading span{font-size:11px}
+.access-privacy{font-size:11px!important;line-height:1.45}
+.access-visual{overflow:hidden}
+.access-visual-content h2{font-size:36px;line-height:1.05;letter-spacing:-.04em}
+.access-feature-list>div{padding-block:11px}
+
+/* --- Global app chrome --- */
+.protected-app>.app-bar{background:var(--index-surface)!important;border-bottom:1px solid var(--index-line)!important;box-shadow:none!important;backdrop-filter:blur(18px)}
+.protected-app>.app-bar .app-bar-inner{min-height:64px}
+.app-actions{gap:5px}
+.app-actions>button,.app-actions>a{box-shadow:none!important}
+.connection{padding:7px 9px;border-radius:11px;background:transparent!important;border:1px solid var(--index-line)!important}
+.top-students-btn,.top-notices-btn,.top-groups-btn,.top-housing-btn,.top-profile-btn{min-height:39px;border-radius:11px!important;padding-inline:10px!important}
+.top-cta{min-height:39px;border-radius:11px!important;padding-inline:11px!important}
+
+/* --- Student home intro --- */
+.main-shell{padding-top:22px}
+.directory-intro{min-height:0!important;border-radius:20px!important;padding:22px!important;box-shadow:none!important;border:1px solid var(--index-line)!important;background:var(--index-surface)!important}
+.directory-intro-with-art{display:grid!important;grid-template-columns:88px minmax(0,1fr) auto!important;gap:18px!important;align-items:center!important}
+.directory-intro-art{width:88px!important;height:88px!important;position:relative!important;inset:auto!important;border-radius:20px!important;overflow:hidden!important}
+.directory-intro-art img{width:100%!important;height:100%!important;object-fit:cover!important;opacity:.92}
+.directory-intro-copy{position:relative!important;z-index:1!important}
+.directory-intro-kicker{font-size:10px!important;letter-spacing:.1em!important}
+.directory-intro h1{font-size:31px!important;line-height:1.05!important;margin:5px 0 5px!important;letter-spacing:-.045em!important}
+.directory-intro p{font-size:13px!important;line-height:1.5!important;margin:0!important;color:var(--index-muted)!important}
+.directory-intro-actions{display:flex!important;gap:8px!important;align-items:center!important;margin:0!important}
+.directory-groups-link,.directory-update-link{min-height:42px!important;border-radius:12px!important;padding:0 12px!important;font-size:12px!important;white-space:nowrap}
+
+/* --- Home Hunt becomes one compact useful banner --- */
+.main-homehunt-guide{margin:12px 0 0!important}
+.main-homehunt-guide-inner{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;align-items:center!important;gap:16px!important;padding:17px 18px!important;border:1px solid var(--index-line)!important;border-radius:18px!important;background:var(--index-surface)!important;box-shadow:none!important}
+.main-homehunt-clean-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:color-mix(in srgb,var(--index-accent) 9%,var(--index-surface-solid));color:var(--index-accent)}
+.main-homehunt-clean-icon .material-symbols-rounded{font-size:24px}
+.main-homehunt-kicker{font-size:9px!important;letter-spacing:.1em!important}
+.main-homehunt-copy h2{font-size:19px!important;margin:3px 0 3px!important;line-height:1.15!important;letter-spacing:-.025em!important}
+.main-homehunt-copy p{font-size:11.5px!important;line-height:1.48!important;margin:0!important;max-width:680px!important;color:var(--index-muted)!important}
+.main-homehunt-clean-points{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.main-homehunt-clean-points span{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--index-muted)}
+.main-homehunt-clean-points i{font-style:normal;font-size:14px;color:var(--index-accent)}
+.main-homehunt-cta{min-height:42px!important;padding:0 13px!important;border-radius:12px!important;white-space:nowrap;font-size:12px!important}
+
+/* --- Directory controls: search first, everything else secondary --- */
+.explore-section{padding-top:30px!important}
+.section-heading{margin-bottom:10px!important;align-items:center!important}
+.section-heading h2{font-size:24px!important;letter-spacing:-.035em!important}
+.desktop-view-switch{padding:3px!important;border-radius:11px!important}
+.desktop-view-switch .seg-btn{height:34px!important;border-radius:8px!important;font-size:11px!important}
+.controls-panel{padding:12px!important;border-radius:17px!important;border:1px solid var(--index-line)!important;background:var(--index-surface)!important;box-shadow:none!important}
+.search-field{min-height:48px!important;border-radius:13px!important;background:var(--index-surface-solid)!important;border:1px solid var(--index-line)!important}
+.search-field input{font-size:14px!important}
+.directory-control-actions{gap:7px!important}
+.filter-trigger,.sort-control-inline,.roommate-match-trigger,.saved-trigger{min-height:40px!important;border-radius:11px!important;box-shadow:none!important}
+.quick-filter-row{display:flex!important;gap:7px!important;overflow:auto!important;scrollbar-width:none!important;padding:10px 0 2px!important}
+.quick-filter-row::-webkit-scrollbar{display:none}
+.quick-filter-row button{flex:0 0 auto!important;min-height:36px!important;border-radius:999px!important;font-size:11px!important;padding:0 12px!important;box-shadow:none!important}
+.results-bar{margin:10px 0!important;padding:0 2px!important;min-height:30px!important}
+.results-bar p{font-size:11px!important;color:var(--index-muted)!important}
+.active-filter-chips{gap:5px!important}
+
+/* --- Student cards: predictable, flat, readable --- */
+.student-grid{gap:10px!important}
+.student-card.student-card-v2.student-card-simple{min-height:0!important;border-radius:16px!important;padding:15px 16px!important;background:var(--index-surface)!important;border:1px solid var(--index-line)!important;box-shadow:none!important;transform:none!important}
+.student-card.student-card-v2.student-card-simple::before{height:2px!important;opacity:.55!important}
+.student-card.student-card-v2.student-card-simple::after{display:none!important}
+.student-card.student-card-v2.student-card-simple:hover{transform:translateY(-1px)!important;box-shadow:0 8px 20px rgba(50,39,29,.06)!important}
+.student-card-simple .student-card-title-row .student-name{font-size:16px!important;line-height:1.25!important;letter-spacing:-.02em!important}
+.student-card-program-simple{font-size:11.5px!important;line-height:1.42!important;color:var(--index-muted)!important}
+.student-card-simple .simple-gender-badge{font-size:9.5px!important}
+.student-card-simple .student-card-simple-chevron{width:30px!important;height:30px!important;border-radius:10px!important}
+
+/* --- Other in-index views should not feel like separate marketing pages --- */
+.announcements-hero,.groups-hero,.me-page-hero{border-radius:20px!important;box-shadow:none!important}
+.announcements-hero h1,.groups-hero h1{font-size:38px!important;line-height:1.04!important}
+.announcements-directory,.groups-directory{padding-top:22px!important}
+.announcements-toolbar,.groups-toolbar{box-shadow:none!important}
+.announcement-card,.telegram-group-card{box-shadow:none!important}
+
+/* --- Mobile: five destinations, calm surfaces --- */
+@media(max-width:760px){
+  body{font-size:15px}
+  .access-gate{padding:0;min-height:100svh;background:var(--index-page)}
+  .access-shell{display:block!important;max-width:none!important}
+  .access-card{min-height:100svh;border:0!important;border-radius:0!important;padding:20px 18px calc(24px + env(safe-area-inset-bottom))!important;box-shadow:none!important;background:var(--index-surface-solid)!important}
+  .access-visual{display:none!important}
+  .access-brand{margin-bottom:30px!important}
+  .access-brand strong{font-size:15px!important}
+  .access-brand small{font-size:10.5px!important}
+  .access-intro h1{font-size:31px!important;line-height:1.06!important;margin-bottom:8px!important}
+  .access-intro .access-lead{font-size:13px!important;line-height:1.5!important}
+  .access-join-actions{margin-top:20px!important}
+  .access-primary-form{min-height:60px!important}
+  .access-primary-copy strong{font-size:14px!important}
+  .access-primary-copy small{font-size:10.5px!important}
+  .access-announcements-link{min-height:48px!important;font-size:12.5px!important}
+  .access-homehunt-mini{font-size:10.5px!important;margin:6px 4px 0!important}
+  .access-return-panel{margin-top:18px!important;padding:15px!important}
+  .access-form-row{grid-template-columns:1fr!important;gap:8px!important}
+  .access-input{min-height:50px!important}
+  .access-input input{font-size:16px!important}
+  .access-form button{min-height:48px!important}
+
+  .protected-app>.app-bar{height:58px!important;position:sticky!important;top:0!important;z-index:90!important}
+  .protected-app>.app-bar .app-bar-inner{min-height:58px!important;padding:0 14px!important}
+  .protected-app .brand-mark{width:34px!important;height:34px!important;border-radius:10px!important}
+  .protected-app .brand-copy strong{font-size:14px!important}
+  .protected-app .brand-copy small{font-size:9.5px!important}
+  .protected-app .app-actions>*:not(#themeToggle){display:none!important}
+  .protected-app #themeToggle{display:grid!important;width:40px!important;height:40px!important;border-radius:12px!important}
+
+  .main-shell{padding-top:14px!important;padding-bottom:98px!important}
+  .directory-intro{padding:0 0 13px!important;border:0!important;border-bottom:1px solid var(--index-line)!important;border-radius:0!important;background:transparent!important;display:block!important}
+  .directory-intro-with-art{display:block!important}
+  .directory-intro-art{display:none!important}
+  .directory-intro-kicker{font-size:9.5px!important}
+  .directory-intro h1{font-size:27px!important;margin:4px 0 4px!important}
+  .directory-intro p{font-size:12.5px!important}
+  .directory-intro-actions{margin-top:11px!important;display:flex!important;overflow:auto!important;scrollbar-width:none!important}
+  .directory-intro-actions::-webkit-scrollbar{display:none}
+  .directory-groups-link,.directory-update-link{min-height:38px!important;font-size:11px!important;flex:0 0 auto!important}
+
+  .main-homehunt-guide{margin-top:10px!important}
+  .main-homehunt-guide-inner{grid-template-columns:38px minmax(0,1fr) auto!important;gap:10px!important;padding:12px!important;border-radius:15px!important}
+  .main-homehunt-clean-icon{width:38px;height:38px;border-radius:12px}
+  .main-homehunt-clean-icon .material-symbols-rounded{font-size:20px}
+  .main-homehunt-kicker{font-size:8.5px!important}
+  .main-homehunt-copy h2{font-size:14.5px!important;margin:2px 0!important}
+  .main-homehunt-copy p{font-size:10.5px!important;line-height:1.4!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .main-homehunt-clean-points{display:none!important}
+  .main-homehunt-cta{width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;font-size:0!important;border-radius:11px!important}
+  .main-homehunt-cta .material-symbols-rounded{font-size:19px!important}
+
+  .explore-section{padding-top:22px!important}
+  .section-heading{margin-bottom:9px!important}
+  .section-heading h2{font-size:21px!important}
+  .desktop-view-switch{display:none!important}
+  .controls-panel{padding:10px!important;border-radius:15px!important}
+  .search-field{min-height:50px!important;grid-column:1/-1!important}
+  .search-field input{font-size:16px!important}
+  .search-shortcut{display:none!important}
+  .directory-control-actions{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:7px!important;margin-top:8px!important}
+  .filter-trigger,.sort-control-inline,.roommate-match-trigger,.saved-trigger{min-height:42px!important;width:100%!important;font-size:11px!important}
+  .sort-control-inline{grid-column:span 1!important}
+  .roommate-match-trigger{display:none!important}
+  .mobile-roommate-shortcut{display:flex!important;min-height:42px!important;border-radius:11px!important;font-size:11px!important}
+  .desktop-filters{display:none!important}
+  .quick-filter-row{margin:0 -14px!important;padding:10px 14px 3px!important}
+  .quick-filter-row button{min-height:36px!important;font-size:10.5px!important}
+  .first-use-hint{border-radius:13px!important;padding:10px!important}
+  .first-use-hint p{font-size:10.5px!important;line-height:1.45!important}
+  .results-bar{margin:8px 0!important}
+
+  .student-grid{grid-template-columns:1fr!important;gap:8px!important}
+  .student-card.student-card-v2.student-card-simple{min-height:78px!important;border-radius:14px!important;padding:13px 14px!important}
+  .student-card-simple-content{gap:6px!important}
+  .student-card-simple .student-card-title-row .student-name{font-size:15px!important}
+  .student-card-program-simple{font-size:11px!important;line-height:1.35!important}
+  .student-card-simple .student-card-simple-chevron{width:28px!important;height:28px!important}
+
+  .pagination{margin-top:18px!important}
+  .pagination-pages,.pagination-info{display:none!important}
+  .pagination-nav,.load-more-button{min-height:42px!important;border-radius:12px!important}
+
+  .app-mobile-nav.has-housing{display:grid!important;grid-template-columns:repeat(5,1fr)!important;position:fixed!important;left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;width:auto!important;border:1px solid var(--index-line)!important;border-radius:18px!important;background:var(--index-surface)!important;box-shadow:0 12px 34px rgba(28,22,18,.16)!important;backdrop-filter:blur(18px)!important;padding:5px!important;z-index:100!important}
+  .app-mobile-nav #mobileSavedButton{display:none!important}
+  .app-mobile-nav .mobile-nav-item{min-width:0!important;height:50px!important;border-radius:13px!important;gap:2px!important;padding:4px!important}
+  .app-mobile-nav .mobile-nav-icon{font-size:21px!important}
+  .app-mobile-nav small{font-size:9.5px!important;font-weight:700!important}
+  .app-mobile-nav .mobile-nav-item.active{background:color-mix(in srgb,var(--index-accent) 10%,var(--index-surface-solid))!important;color:var(--index-accent)!important}
+
+  .announcements-main,.groups-main,.me-main{padding-top:14px!important;padding-bottom:98px!important}
+  .announcements-hero,.groups-hero,.me-page-hero{padding:18px!important;border-radius:17px!important}
+  .announcements-hero h1,.groups-hero h1{font-size:27px!important}
+  .announcements-hero p,.groups-hero p{font-size:12px!important}
+  .announcements-directory,.groups-directory{padding-top:16px!important}
+  .site-footer{display:none!important}
+}
+
+@media(max-width:390px){
+  .directory-control-actions{grid-template-columns:1fr 1fr!important}
+  .saved-trigger{grid-column:auto!important}
+  .main-homehunt-copy p{display:none!important}
+}

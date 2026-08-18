@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="compact-motion.css?v=20260812-v2" />
   <link rel="stylesheet" href="warm-milan.css?v=20260815-navbar-v1" />
   <link rel="stylesheet" href="readability-v6.css?v=20260818-homehunt-v6-ux" />
+  <link rel="stylesheet" href="index-v10.css?v=20260818-index-clean-v10" />
 </head>
 <body>
   <div class="app-bg" aria-hidden="true"></div>
@@ -56,7 +57,7 @@
           </a>
           <a class="access-announcements-link" href="announcements.html"><span class="material-symbols-rounded" aria-hidden="true">notifications</span><span>University updates</span><i id="accessAnnouncementsUnread" class="access-announcements-unread" hidden>0</i><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
           <a class="access-announcements-link access-housing-link" href="housing.html"><span class="material-symbols-rounded" aria-hidden="true">home_work</span><span>Milan Home Hunt</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
-          <div class="access-homehunt-mini" aria-label="How Milan Home Hunt works"><span><b>1</b> Search real rental sites</span><span><b>2</b> Paste a listing</span><span><b>3</b> Review & compare</span></div>
+          <p class="access-homehunt-mini"><span class="material-symbols-rounded" aria-hidden="true">lightbulb</span> Search elsewhere, paste serious rental links into Home Hunt, and compare them there.</p>
           <button class="access-announcements-link access-install-link" id="accessInstallButton" type="button" hidden>
             <span class="material-symbols-rounded" aria-hidden="true">install_mobile</span><span id="accessInstallLabel">Install app</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
           </button>
@@ -159,21 +160,20 @@
       </div>
     </section>
 
-    <section class="main-homehunt-guide" aria-labelledby="mainHomeHuntGuideTitle">
+    <section class="main-homehunt-guide main-homehunt-guide-clean" aria-labelledby="mainHomeHuntGuideTitle">
       <div class="main-homehunt-guide-inner">
+        <div class="main-homehunt-clean-icon" aria-hidden="true"><span class="material-symbols-rounded">home_work</span></div>
         <div class="main-homehunt-copy">
-          <span class="main-homehunt-kicker"><span class="material-symbols-rounded" aria-hidden="true">home_work</span>MILAN HOME HUNT</span>
-          <h2 id="mainHomeHuntGuideTitle">Found a rental? Bring the link here.</h2>
-          <p>Search Milan on the real rental platforms, then let Home Hunt turn serious listings into one organized shortlist with costs, commute checks, questions and comparison.</p>
-          <a class="main-homehunt-cta" href="housing.html"><span>Open Home Hunt</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+          <span class="main-homehunt-kicker">MILAN HOME HUNT</span>
+          <h2 id="mainHomeHuntGuideTitle">Looking for a home in Milan?</h2>
+          <p>Search real rental sites, paste a serious listing, then compare costs and commute in one shortlist.</p>
+          <div class="main-homehunt-clean-points" aria-label="Home Hunt features">
+            <span><i class="material-symbols-rounded" aria-hidden="true">link</i>Paste a listing</span>
+            <span><i class="material-symbols-rounded" aria-hidden="true">payments</i>See real cost</span>
+            <span><i class="material-symbols-rounded" aria-hidden="true">compare_arrows</i>Compare homes</span>
+          </div>
         </div>
-        <div class="main-homehunt-steps" aria-label="Home Hunt quick guide">
-          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">travel_explore</span><div><strong>Search real rental sites</strong><small>HousingAnywhere and Spotahome for direct import; other listing links can still be saved manually.</small></div></div>
-          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">content_paste</span><div><strong>Paste the listing URL</strong><small>Home Hunt attempts to extract the important property details.</small></div></div>
-          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span><div><strong>Review before saving</strong><small>Confirm prices, fees, availability and anything the listing leaves unclear.</small></div></div>
-          <div class="main-homehunt-step"><span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span><div><strong>Compare and follow up</strong><small>Track favorites, commute, true cost, landlord questions and next steps.</small></div></div>
-          <div class="main-homehunt-platforms"><b>Private rentals only</b><span>No fake inventory</span><span>Local shortlist</span><span>Manual fallback</span></div>
-        </div>
+        <a class="main-homehunt-cta" href="housing.html"><span>Open Home Hunt</span><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
       </div>
     </section>
 
